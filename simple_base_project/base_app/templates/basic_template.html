@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+        {% endblock %}
+    </title>
+    {% block head_content %}
+    {% endblock %}
+</head>
+<body>
+<table>
+    <tr>
+        <td>
+            <h1 align="center">Текст шапки</h1>
+        </td>
+    </tr>
+</table>
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

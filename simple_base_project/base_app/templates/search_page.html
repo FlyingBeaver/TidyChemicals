@@ -1,0 +1,39 @@
+{% extends "basic_template.html" %}
+
+{% block title %}
+Search
+{% endblock %}
+
+
+{% block head_content %}
+<script type="text/javascript" language="javascript"
+        src="static/base_app/jsme_files/jsme/jsme.nocache.js">
+</script>
+<script>
+    function jsmeOnLoad() {
+        jsmeApplet = new JSApplet.JSME("jsme_container", "380px", "340px");
+    }
+</script>
+{% endblock %}
+
+
+{% block content %}
+<div id="jsme_container"></div>
+
+
+<p>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" id="field" name="mol">
+        <input type="submit" value="SEND">
+    </form>
+</p>
+
+<script type="text/javascript">
+  document.querySelector("div")
+    .addEventListener("click", function (event) {
+      var data = jsmeApplet.molFile(true);
+      document.getElementById("field").value = data;
+    })
+</script>
+{% endblock %}
