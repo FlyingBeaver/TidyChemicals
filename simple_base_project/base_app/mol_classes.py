@@ -26,7 +26,7 @@ from rdkit.Chem import MolFromSmiles
 from rdkit.Chem import MolToSmiles
 from rdkit.Chem import MolFromMolFile
 from rdkit.Chem import MolToMolBlock
-from rdkit.Chem.Descriptors import ExactMolWt
+from rdkit.Chem.Descriptors import MolWt
 from rdkit.Chem.Draw import MolToFile
 from rdkit.Chem.inchi import MolToInchi
 from rdkit.Chem.inchi import MolToInchiKey
@@ -122,7 +122,7 @@ class LazyMol(object):
             raise MyMolError(msg)
         self._rdmol = structure
         self.molecular_formula = CalcMolFormula(structure)
-        self.molar_weight = ExactMolWt(structure)
+        self.molar_weight = MolWt(structure)
         
     def process_block(self, structure: str, form: str):
         if form.lower() in ('mol', 'pdb'):
@@ -134,7 +134,7 @@ class LazyMol(object):
             raise ValueError(msg)
 
     def process_path_or_strrepr(self, structure: str):
-        if structure.startswith("InChi="):
+        if structure.lower().startswith("inchi="):
             rdmol = self.make_rdmol(structure, "inchi")
         elif structure.lower().endswith(".mol"):
             self.source_file_path = structure
@@ -213,7 +213,7 @@ class LazyMol(object):
 
     @property
     def charge(self):
-        formula = self.molecular_formula()
+        formula = self.molecular_formula
         # r"[+-]\d*" is for example to cut '-2' from 'HPO4-2'
         match = search(r"[+-]\d*", formula, ASCII)
         if match:
@@ -226,7 +226,8 @@ class LazyMol(object):
     def elements_list(self):
         formula = self.molecular_formula
         # for example 'C9H21SiCl- -> ['C', 'H', 'Si', 'Cl']
-        return findall(r"[A-Z][a-z]?", formula)
+        self._elements_list = findall(r"[A-Z][a-z]?", formula)
+        return self._elements_list
 
     @property
     def elements_dict(self, template: list = None):
@@ -236,7 +237,7 @@ class LazyMol(object):
             order of elements in OrderedDict returned.
         If template have some elements which the structure doesn't
             contain, they are just ignored.
-        If the structure have some elements which structure doesn't
+        If the structure have some elements which template doesn't
             contain, they appear in OrderedDict after those in template.
         If template is None, method returns usual dict
         """
@@ -246,8 +247,8 @@ class LazyMol(object):
 
         for i in symbols:
             # re searching for a number after string i
-            match = search(r"(?<=%s)*\d" % i, formula, ASCII)
-            dictionary[i] = (1 if match[0] == '' else int(match[0]))
+            match = search(r"(?<=%s)+\d+" % i, formula, ASCII)
+            dictionary[i] = (1 if not match else int(match[0]))
 
         if template:
             template_odict = OrderedDict(zip(template, [0]*len(template)))
@@ -258,20 +259,64 @@ class LazyMol(object):
             return dictionary
 
 
-class BuzyMol(LazyMol):
-	def __init__(self, *args, **kwargs):
-		super().__init__(self, *args, **kwargs)
-		        
-        methods = [self.charge,
-                   self.inchi,
-                   self.inchikey,
-                   self.smiles,
-                   self.mol_block,
-                   self.pdb_block,
-                   self.elements_list,
-                   self.elements_dict]
-        # Не помешал бы декоратор, который
-        # 1) Ловил бы в аргументах recalc
-        # 2) В зависимости от того, recalc или не recalc
-        # возвращал бы уже посчитанное или сохранял бы
-        
+# class BuzyMol(LazyMol):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(self, *args, **kwargs)
+#         properties_to_calc = [self.charge,
+#                               self.inchi,
+#                               self.inchikey,
+#                               self.smiles,
+#                               self.molblock,
+#                               self.pdbblock,
+#                               self.elements_list,
+#                               self.elements_dict]
+#         for i in properties_to_calc:
+#             i()
+#
+#     @staticmethod
+#     def if_already_calculated_just_return(method):
+#         method_and_attribute = {super().smiles: '_smiles',
+#                                 super().inchi: '_inchi',
+#                                 super().molblock: '_mol_block',
+#                                 super().pdbblock: '_pdb_block',
+#                                 super().inchikey: '_inchikey',
+#                                 super().charge: '_charge'}
+#
+#         def wrapper(self, recalc=False):
+#             if recalc or not getattr(self, method_and_attribute[method]):
+#                 attr_value = self.method()
+#                 setattr(self,
+#                         method_and_attribute[method],
+#                         attr_value)
+#                 return attr_value
+#             else:
+#                 return getattr(self, method_and_attribute[method])
+#         return wrapper
+#
+#     @if_already_calculated_just_return
+#     def smiles(self, *args, **kwargs):
+#         super().smiles(self, *args, **kwargs)
+#
+#     @if_already_calculated_just_return
+#     def inchi(self, *args, **kwargs):
+#         super().inchi(self, *args, **kwargs)
+#
+#     @if_already_calculated_just_return
+#     def molblock(self, *args, **kwargs):
+#         super().molblock(self, *args, **kwargs)
+#
+#     @if_already_calculated_just_return
+#     def pdbblock(self, *args, **kwargs):
+#         super().pdbblock(self, *args, **kwargs)
+#
+#     @if_already_calculated_just_return
+#     def inchikey(self, *args, **kwargs):
+#         super().inchikey(self, *args, **kwargs)
+#
+#     @if_already_calculated_just_return
+#     def charge(self, *args, **kwargs):
+#         super().charge
+#
+#     @if_already_calculated_just_return
+#     def elements_list(self, *args, **kwargs):
+#         super().elements_list(self, *args, **kwargs)
