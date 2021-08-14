@@ -120,6 +120,7 @@ class StoragePlace(models.Model):
     level = models.SmallIntegerField()
     parent = models.IntegerField(null=True)
     terminal = models.BooleanField()
+    path_str = models.CharField(max_length=1024)
 
     @classmethod
     def make_root(cls, root_name="Root"):
@@ -129,7 +130,7 @@ class StoragePlace(models.Model):
                                     f"{possible_roots}")
         elif not possible_roots:
             new_root = cls(name=root_name, level=0,
-                           parent=None, terminal=False)
+                           parent=None, terminal=False, path_str=root_name)
             new_root.save()
         else:
             root = possible_roots[0]
@@ -147,8 +148,11 @@ class StoragePlace(models.Model):
                             "StoragePlace class")
         level = parent.level
         level += 1
+        parent_path = parent.path_str
+        self_path = parent_path + '/' + name
         new_storage = cls(name=name, parent=parent,
-                          level=level, terminal=terminal)
+                          level=level, terminal=terminal,
+                          path_str=self_path)
         new_storage.save()
 
 
@@ -159,4 +163,3 @@ class QuantityUnit(models.Model):
     relation_to_basic = models.FloatField(null=True)
     comment = models.TextField()
     # Как минимум кг, г, л, мл, мг
-

@@ -258,6 +258,18 @@ class LazyMol(object):
         else:
             return dictionary
 
+    def __mod__(self, other):
+        """Check for presence of substructure in structure.
+        The order is:
+        STRUCTURE % SUBSTRUCTURE,
+        not vice versa!"""
+        if not isinstance(other, self.__class__):
+            raise TypeError(f"Second arg has wrong type: "
+                            f"{other.__class__}, must be LazyMol")
+        super_rdmol = self._rdmol
+        sub_rdmol = other._rdmol
+        return super_rdmol.HasSubstructMatch(sub_rdmol)
+
 
 # class BuzyMol(LazyMol):
 #     def __init__(self, *args, **kwargs):

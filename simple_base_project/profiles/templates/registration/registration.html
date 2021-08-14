@@ -1,0 +1,29 @@
+{% extends 'basic_template.html' %}
+
+{% block title %} Registration {% endblock %}
+
+
+{% block content %}
+
+
+<div class="blank_before"></div>
+
+<div class="wide_div">
+    <div></div>
+    <div class="form_cont">
+    <form method="post">
+        <table>
+        {% csrf_token %}
+        {{ form.as_table }}
+            <tr>
+                <td colspan="2" align="center">
+                    <input type="submit" value="Submit!!">
+                </td>
+            </tr>
+        </table>
+    </form>
+    </div>
+    <div></div>
+</div>
+
+{% endblock %}

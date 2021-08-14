@@ -16,6 +16,7 @@ body {
 	height: 120px;
 	padding: 5px;
 	box-sizing: border-box;
+	display: flex;
 }
 
 body > p {
@@ -23,8 +24,8 @@ body > p {
 }
 
 #logo {
-	float: left;
-	width: 200px;
+	flex: 1;
+	max-width: 200px;
 	border: 2px white solid;
 	margin: 5px;
 	height: 95px;
@@ -32,28 +33,31 @@ body > p {
 }
 
 .button_cont {
-	color: white;
-	float: right;
+    display: flex;
+	max-width: 150px;
+	flex: 1;
     margin: 5px;
+    padding: 3px 6px 3px 6px;
 	border: 1px white solid;
+    flex-direction: column;
 }
 
 .button {
+    display: flex;
 	background-color: white;
     color: blue;
-    width: 90px;
-    height: 40px;
-    margin: 5px;
+    margin: 3px 0px 3px 0px;
     box-sizing: border-box;
-    text-align: center;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
 }
 
 #middle {
-	float: left;
-	border: 2px white solid;
+    display: flex;
+	flex: 1;
 	margin: 5px;
-	height: 85px;
-
+    justify-content: right;
 }
 
 .menu {

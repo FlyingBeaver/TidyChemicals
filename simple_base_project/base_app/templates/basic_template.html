@@ -20,16 +20,42 @@
         <img align="center" src="{% static 'base_app/there_will_be_logo.png' %}" width="200">
     </p>
 
-    {% if menu %}
+
     <div id=middle>
-        {% for i in menu%}
-        <p><a href="{{ i.link }}" class="menu">{{ i.text }}</a></p>
-        {% endfor %}
+        {% if username %}
+        <p>You logged in is as {{username}}</p>
+        {% endif %}
+    </div>
+
+
+    {% if page_kind == "login" %}
+    <div class="button_cont">
+        <a href="/registration/">
+            <div class="button">
+                Registration
+            </div></a>
+    </div>
+    {% elif page_kind == "reg" %}
+    <div class="button_cont">
+        <a href="/login/">
+            <div class="button">
+                Login
+            </div></a>
+    </div>
+    {% else %}
+    <div class="button_cont">
+        <a href="/profile/">
+        <div class="button">
+            Profile
+        </div>
+        </a>
+        <a href="/logout/">
+        <div class="button">
+            Logout
+        </div></a>
     </div>
     {% endif %}
 
-    {% block top_right_corner %}
-    {% endblock %}
 </div>
 
 {% block content %}
