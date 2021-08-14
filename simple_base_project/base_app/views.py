@@ -8,3 +8,4 @@ def search_view(request):
                             f'<br>{request.POST["mol"]}')
     else:
         return render(request, 'search_page.html')
+

@@ -1,22 +1,36 @@
-<!DOCTYPE html>
+{% load static %}
+
+<!DOcTYPE html>
 <html lang="en">
 <head>
+    {% block head_content %}
+    {% endblock %}
     <meta charset="UTF-8">
     <title>
         {% block title %}
         {% endblock %}
     </title>
-    {% block head_content %}
-    {% endblock %}
+    <link rel="stylesheet" href="{% static 'base_app/style.css' %}">
 </head>
 <body>
-<table>
-    <tr>
-        <td>
-            <h1 align="center">Текст шапки</h1>
-        </td>
-    </tr>
-</table>
+
+
+<div id="header">
+    <p id="logo">
+        <img align="center" src="{% static 'base_app/there_will_be_logo.png' %}" width="200">
+    </p>
+
+    {% if menu %}
+    <div id=middle>
+        {% for i in menu%}
+        <p><a href="{{ i.link }}" class="menu">{{ i.text }}</a></p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block top_right_corner %}
+    {% endblock %}
+</div>
 
 {% block content %}
 {% endblock %}

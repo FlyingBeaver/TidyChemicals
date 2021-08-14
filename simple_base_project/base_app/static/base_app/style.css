@@ -1,0 +1,116 @@
+body {
+	background-color: azure;
+	width: 100%;
+	margin-top: 130px;
+	margin-right: 0px;
+	margin-left: 0px;
+	box-sizing: border-box;
+}
+
+#header {
+	position: absolute;
+	top: 0px;
+	background-color: CornflowerBlue;
+	color: white;
+	width: 100%;
+	height: 120px;
+	padding: 5px;
+	box-sizing: border-box;
+}
+
+body > p {
+	padding: 5px;
+}
+
+#logo {
+	float: left;
+	width: 200px;
+	border: 2px white solid;
+	margin: 5px;
+	height: 95px;
+
+}
+
+.button_cont {
+	color: white;
+	float: right;
+    margin: 5px;
+	border: 1px white solid;
+}
+
+.button {
+	background-color: white;
+    color: blue;
+    width: 90px;
+    height: 40px;
+    margin: 5px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#middle {
+	float: left;
+	border: 2px white solid;
+	margin: 5px;
+	height: 85px;
+
+}
+
+.menu {
+	padding: 3px;
+	margin: 0px;
+}
+
+.blank_before {
+    height: 50px;
+}
+
+.wide_div {
+    display: flex;
+}
+
+.form_cont {
+	box-sizing: border-box;
+	min-width: 630px;
+	background-color: white;
+}
+
+.wide_div div {
+    flex: 1;
+}
+
+.form_container_login {
+	box-sizing: border-box;
+	max-width: 300px;
+	background-color: white;
+}
+
+
+table {
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+}
+
+td {
+    color: blue;
+    font-size: 12px;
+}
+
+th {
+    align: left;
+    vertical-align: top;
+    padding-right: 5px;
+}
+
+.form_container_login th {
+    width: 30%;
+}
+
+.form_container_login tr>td {
+    width: 70%;
+}
+
+label {
+    font-weight: normal;
+    font-size: 14px;
+}
