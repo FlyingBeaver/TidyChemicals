@@ -16,14 +16,14 @@ def primary_search(search_order: OrderedDict, q_set=None):
         if not q_set:
             new_q_set = Chemical.objects \
                 .filter(chemicalelemetnrel__element=element_obj,
-                        chemicalelemetnrel__gte=index)
+                        chemicalelemetnrel__index__gte=index)
             return primary_search(search_order, new_q_set)
     elif len(search_order) == 1:
         elem_sym, index = search_order.popitem(last=False)
         element_obj = Element.get_by_symbol(elem_sym)
         new_q_set = \
             q_set.filter(chemicalelemetnrel__element=element_obj,
-                         chemicalelemetnrel__gte=index)
+                         chemicalelemetnrel__index__gte=index)
         return new_q_set
     else:
         raise SearchException("search_order всё.")

@@ -1,8 +1,13 @@
 import re
+import datetime
 from collections import OrderedDict
 from django.db import models
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from profiles.models import Profile
+
+
+DEFAULT_DATETIME = datetime.datetime(2012, 12, 21, 12, 21, 0)
 
 
 class DatabaseException(BaseException):
@@ -10,7 +15,7 @@ class DatabaseException(BaseException):
 
 
 class Chemical(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
     name_format = models.JSONField(max_length=256, blank=True)
     structure = models.JSONField(max_length=4096, blank=True)
@@ -19,9 +24,9 @@ class Chemical(models.Model):
     mol_block = models.TextField(blank=True)
     molecular_formula = models.CharField(max_length=128, blank=True)
     molar_mass = models.FloatField(blank=True)
-    synonym = models.TextField(null=True, blank=True)
-    comment = models.TextField(null=True, blank=True)
-    cas = models.IntegerField(null=True, blank=True)
+    synonym = models.TextField(blank=True)
+    comment = models.TextField(blank=True)
+    cas = models.IntegerField(null=True)
     storage_place = models.ForeignKey("StoragePlace",
                                       on_delete=models.PROTECT)
     # PROTECT -- нельзя будет удалить StaragePlace, пока в нём
@@ -32,7 +37,17 @@ class Chemical(models.Model):
     # PROTECT -- нельзя будет удалить единицу количества, пока
     # она используется хотя бы в одной из записей для обозначения
     # количества
-    hazard_pictograms = models.TextField(null=True)
+    hazard_pictograms = models.CharField(blank=True, max_length=256)
+    when_created = models.DateTimeField(default=DEFAULT_DATETIME)
+    when_updated = models.DateTimeField(default=DEFAULT_DATETIME)
+    who_created = models.ForeignKey(Profile,
+                                    on_delete=models.SET_NULL,
+                                    null=True,
+                                    related_name="created_chemical_records")
+    who_updated = models.ForeignKey(Profile,
+                                    on_delete=models.SET_NULL,
+                                    null=True,
+                                    related_name="updated_chemical_records")
 
     # Собирать все данные и упаковывать их в словарь должна
     # внешняя функция. Этот метод должен только принять
@@ -51,7 +66,11 @@ class Chemical(models.Model):
             StructElementRel.create(element, new_chemical, index)
 
     def update(self, summary: dict, ):
-        pass
+        reversed_dir = reversed(dir(self.__class__))
+        if not all(map(lambda x: x in reversed_dir, summary.keys())):
+            raise ValueError("Some wrong keys in 'summary' dict")
+        for key, value in summary.keys():
+            setattr(self, key, value)
 
 
 class Element(models.Model):
@@ -115,7 +134,7 @@ class StructElementRel(models.Model):
 
 
 class StoragePlace(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True, )
     name = models.CharField(max_length=32)
     level = models.SmallIntegerField()
     parent = models.IntegerField(null=True)
@@ -132,6 +151,7 @@ class StoragePlace(models.Model):
             new_root = cls(name=root_name, level=0,
                            parent=None, terminal=False, path_str=root_name)
             new_root.save()
+            return new_root
         else:
             root = possible_roots[0]
             if not root.terminal:
@@ -149,17 +169,24 @@ class StoragePlace(models.Model):
         level = parent.level
         level += 1
         parent_path = parent.path_str
-        self_path = parent_path + '/' + name
-        new_storage = cls(name=name, parent=parent,
+        self_path = str(parent_path) + '/' + name
+        parent_no = parent.id
+        new_storage = cls(name=name, parent=parent_no,
                           level=level, terminal=terminal,
                           path_str=self_path)
         new_storage.save()
+        return new_storage
 
 
 class QuantityUnit(models.Model):
     name = models.CharField(max_length=32, unique=True)
     unit_symbol = models.CharField(max_length=32, unique=True)
     measure_type = models.CharField(max_length=32)
-    relation_to_basic = models.FloatField(null=True)
-    comment = models.TextField()
+    relation_to_basic = models.DecimalField(max_digits=64,
+                                            decimal_places=32,
+                                            null=True)
+    comment = models.TextField(blank=True)
     # Как минимум кг, г, л, мл, мг
+
+    def __str__(self):
+        return str(self.name) + f"; symbol: {self.unit_symbol}"

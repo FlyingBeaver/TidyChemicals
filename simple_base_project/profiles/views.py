@@ -7,30 +7,6 @@ from . import forms
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from simple_base_project.settings import LOGIN_URL
-
-
-# class AuthView(View):
-#     @classmethod
-#     def as_view(cls, *args, **kwargs):
-#         def result(request):
-#             if isinstance(request.user, AnonymousUser):
-#                 return redirect(LOGIN_URL)
-#             else:
-#                 return super().as_view(*args, **kwargs)
-#         return result
-
-
-# class AnonymousOnlyView(View):
-#     @classmethod
-#     def as_view(cls, *args, **kwargs):
-#         def result(request):
-#             if not isinstance(request.user, AnonymousUser):
-#                 return redirect('')
-#             else:
-#                 return cls.(View.as_view)(cls, *args, **kwargs)
-#                 # return cls.parents_as_view(*args, **kwargs)
-#         return result
 
 
 class Mixin:
@@ -59,6 +35,9 @@ class LoginPage(Mixin, View):
     issues_message = "Не удолось совершить вход. " \
                      "Проверьте правильность введённых данных"
     page_kind = "login"
+    # TODO: Форма регистрации перенаправляет на логин,
+    # но было бы здорово, если бы при этом ещё и
+    # показывалось сообщение об успешной регистрации
 
     def post(self, request):
         form = self.form(request.POST)
@@ -67,12 +46,18 @@ class LoginPage(Mixin, View):
                                 password=form.cleaned_data['password'])
             if user is not None:
                 login(request, user)
+                print(user)
+                print("user is not none")
                 return redirect('/search')
+            else:
+                print('user is none')
+                return self.try_again(request)
         else:
             return self.try_again(request)
 
 
 class RegistrationPage(Mixin, View):
+    # TODO: Форма регистрации не показывает сообщения, исправить
     form = UserCreationForm
     template = 'registration/registration.html'
     issues_message = "Проверьте корректность введённых данных"
@@ -81,9 +66,10 @@ class RegistrationPage(Mixin, View):
     def post(self, request):
         form = self.form(request.POST)
         if form.is_valid():
-            return redirect('')
+            form.save()
+            return redirect('/')
         else:
-            self.try_again(request)
+            return self.try_again(request)
 
 
 @login_required
@@ -95,42 +81,3 @@ def logout_invisible(request):
 @login_required
 def HomePage(request):
     return redirect('/search/')
-
-##################################################
-
-
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('/search')
-        else:
-            form = forms.LoginForm()
-            message = "Вы ввели что-то не то"
-            return render(request, 'authentificate/login.html',
-                          {"form": form, 'message': message})
-    elif not isinstance(request.user, AnonymousUser):
-        return HttpResponse(f'<h1>Уже залогинился, брат: {request.user}</h1>')
-    else:
-        form = forms.LoginForm()
-        return render(request,
-                      'authentificate/login.html',
-                      context={"form": form})
-
-
-def registration_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return HttpResponse(f'<h1>Регистрация прошла успешно!</h1>')
-    else:
-        form = UserCreationForm()
-        return render(request, 'registration/registration.html',
-                      context={"form": form})
-
-
-
