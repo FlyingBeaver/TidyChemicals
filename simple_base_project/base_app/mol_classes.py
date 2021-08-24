@@ -105,6 +105,7 @@ class LazyMol(object):
         self._elements_list = None
         self._elements_dict = None
 
+        
         if isinstance(structure, Mol):
             self.process_rdmol(structure)
         elif not isinstance(structure, str):
@@ -138,7 +139,8 @@ class LazyMol(object):
             rdmol = self.make_rdmol(structure, "inchi")
         elif structure.lower().endswith(".mol"):
             self.source_file_path = structure
-            rdmol = self.make_rdmol(structure, "mol_file")
+            self.make_rdmol(structure, "mol_file")
+            return self
         elif structure.lower().endswith(".pdb"):
             rdmol = self.make_rdmol(structure, "pdb_file")
         # The check if it can be smiles:
@@ -153,7 +155,11 @@ class LazyMol(object):
         self.process_rdmol(rdmol)
 
     def make_rdmol(self, structure, key: str):
-        return self.FUNCS_FROM[key](structure)
+        result = self.FUNCS_FROM[key](structure)
+        if isinstance(result, None.__class__):
+            raise MyMolError("rdkit function returned None instead of "
+                             "an rdkit.Chem.rdchem.Mol object")
+        self.process_rdmol(result)
 
     def convert_to(self, key: str):
         return self.FUNCS_TO[key](self._rdmol)
@@ -229,7 +235,6 @@ class LazyMol(object):
         self._elements_list = findall(r"[A-Z][a-z]?", formula)
         return self._elements_list
 
-    @property
     def elements_dict(self, template: list = None):
         """
         In case of template != None
@@ -241,6 +246,9 @@ class LazyMol(object):
             contain, they appear in OrderedDict after those in template.
         If template is None, method returns usual dict
         """
+        if self._elements_dict and not template:
+            return self._elements_dict
+
         dictionary = dict()
         formula = self.molecular_formula
         symbols = self.elements_list
@@ -254,8 +262,12 @@ class LazyMol(object):
             template_odict = OrderedDict(zip(template, [0]*len(template)))
             raw_odict = template_odict | OrderedDict(dictionary)
             result = OrderedDict(filter(lambda x: x[1], raw_odict.items()))
+            if not self._elements_dict:
+                self._elements_dict = result
             return result
         else:
+            if not self._elements_dict:
+                self._elements_dict = dictionary
             return dictionary
 
     def __mod__(self, other):
@@ -269,66 +281,3 @@ class LazyMol(object):
         super_rdmol = self._rdmol
         sub_rdmol = other._rdmol
         return super_rdmol.HasSubstructMatch(sub_rdmol)
-
-
-# class BuzyMol(LazyMol):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(self, *args, **kwargs)
-#         properties_to_calc = [self.charge,
-#                               self.inchi,
-#                               self.inchikey,
-#                               self.smiles,
-#                               self.molblock,
-#                               self.pdbblock,
-#                               self.elements_list,
-#                               self.elements_dict]
-#         for i in properties_to_calc:
-#             i()
-#
-#     @staticmethod
-#     def if_already_calculated_just_return(method):
-#         method_and_attribute = {super().smiles: '_smiles',
-#                                 super().inchi: '_inchi',
-#                                 super().molblock: '_mol_block',
-#                                 super().pdbblock: '_pdb_block',
-#                                 super().inchikey: '_inchikey',
-#                                 super().charge: '_charge'}
-#
-#         def wrapper(self, recalc=False):
-#             if recalc or not getattr(self, method_and_attribute[method]):
-#                 attr_value = self.method()
-#                 setattr(self,
-#                         method_and_attribute[method],
-#                         attr_value)
-#                 return attr_value
-#             else:
-#                 return getattr(self, method_and_attribute[method])
-#         return wrapper
-#
-#     @if_already_calculated_just_return
-#     def smiles(self, *args, **kwargs):
-#         super().smiles(self, *args, **kwargs)
-#
-#     @if_already_calculated_just_return
-#     def inchi(self, *args, **kwargs):
-#         super().inchi(self, *args, **kwargs)
-#
-#     @if_already_calculated_just_return
-#     def molblock(self, *args, **kwargs):
-#         super().molblock(self, *args, **kwargs)
-#
-#     @if_already_calculated_just_return
-#     def pdbblock(self, *args, **kwargs):
-#         super().pdbblock(self, *args, **kwargs)
-#
-#     @if_already_calculated_just_return
-#     def inchikey(self, *args, **kwargs):
-#         super().inchikey(self, *args, **kwargs)
-#
-#     @if_already_calculated_just_return
-#     def charge(self, *args, **kwargs):
-#         super().charge
-#
-#     @if_already_calculated_just_return
-#     def elements_list(self, *args, **kwargs):
-#         super().elements_list(self, *args, **kwargs)
