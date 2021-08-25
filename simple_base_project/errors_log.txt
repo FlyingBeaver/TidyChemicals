@@ -1,0 +1,8 @@
+
+Wed Aug 25 15:45:57 2021: MyMolError at object with id=17766, name='Trolullatefe acolocl'
+
+Wed Aug 25 15:46:00 2021: MyMolError at object with id=19416, name='Fodimiolata'
+
+Wed Aug 25 15:57:03 2021: MyMolError at object with id=17766, name='Trolullatefe acolocl'
+
+Wed Aug 25 15:57:10 2021: MyMolError at object with id=19416, name='Fodimiolata'
