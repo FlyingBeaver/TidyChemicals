@@ -1,4 +1,4 @@
-from mol_classes import LazyMol
+from base_app.mol_classes import LazyMol
 import re
 
 
@@ -8,7 +8,7 @@ REQUIRED_KEYS = {'name',
                  'quantity_unit', 
                  'who_created'}
 
-FIELD_VALUES_TYPES = {'name': str, 
+FIELD_VALUES_TYPES = {'name': str,
                       'name_format': str, 
                       'structure': dict, 
                       'mol_block': str, 
@@ -25,6 +25,10 @@ FIELD_VALUES_TYPES = {'name': str,
                       'who_updated': 'Profile'}
 
 
+def join_set(set_: set):
+    return "'" + "', '".join(list(set_)) + "'"
+
+
 def summary_dict_validation(summary):
     """
     It checks:
@@ -36,44 +40,59 @@ def summary_dict_validation(summary):
     If summary is invalid, exception raised
     Method doesn't return anything
     """
-    for field_name in ["id", "when_created", "who_updated"]:
-        if field_name in summary:
-            raise ValueError(f"summary dict can't contain '"
-                             f"{field_name}' key, {field_name} "
-                             f"field is generated"
-                             f"automatically")
+    auto_gen_keys = {"id", "when_created", "who_updated"}
+    if auto_gen_keys & set(summary):
+        raise ValueError(f"summary dict can't contain '"
+                         f"{join_set(auto_gen_keys & set(summary))} "
+                         f"(generated automatically only)")
     extra_keys = set(summary) - set(FIELD_VALUES_TYPES)
     if extra_keys:
         raise ValueError(f"Some extra keys in 'summary' dict: "
-                         f"'{"', '".join(list(extra_keys))}'")
+                         f"'{join_set(extra_keys)}'")
     for key, value in summary.items():
-        if (isinstance(summary[key], FIELD_VALUES_TYPES[key]) or 
-                (summary[key].__class__.__name__ == 
-                 FIELD_VALUES_TYPES[key])):
-            raise TypeError("Some values in 'summary' dict have "
-                            "wrong types")
+        if isinstance(FIELD_VALUES_TYPES[key], str):
+            if summary[key].__class__.__name__ == FIELD_VALUES_TYPES[key]:
+                continue
+        else:
+            if isinstance(summary[key], FIELD_VALUES_TYPES[key]):
+                continue
+            else:
+                raise TypeError(f"Some values in 'summary' dict have "
+                                f"wrong types: key is {key}, type "
+                                f"is {summary[key].__class__}")
 
 
 def if_lacks_add_items(summary):
     """If 'summary' dict does contains 'structure' but
     'molar_mass', 'molecular_formula' and 'mol_block'
-    for some reason doesn's, this method will add
+    for some reason doesn't, this method will add
     them to 'summary'. Otherwise 'summary' won't be
     changed.
     Returns 'summary'
     """
+    # TODO Выглядит ужасно. Неплохо было бы переписать
     lacking_keys = filter(lambda x: not summary.get(x), 
                           ["molar_mass", 
                            "molecular_formula", 
                            "mol_block"])
-    if lacking_keys:
-        lazy_mol = LazyMol(summary["structure"])
+    lacking_keys_list = list(lacking_keys)
+    if lacking_keys_list:
+        lazy_mol = None
+
+        def make_lazymol(sum_dic):
+            """Function for reuse the same lazymol obj"""
+            nonlocal lazy_mol
+            if not lazy_mol:
+                lazy_mol = LazyMol(sum_dic["structure"]["inchi"])
+            return lazy_mol
+
         if not summary.get("molar_mass"):
-            summary["molar_mass"] = lazy_mol.molar_weight
+            summary["molar_mass"] = make_lazymol(summary).molar_weight
         if not summary.get("molecular_formula"):
-            summary["molecular_formula"] = lazy_mol.molecular_formula
+            summary["molecular_formula"] = \
+                make_lazymol(summary).molecular_formula
         if not summary.get["mol_block"]:
-            summary["mol_block"] = lazy_mol.molblock
+            summary["mol_block"] = make_lazymol(summary).molblock
     return summary
 
 
@@ -105,4 +124,4 @@ def check_and_correct(summary):
 
 def are_there_required_keys(summary):
     if not REQUIRED_KEYS <= set(summary):
-    	raise ValueError("Not all required keys are in summary")
+        raise ValueError("Not all required keys are in summary")

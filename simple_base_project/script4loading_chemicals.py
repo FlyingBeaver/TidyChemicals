@@ -115,8 +115,8 @@ class StructureLoader:
 
         # Quantity part
         if self.quantity_unit in [gram, milligram, milliliter]:
-            self.quantity = choice([100, 200, 300, 400, 500,
-                                    600, 700, 800, 900])
+            self.quantity = float(choice([100, 200, 300, 400, 500,
+                                          600, 700, 800, 900]))
         else:
             self.quantity = choice([1.0, 2.0, 1.5, 0.5])
 
@@ -155,15 +155,15 @@ class StructureLoader:
                        'storage_place': self.storage_place,
                        'quantity': self.quantity,
                        'quantity_unit': self.quantity_unit,
-                       'who_created': self.created_by,
-                       'who_updated': self.updated_by}
+                       'who_created': self.created_by}
         return fields_dict
 
 
 counter = 0
 for i in normal_files:
     loader = StructureLoader(i)
-    Chemical.create(loader.create_summary(),
+    summary_for_chemical_creation = loader.create_summary()
+    Chemical.create(summary_for_chemical_creation,
                     loader.loaded_structure.elements_dict())
     counter += 1
     if counter % 100 == 0:

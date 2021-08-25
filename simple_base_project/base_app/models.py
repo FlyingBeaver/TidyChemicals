@@ -7,9 +7,9 @@ from django.db import models
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from profiles.models import Profile
-from correction_and_validation import summary_dict_validation, 
-                                      check_and_correct,
-                                      are_there_required_keys
+from base_app.correction_and_validation import (summary_dict_validation,
+                                                check_and_correct,
+                                                are_there_required_keys)
 
 
 class DatabaseException(BaseException):
@@ -55,7 +55,6 @@ class Chemical(models.Model):
                                     null=True,
                                     related_name="updated_chemical_records")
 
-
     @classmethod
     def create(cls, summary: dict, elem_dict: (dict, OrderedDict)):
         are_there_required_keys(summary)
@@ -68,7 +67,6 @@ class Chemical(models.Model):
             ElementAbundance.increment(element)
             StructElementRel.create(element, new_chemical, index)
 
-
     def update(self, summary: dict, elem_dict: (dict, OrderedDict)):
         summary_dict_validation(summary)
         self.update_related(elem_dict)
@@ -76,7 +74,6 @@ class Chemical(models.Model):
         for key, value in summary.items():
             setattr(self, key, value)
         self.save()
-
 
     def update_related(self, elem_dict):
         relations = StructElementRel.objects.filter(chemical=self)
@@ -109,11 +106,11 @@ class Chemical(models.Model):
             StructElementRel.create(element, self, index)
             ElementAbundance.increment(element)
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         relations = StructElementRel.objects.filter(chemical=self)
         for rel in relations:
             ElementAbundance.decrement(rel.element)
-            rel.delete()
+        super().delete(*args, **kwargs)
 
 
 class Element(models.Model):
@@ -168,12 +165,16 @@ class ElementAbundance(models.Model):
 
     @classmethod
     def get_abundance_list(cls):
-        ordered_list_of_selves = list(cls.objects.all().order_by("-n_of_chemicals"))
-        list_of_symbols = list(map(lambda x: x.element.symbol, ordered_list_of_selves))
+        ordered_list_of_selves = \
+            list(cls.objects.all().order_by("-n_of_chemicals"))
+        list_of_symbols = list(map(lambda x: x.element.symbol,
+                                   ordered_list_of_selves)
+                               )
         return list_of_symbols
 
     def __str__(self):
-        result = f"ElementAbundance: {self.element} in {self.n_of_chemicals};"
+        result = (f"ElementAbundance: {self.element}"
+                  f" in {self.n_of_chemicals};")
         return result
 
 

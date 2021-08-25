@@ -44,6 +44,11 @@ def find_superstructures(mol_block):
     n = 0
     cleaned_results = []
     raw_results = primary_search(order_of_search, None)
+    print(60*"#")
+    print(60*"#")
+    print(f"found {len(raw_results)}")
+    print(60*"#")
+    print(60*"#")
     Matched = namedtuple("Matched", ["id", "uuid",
                                      "name", "storage_place"])
     for i in raw_results:

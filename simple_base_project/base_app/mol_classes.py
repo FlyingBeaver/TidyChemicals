@@ -104,8 +104,6 @@ class LazyMol(object):
         self._image_path = None
         self._elements_list = None
         self._elements_dict = None
-
-        
         if isinstance(structure, Mol):
             self.process_rdmol(structure)
         elif not isinstance(structure, str):
