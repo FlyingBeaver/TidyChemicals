@@ -1,0 +1,23 @@
+{% extends "basic_template.html" %}
+{% load static %}
+
+{% block title %}
+Search results
+{% endblock %}
+
+
+{% block head_content %}
+
+{% endblock %}
+<!-- Здесь должна быть ссылка на css-файл страницы поиска -->
+
+{% block content %}
+
+{% for image_file_name in images %}
+
+<img src="/static/base_app/{{ image_file_name }}" width="200">
+
+{% endfor %}
+
+
+{% endblock %}

@@ -38,7 +38,7 @@ gram = find_unit_by_symbol('g')
 kilogram = find_unit_by_symbol('kg')
 
 
-with open("11thousands_of_generated_names.txt", "rt", encoding="utf-8") as f:
+with open("11thousands_of_fake_names.txt", "rt", encoding="utf-8") as f:
     long_string = f.read()
     GENERATED_NAMES = list(map(lambda x: x.strip(), long_string.split('\n')))
 name_number = 0

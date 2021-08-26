@@ -1,0 +1,10 @@
+mol_files/
+/monday_dump.json
+/errors_log
+.idea/
+__pycache__/
+profiles/migrations/
+base_app/migrations/
+*.svg
+*.pyc
+!__init__.py

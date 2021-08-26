@@ -90,7 +90,7 @@ class LazyMol(object):
                   "pdb_file": MolFromPDBFile,
                   "pdb_block": MolFromPDBBlock}
 
-    def __init__(self, structure, form:(None, str)=None):
+    def __init__(self, structure, form:(None, str)=None, calc_mwmf=True):
         self._rdmol = None
         self.molecular_formula = None
         self.molar_weight = None
@@ -104,6 +104,7 @@ class LazyMol(object):
         self._image_path = None
         self._elements_list = None
         self._elements_dict = None
+        self._calc_mwmf = calc_mwmf
         if isinstance(structure, Mol):
             self.process_rdmol(structure)
         elif not isinstance(structure, str):
@@ -120,12 +121,15 @@ class LazyMol(object):
             msg = "Mol object is None. Looks like convertion error happened"
             raise MyMolError(msg)
         self._rdmol = structure
-        self.molecular_formula = CalcMolFormula(structure)
-        self.molar_weight = MolWt(structure)
+        if self._calc_mwmf:
+            self.molecular_formula = CalcMolFormula(structure)
+            self.molar_weight = MolWt(structure)
         
     def process_block(self, structure: str, form: str):
         if form.lower() in ('mol', 'pdb'):
             self.make_rdmol(structure, form.lower() + "_block")
+        elif form.lower in ('mol_block', 'pdb_block'):
+            self.make_rdmol(structure, form.lower())
         elif form.lower() in ('smiles', 'inchi'):
             self.make_rdmol(structure, form.lower())
         else:

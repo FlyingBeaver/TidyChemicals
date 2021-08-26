@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'profiles',
-    'base_app',
+    'base_app.apps.BaseAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -134,3 +134,7 @@ LOGIN_URL = '/login/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# From which linear notation render pictures: "mol", "inchi"
+
+NOTATION_FOR_RENDERING = "inchi"

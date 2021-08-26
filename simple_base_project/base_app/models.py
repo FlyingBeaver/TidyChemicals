@@ -122,7 +122,7 @@ class Element(models.Model):
                                           through="StructElementRel")
 
     def __str__(self):
-        return f"Element: {self.symbol}"
+        return self.symbol
 
     @classmethod
     def get_by_symbol(cls, symbol: str):
@@ -132,6 +132,9 @@ class Element(models.Model):
             raise ValueError(f"Method get_by_symbol(): element "
                              f"with symbol '{symbol}' does not exist")
         return element
+
+    class Meta:
+        ordering = ["z"]
 
 
 class ElementAbundance(models.Model):
@@ -166,14 +169,14 @@ class ElementAbundance(models.Model):
     @classmethod
     def get_abundance_list(cls):
         ordered_list_of_selves = \
-            list(cls.objects.all().order_by("-n_of_chemicals"))
+            list(cls.objects.all().order_by("n_of_chemicals"))
         list_of_symbols = list(map(lambda x: x.element.symbol,
                                    ordered_list_of_selves)
                                )
         return list_of_symbols
 
     def __str__(self):
-        result = (f"ElementAbundance: {self.element}"
+        result = (f"{self.element}"
                   f" in {self.n_of_chemicals};")
         return result
 
@@ -189,6 +192,7 @@ class StructElementRel(models.Model):
 
     class Meta:
         unique_together = [["element", "chemical"]]
+        verbose_name = "ManyToMany table with n of atoms field"
 
     @classmethod
     def create(cls, element: Element, chemical: Chemical, index: int):
@@ -242,6 +246,9 @@ class StoragePlace(models.Model):
                           path_str=self_path)
         new_storage.save()
         return new_storage
+
+    def __str__(self):
+        return self.path_str
 
 
 class QuantityUnit(models.Model):
