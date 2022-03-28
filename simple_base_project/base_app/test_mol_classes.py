@@ -61,54 +61,94 @@ class TestLazyMol(unittest.TestCase):
 
 
     def test_elements_list(self):
-        self.assertEqual(sorted(self.water.elements_list), sorted(sub.water['elements_list']))
-        self.assertEqual(sorted(self.nacl.elements_list), sorted(sub.nacl['elements_list']))
-        self.assertEqual(sorted(self.iproh.elements_list), sorted(sub.iproh['elements_list']))
-        self.assertEqual(sorted(self.stigm.elements_list), sorted(sub.stigm['elements_list']))
-        self.assertEqual(sorted(self.tio2.elements_list), sorted(sub.tio2['elements_list']))
-        self.assertEqual(sorted(self.cuso4aq.elements_list), sorted(sub.cuso4aq['elements_list']))
-        self.assertEqual(sorted(self.ti_ipro4.elements_list), sorted(sub.ti_ipro4['elements_list']))
-        self.assertEqual(sorted(self.so4.elements_list), sorted(sub.so4['elements_list']))
+        self.assertEqual(sorted(self.water.elements_list), 
+                         sorted(sub.water['elements_list']))
+        self.assertEqual(sorted(self.nacl.elements_list), 
+                         sorted(sub.nacl['elements_list']))
+        self.assertEqual(sorted(self.iproh.elements_list), 
+                         sorted(sub.iproh['elements_list']))
+        self.assertEqual(sorted(self.stigm.elements_list), 
+                         sorted(sub.stigm['elements_list']))
+        self.assertEqual(sorted(self.tio2.elements_list), 
+                         sorted(sub.tio2['elements_list']))
+        self.assertEqual(sorted(self.cuso4aq.elements_list), 
+                         sorted(sub.cuso4aq['elements_list']))
+        self.assertEqual(sorted(self.ti_ipro4.elements_list), 
+                         sorted(sub.ti_ipro4['elements_list']))
+        self.assertEqual(sorted(self.so4.elements_list), 
+                         sorted(sub.so4['elements_list']))
 
     def test_elements_dict(self):
-        self.assertEqual(self.water.elements_dict, sub.water['elements_dict'])
-        self.assertEqual(self.nacl.elements_dict, sub.nacl['elements_dict'])
-        self.assertEqual(self.iproh.elements_dict, sub.iproh['elements_dict'])
-        self.assertEqual(self.stigm.elements_dict, sub.stigm['elements_dict'])
-        self.assertEqual(self.tio2.elements_dict, sub.tio2['elements_dict'])
-        self.assertEqual(self.cuso4aq.elements_dict, sub.cuso4aq['elements_dict'])
-        self.assertEqual(self.ti_ipro4.elements_dict, sub.ti_ipro4['elements_dict'])
-        self.assertEqual(self.so4.elements_dict, sub.so4['elements_dict'])
+        self.assertEqual(self.water.elements_dict, 
+                         sub.water['elements_dict'])
+        self.assertEqual(self.nacl.elements_dict, 
+                         sub.nacl['elements_dict'])
+        self.assertEqual(self.iproh.elements_dict, 
+                         sub.iproh['elements_dict'])
+        self.assertEqual(self.stigm.elements_dict, 
+                         sub.stigm['elements_dict'])
+        self.assertEqual(self.tio2.elements_dict, 
+                         sub.tio2['elements_dict'])
+        self.assertEqual(self.cuso4aq.elements_dict, 
+                         sub.cuso4aq['elements_dict'])
+        self.assertEqual(self.ti_ipro4.elements_dict, 
+                         sub.ti_ipro4['elements_dict'])
+        self.assertEqual(self.so4.elements_dict, 
+                         sub.so4['elements_dict'])
 
     def test_inchikey(self):
-        self.assertEqual(self.water.inchikey, sub.water['inchikey'])
-        self.assertEqual(self.nacl.inchikey, sub.nacl['inchikey'])
-        self.assertEqual(self.iproh.inchikey, sub.iproh['inchikey'])
-        self.assertEqual(self.stigm.inchikey, sub.stigm['inchikey'])
-        self.assertEqual(self.tio2.inchikey, sub.tio2['inchikey'])
-        self.assertEqual(self.cuso4aq.inchikey, sub.cuso4aq['inchikey'])
-        self.assertEqual(self.ti_ipro4.inchikey, sub.ti_ipro4['inchikey'])
-        self.assertEqual(self.so4.inchikey, sub.so4['inchikey'])
+        self.assertEqual(self.water.inchikey, 
+                         sub.water['inchikey'])
+        self.assertEqual(self.nacl.inchikey, 
+                         sub.nacl['inchikey'])
+        self.assertEqual(self.iproh.inchikey, 
+                         sub.iproh['inchikey'])
+        self.assertEqual(self.stigm.inchikey, 
+                         sub.stigm['inchikey'])
+        self.assertEqual(self.tio2.inchikey, 
+                         sub.tio2['inchikey'])
+        self.assertEqual(self.cuso4aq.inchikey, 
+                         sub.cuso4aq['inchikey'])
+        self.assertEqual(self.ti_ipro4.inchikey, 
+                         sub.ti_ipro4['inchikey'])
+        self.assertEqual(self.so4.inchikey, 
+                         sub.so4['inchikey'])
 
     def test_molecular_formula(self):
-        self.assertEqual(brutto_list(self.water.molecular_formula), brutto_list(sub.water['molecular_formula']))
-        self.assertEqual(brutto_list(self.nacl.molecular_formula), brutto_list(sub.nacl['molecular_formula']))
-        self.assertEqual(brutto_list(self.iproh.molecular_formula), brutto_list(sub.iproh['molecular_formula']))
-        self.assertEqual(brutto_list(self.stigm.molecular_formula), brutto_list(sub.stigm['molecular_formula']))
-        self.assertEqual(brutto_list(self.tio2.molecular_formula), brutto_list(sub.tio2['molecular_formula']))
-        self.assertEqual(brutto_list(self.cuso4aq.molecular_formula), brutto_list(sub.cuso4aq['molecular_formula']))
-        self.assertEqual(brutto_list(self.ti_ipro4.molecular_formula), brutto_list(sub.ti_ipro4['molecular_formula']))
-        self.assertEqual(brutto_list(self.so4.molecular_formula), brutto_list(sub.so4['molecular_formula']))
+        self.assertEqual(brutto_list(self.water.molecular_formula), 
+                         brutto_list(sub.water['molecular_formula']))
+        self.assertEqual(brutto_list(self.nacl.molecular_formula), 
+                         brutto_list(sub.nacl['molecular_formula']))
+        self.assertEqual(brutto_list(self.iproh.molecular_formula), 
+                         brutto_list(sub.iproh['molecular_formula']))
+        self.assertEqual(brutto_list(self.stigm.molecular_formula), 
+                         brutto_list(sub.stigm['molecular_formula']))
+        self.assertEqual(brutto_list(self.tio2.molecular_formula), 
+                         brutto_list(sub.tio2['molecular_formula']))
+        self.assertEqual(brutto_list(self.cuso4aq.molecular_formula), 
+                         brutto_list(sub.cuso4aq['molecular_formula']))
+        self.assertEqual(brutto_list(self.ti_ipro4.molecular_formula), 
+                         brutto_list(sub.ti_ipro4['molecular_formula']))
+        self.assertEqual(brutto_list(self.so4.molecular_formula), 
+                         brutto_list(sub.so4['molecular_formula']))
 
     def test_molar_weight(self):
-        self.assertEqual(self.water.molar_weight, sub.water["molar_weight"])
-        self.assertEqual(self.nacl.molar_weight, sub.nacl["molar_weight"])
-        self.assertEqual(self.iproh.molar_weight, sub.iproh["molar_weight"])
-        self.assertEqual(self.stigm.molar_weight, sub.stigm["molar_weight"])
-        self.assertEqual(self.tio2.molar_weight, sub.tio2["molar_weight"])
-        self.assertEqual(self.cuso4aq.molar_weight, sub.cuso4aq["molar_weight"])
-        self.assertEqual(self.ti_ipro4.molar_weight, sub.ti_ipro4["molar_weight"])
-        self.assertEqual(self.so4.molar_weight, sub.so4["molar_weight"])
+        self.assertEqual(self.water.molar_weight, 
+                         sub.water["molar_weight"])
+        self.assertEqual(self.nacl.molar_weight, 
+                         sub.nacl["molar_weight"])
+        self.assertEqual(self.iproh.molar_weight, 
+                         sub.iproh["molar_weight"])
+        self.assertEqual(self.stigm.molar_weight, 
+                         sub.stigm["molar_weight"])
+        self.assertEqual(self.tio2.molar_weight, 
+                         sub.tio2["molar_weight"])
+        self.assertEqual(self.cuso4aq.molar_weight, 
+                         sub.cuso4aq["molar_weight"])
+        self.assertEqual(self.ti_ipro4.molar_weight, 
+                         sub.ti_ipro4["molar_weight"])
+        self.assertEqual(self.so4.molar_weight, 
+                         sub.so4["molar_weight"])
 
 
 if __name__ == "__main__":

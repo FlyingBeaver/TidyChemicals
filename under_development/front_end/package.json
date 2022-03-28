@@ -1,0 +1,17 @@
+{
+  "name": "search_form_for_tidyChemicals",
+  "version": "0.2.0",
+  "description": "Making form page",
+  "main": "new13.html",
+  "dependencies": {
+    "coffeescript": "^1.12.7",
+    "jest": "^27.5.1",
+    "puppeteer": "^13.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Aliaksandr Karaliou",
+  "license": "MIT"
+}

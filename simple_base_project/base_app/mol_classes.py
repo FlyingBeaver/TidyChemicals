@@ -55,25 +55,28 @@ class LazyMol(object):
     Экземпляр класса -- объект, содержащий в себе объект типа
     rdkit.Chem.rdchem.Mol, который при инстанцировании передаётся
     конструктору или создаётся конструктором конвертированием строки
-    со smiles, inchi, mol block, pdb block, или содержащей путь к файлу
-    типа .mol или .pdb
+    со smiles, inchi, mol block, pdb block, или содержащей путь к 
+    файлу типа .mol или .pdb
     '''
     # SMILES_RE is a regular expression that checks
     # potential smiles string. re.fullmatch() matches if
     # all symbols in evaluated string can be in smiles
     SMILES_RE = r"[-A-Za-z0-9=#:@[\]+()/\\$.]+"
     TYPE_ERROR_MSG = ("Type of a 'structure' argument must be "
-                      "'rdkit.Chem.rdchem.Mol' or str, but it's {}")
-    WRONG_FORM_VALUE = ("Unknown 'form' value: {}. It says what kind of "
-                        "text data 'structure' variable contains and must be "
-                        "one of these: 'mol', 'pdb', 'inchi', 'smiles'. For "
-                        "paths to files they are not required")
-    STRING_VALUE_ERROR_MSG = ("Invalid 'structure' value. If string '{}' "
-                              "supposed to be smiles, it most likely to be "
-                              "caused by some issues with it's validity, but "
-                              "for some valid representations (like C#O, not "
-                              "CO) cause aren't recognized as valid because "
-                              "of some rdkit bugs")
+                      "'rdkit.Chem.rdchem.Mol' or str, but it's"
+                      " {}")
+    WRONG_FORM_VALUE = ("Unknown 'form' value: {}. It says what "
+                        "kind of text data 'structure' variable "
+                        "contains and must be one of these: 'mol', "
+                        "'pdb', 'inchi', 'smiles'. For paths to "
+                        "files they are not required")
+    STRING_VALUE_ERROR_MSG = ("Invalid 'structure' value. If string "
+                              "'{}' supposed to be smiles, it most "
+                              "likely to be caused by some issues "
+                              "with it's validity, but for some "
+                              "valid representations (like C#O, not "
+                              "CO) cause aren't recognized as valid "
+                              "because of some rdkit bugs")
 
     FUNCS_TO = {"smiles": MolToSmiles,
                 "inchi": MolToInchi,
@@ -90,7 +93,8 @@ class LazyMol(object):
                   "pdb_file": MolFromPDBFile,
                   "pdb_block": MolFromPDBBlock}
 
-    def __init__(self, structure, form:(None, str)=None, calc_mwmf=True):
+    def __init__(self, structure, form:(None, str)=None, 
+                 calc_mwmf=True):
         self._rdmol = None
         self.molecular_formula = None
         self.molar_weight = None
@@ -118,7 +122,8 @@ class LazyMol(object):
         
     def process_rdmol(self, structure: Mol):
         if structure is None:
-            msg = "Mol object is None. Looks like convertion error happened"
+            msg = ("Mol object is None. Looks like "
+                   "convertion error happened")
             raise MyMolError(msg)
         self._rdmol = structure
         if self._calc_mwmf:
@@ -159,8 +164,8 @@ class LazyMol(object):
     def make_rdmol(self, structure, key: str):
         result = self.FUNCS_FROM[key](structure)
         if isinstance(result, None.__class__):
-            raise MyMolError("rdkit function returned None instead of "
-                             "an rdkit.Chem.rdchem.Mol object")
+            raise MyMolError("rdkit function returned None instead "
+                             "of an rdkit.Chem.rdchem.Mol object")
         self.process_rdmol(result)
 
     def convert_to(self, key: str):
@@ -211,9 +216,14 @@ class LazyMol(object):
         Wrapper for rdkit function MolToFile
         MolToFile can save only to pdf, svg, ps, and png
         """
-        MolToFile(self._rdmol, filename, size=size, kekulize=kekulize,
-                  wedgeBonds=wedge_bonds, imageType=file_type,
-                  fitImage=fit_image, options=options, **kwargs)
+        MolToFile(self._rdmol, filename, 
+                  size=size, 
+                  kekulize=kekulize,
+                  wedgeBonds=wedge_bonds, 
+                  imageType=file_type,
+                  fitImage=fit_image, 
+                  options=options, 
+                  **kwargs)
         self._image_path = filename
 
     def __contains__(self, element_symbol):
@@ -245,7 +255,8 @@ class LazyMol(object):
         If template have some elements which the structure doesn't
             contain, they are just ignored.
         If the structure have some elements which template doesn't
-            contain, they appear in OrderedDict after those in template.
+            contain, they appear in OrderedDict after those in 
+            template.
         If template is None, method returns usual dict
         """
         if self._elements_dict and not template:
@@ -261,9 +272,11 @@ class LazyMol(object):
             dictionary[i] = (1 if not match else int(match[0]))
 
         if template:
-            template_odict = OrderedDict(zip(template, [0]*len(template)))
+            template_odict = OrderedDict(zip(template, 
+                                             [0]*len(template)))
             raw_odict = template_odict | OrderedDict(dictionary)
-            result = OrderedDict(filter(lambda x: x[1], raw_odict.items()))
+            result = OrderedDict(filter(lambda x: x[1], 
+                                        raw_odict.items()))
             if not self._elements_dict:
                 self._elements_dict = result
             return result
