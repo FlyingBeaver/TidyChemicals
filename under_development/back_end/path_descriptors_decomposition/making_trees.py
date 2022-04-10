@@ -25,7 +25,7 @@ class AtomTree(Tree):
     
     def create_atom_node(self, atom: Atom, parent: (None, Atom)=None):
         if parent:
-            # IT'S BRANCH
+            # IT'S A BRANCH
             atom_id = atom.GetIdx()
             parent_id = parent.GetIdx()
             element_symbol = atom.GetSymbol()
@@ -34,7 +34,7 @@ class AtomTree(Tree):
             bond_symbol = BOND_SYMBOLS[str(bond.GetBondType())]
             atom_data = AtomData(element_symbol, bond_symbol)
         else:
-            # IT'S ROOT
+            # IT'S A ROOT
             self.level_no = 0
             self.root_index = atom.GetIdx()
             atom_id = self.root_index
@@ -60,12 +60,22 @@ class AtomTree(Tree):
         atom_neighbors = atom_Atom.GetNeighbors()
         for neig in atom_neighbors:
             neig_id = neig.GetIdx()
-            # if node with this id already not in tree,
+            # if node with this id already is in tree,
             # tree.get_node(id) gives False
+            # Здесь попробовать поменять условие "новый атом"
+            # на "не родительский атом": 
+            # its_not_parent_atom = (neig_id != atom_id)
+            # и поменять its_new_neighbor_atom на its_not_parent_atom
+            # ORIGINAL:
             its_new_neighbor_atom = not self.get_node(neig_id)
             if its_new_neighbor_atom:
                 self.next_level.add(neig_id)
                 self.create_atom_node(neig, parent=atom_Atom)
+            # MODIFIED
+            # its_not_parent_atom = (neig_id != atom_id)
+            # if its_not_parent_atom:
+            #     self.next_level.add(neig_id)
+            #     self.create_atom_node(neig, parent=atom_Atom)
 
 
 def main():

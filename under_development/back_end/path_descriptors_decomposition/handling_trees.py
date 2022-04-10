@@ -1,10 +1,11 @@
 from copy import copy, deepcopy
 from collections import Counter
 from itertools import combinations
+from pprint import pprint
 from rdkit.Chem import MolFromSmiles
 from rdkit.Chem.rdchem import Mol
 from rdkit.Chem.rdchem import Atom
-from making_trees import AtomTree
+from making_trees import AtomTree, BOND_SYMBOLS
 
 
 def make_path_dicts(molecule: Mol):
@@ -28,16 +29,19 @@ class TreeHandler:
         self.make_level_sets()
 
     def make_level_sets(self):
-        """
+        """Fills rect.paths_list, transposed_paths, level_sets fields
+
         It saves 2d array of atom_id's made by Tree's method
         'paths_to_leaves'. Then transforms it into rectangular
         matrix, adding None's to make lists of equal lengthes.
         Then transposes it and transforms every column to set,
         removes None's from sets (self.level_sets)
+
+        Does not return anything
         """
         self.rectangular_paths_list = []
         for i in range(len(self.paths_to_leaves)):
-            delta = len(self.paths_to_leaves[i]) - self.max_length
+            delta = self.max_length - len(self.paths_to_leaves[i])
             list_to_add = copy(self.paths_to_leaves[i])
             list_to_add.extend([None] * delta)
             self.rectangular_paths_list.append(list_to_add)
@@ -46,44 +50,55 @@ class TreeHandler:
                                    list(self.transposed_paths)))
 
     def find_common_nodes(self, other):
+        """
+        There are two possible intersection patterns:
+        [a, b, c, X, Y] [d, e, f, Y, X] and
+        [a, b, c, X] [d, e, f, X]
+        Code here finds approximate index of intersection
+        level and...
+        """
         if not isinstance(other, self.__class__):
             raise TypeError("Argument must be TreeHandler")
         length = min(self.max_length, other.max_length)
         intersection_position = None
-        for i in range(1, length):
-            intersection_set = (
-                                (self.level_sets[i] | self.level_sets[i + 1]) &
-                                (other.level_sets[i] | other.level_sets[i + 1])
-                                )
-            if intersection_set:
-                # то нужно провести сравнение отдельными множествами
-                intersection_position = i
-                return self.specify_found(intersection_position, other)
-
-    def specify_found(self,
-                      intersection_position: int,
-                      other):
-        second_position = intersection_position + 1
-        possible_result = (self.level_sets[second_position] &
-                           other.level_sets[second_position])
-        if possible_result:
-            return possible_result, intersection_position
+        for i in range(length - 1):
+            true_if_even_intersection = \
+                (self.level_sets[i] & other.level_sets[i + 1]
+                ) and (
+                other.level_sets[i] & self.level_sets[i + 1])
+            true_if_odd_intersection = \
+                (self.level_sets[i + 1] & other.level_sets[i + 1])
+            if true_if_odd_intersection:
+                return self.process_odd_intersection(other, i + 1)
+            elif true_if_even_intersection:
+                return self.process_even_intersection(other, i)
         else:
-            list_of_pairs1 = list(
-                zip(self.transposed_paths[intersection_position],
-                    self.transposed_paths[second_position])
-            )
-            list_of_pairs2_raw = list(
-                zip(other.transposed_paths[intersection_position],
-                    other.transposed_paths[second_position])
-            )
-            list_of_pairs2 = list(map(lambda x: (x[1], x[0]),
-                                      list_of_pairs2_raw))
-            common_pairs = set(list_of_pairs1) & set(list_of_pairs2)
-            if common_pairs:
-                return set(common_pairs.pop()), intersection_position
-            else:
-                raise ValueError("??????????")
+            raise RuntimeError("intersection not found2")
+
+    def process_even_intersection(self, other, intersection_position):
+        """Будет возвращать список тьюплов"""
+        intersection_near = (self.level_sets[intersection_position] &
+                        other.level_sets[intersection_position + 1])
+        intersection_far = (self.level_sets[intersection_position + 1] &
+                        other.level_sets[intersection_position])
+        result = []
+        # для каждого члена множества интерсекшн нужно найти его вхождения 
+        # в self.transposed_paths[intersection_position]
+        #    для каждого вхождения нужно найти 
+        #    self.transposed_paths[intersection_position + 1][index]
+        #        и если он входит в intersection_far
+        for i in intersection_near:
+            for j in self.appearance_indices(self.transposed_paths[intersection_position], i):
+                if self.transposed_paths[intersection_position + 1][j] in intersection_far:
+                    result.append((self.transposed_paths[intersection_position][j],
+                                   self.transposed_paths[intersection_position + 1][j])
+                    )
+        return result, intersection_position
+
+    def process_odd_intersection(self, other, intersection_position):
+        """Будет возвращать список целых чисел"""
+        return list(self.level_sets[intersection_position] &
+                    other.level_sets[intersection_position]), intersection_position
 
     def make_pathlist_to_leaf_int(self, node_id: int, position: int):
         list_number = self.transposed_paths[position].index(node_id)
@@ -108,12 +123,13 @@ class TreeHandler:
             atom_id1, atom_id2 = atom_id2, atom_id1
         else:
             raise ValueError("At least one atom_id isn't in a column")
-        row_no = self.transposed_paths[position].index(atom_id1)
-        row_no2 = self.transposed_paths[position + 1].index(atom_id2)
-        if row_no != row_no2:
-            raise ValueError("There are different row numbers")
+        column1 = self.transposed_paths[position]
+        column2 = self.transposed_paths[position + 1]
+        column_of_pairs = list(zip(column1, column2))
+        row_no = column_of_pairs.index((atom_id1, atom_id2))
+        
         atom_id_row = self.rectangular_paths_list[row_no]
-        truncated_atom_id_row = atom_id_row[:max(atom_id1, atom_id2) + 1]
+        truncated_atom_id_row = atom_id_row[:position + 2]
         return truncated_atom_id_row
     
     @staticmethod
@@ -125,14 +141,33 @@ class TreeHandler:
         else:
             raise ValueError(f"Pathlists {path1} and"
                              f" {path2} can't be united")
+    
+    @staticmethod
+    def appearance_indices(the_list, element):
+        result = []
+        index = 0
+        while True:
+            try:
+                index = the_list.index(element, index)
+            except ValueError:
+                return result
+            result.append(index)
+            index += 1
 
     def make_raw_pathstring(self, pathlist: list):
         result = ''
         for index, node_id in enumerate(pathlist):
-            result += self.tree.get_node(node_id).data.elem_symbol
+            node_itself = self.tree.get_node(node_id)
+            if node_itself:
+                result += node_itself.data.elem_symbol
+            else:
+                result += self.tree.molecule.GetAtomWithIdx(node_id).GetSymbol()
             if index < len(pathlist) - 1:
-                bond_symbol = self.tree.get_node(pathlist[index + 1]
-                                                 ).data.bond_to_parent
+                bond_object = self.tree.molecule.GetBondBetweenAtoms(
+                    node_id, pathlist[index + 1]
+                    )
+                bond_type = bond_object.GetBondType()
+                bond_symbol = BOND_SYMBOLS[str(bond_type)]
                 if bond_symbol != "-":
                     result += bond_symbol
         return result
@@ -161,21 +196,29 @@ def shortest_paths(struct: str = '',
     atom2 = molecule.GetAtomWithIdx(idx2)
     tree1 = AtomTree(molecule)
     tree2 = deepcopy(tree1)
-    tree1.create_node(atom1)
-    tree2.create_node(atom2)
+    tree1.create_atom_node(atom1)
+    tree2.create_atom_node(atom2)
     tree1.grow()
     tree2.grow()
+    # tree1.show(idhidden=False)
+    # tree2.show(idhidden=False)
     handler1 = TreeHandler(tree1)
     handler2 = TreeHandler(tree2)
     common_nodes, position = handler1.find_common_nodes(handler2)
-    p = None
-    if isinstance(common_nodes, list):
+    list_of_results = []
+    if isinstance(common_nodes[0], int):
         for i in common_nodes:
-            p = handler1.make_pathlist_to_leaf_int(i)
-    elif isinstance(common_nodes, tuple):
+            half_path1 = handler1.make_pathlist_to_leaf_int(i, position)
+            half_path2 = handler2.make_pathlist_to_leaf_int(i, position)
+            united_pathlist = TreeHandler.unite_pathlists(half_path1, half_path2)
+            list_of_results.append(united_pathlist)
+    elif isinstance(common_nodes[0], tuple):
         for i in common_nodes:
-            p = handler1.make_pathlist_to_leaf_tuple(i)
-    print(p)
+            half_path1 = handler1.make_pathlist_to_leaf_tuple(i, position)
+            half_path2 = handler2.make_pathlist_to_leaf_tuple(i, position)
+            united_pathlist = TreeHandler.unite_pathlists(half_path1, half_path2)
+            list_of_results.append(united_pathlist)
+    return list_of_results
 
 
 def main():
@@ -222,9 +265,10 @@ def main():
 def not_main():
     chol_smiles = ("C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC"
                    "[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C")
-    shortest_paths(chol_smiles, 2, 11)
+    print(shortest_paths(chol_smiles, 23, 12))
 
 
 if __name__ == '__main__':
-    # not_main()
-    main()
+    not_main()
+    # main()
+    

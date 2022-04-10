@@ -8,9 +8,16 @@ from atom_tree_mock import AtomTreeMock
 
 class TestTreeHandler(unittest.TestCase):
     def setUp(self):
+        # Later in comments the substance represented by 
+        # self.smiles_al SMILES is referenced as 'the aldehyde'
         self.smiles_al = "COCNCC=O"
+        # The substance represented by self.smiles_tbf
+        # later represented as TBP (tributhylphosphsate)
         self.smiles_tbf = "O=P(OCCCC)(OCCCC)OCCCC"
+        # The substance represented by self.smiles_arg
+        # later represented as ARG (arginine)
         self.smiles_arg = "NC(CCCNC(N)=N)C(O)=O"
+
         self.mol_al = MolFromSmiles(self.smiles_al)
         self.mol_tbf = MolFromSmiles(self.smiles_tbf)
         self.mol_arg = MolFromSmiles(self.smiles_arg)
@@ -22,6 +29,17 @@ class TestTreeHandler(unittest.TestCase):
     def atomtree_and_atom_to_tuples_set(atom_tree: AtomTree,
                                         atom: Atom,
                                         what_in_result="element"):
+        """
+        Grows tree, finds paths_to_leaves, transforms to tuples set
+
+        Grows a tree in the raw atom_tree (arg1) from the atom (arg2).
+        Then finds paths to leaves what is list of lists of element
+        symbols. Transforms list of lists to set of tuples that is 
+        easier to compare 
+        """
+
+        # TODO: (лучше будет потом сделать преобразование не в сет 
+        #       тьюплов, а сравнивать отсортированные списки)
         atom_tree.create_atom_node(atom)
         atom_tree.grow()
         # transform list of lists paths_to_leaves
@@ -45,6 +63,15 @@ class TestTreeHandler(unittest.TestCase):
 
 
     def test_grow1(self):
+        """
+        Checks if the aldehyde molecule tree (root is N) is made correctly
+
+        It finds nitrogen atom in the aldehyde molecule and then 
+        makes tree from it. Then paths to leaves function is used,
+        list of lists made as result of paths to leaves function
+        
+        """
+
         # Find nitrogen atom:
         start_atom = None
         for atom in self.mol_al.GetAtoms():
