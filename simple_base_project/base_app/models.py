@@ -82,21 +82,32 @@ class Chemical(models.Model):
                                   ['symbol', 'element_obj', 'old_index', 
                                    'new_index', 'relation'])
         about_old_elements = []
+        # Здесь он собирает в about_old_elements инфу о тех
+        # элементах, которые согласно неотредактированной записи
+        # содержатся в веществе. При этом в конце в new_elem_dict
+        # остаются только те элементы, которых раньше не было, но
+        # в новом elem_dict они появились.
         for rel in relations:
             about = AboutElement(symbol=rel.element.symbol,
                                  element_obj=rel.element,
                                  old_index=rel.index,
                                  new_index=elem_dict.get(rel.element.symbol),
+                                 # если в elem_dict нет этого элемента,
+                                 # new_index примет значение None
                                  relation=rel)
             about_old_elements.append(about)
             new_elem_dict.pop(about.symbol, None)
         
         for i in about_old_elements:
+            # Удаление StructElementRel тех элементов,
+            # которых больше нет:
             if not i.new_index:
                 i.relation.delete()
                 ElementAbundance.decrement(i.element_obj)
+            # Ничего не делать, если индексы равны:
             elif i.new_index == i.old_index:
                 continue
+            # Перезаписать, если поменялся:
             elif i.new_index != i.old_index:
                 i.relation.index = i.new_index
                 i.relation.save()
@@ -197,7 +208,8 @@ class StructElementRel(models.Model):
     @classmethod
     def create(cls, element: Element, chemical: Chemical, index: int):
         if index <= 0:
-            raise DatabaseException("StructElementRel: index must be positive")
+            raise DatabaseException("StructElementRel: "
+                                    "index must be positive")
         relation = cls(element=element, chemical=chemical, index=index)
         relation.save()
         return relation
