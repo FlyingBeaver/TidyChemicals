@@ -754,3 +754,4 @@ kilogram = QuantityUnit.objects.create(name="kilogram",
                                        unit_symbol="kg", 
                                        measure_type="mass", 
                                        relation_to_basic=D(1))
+kilogram.save()
