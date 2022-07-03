@@ -66,6 +66,7 @@ class Chemical(models.Model):
             element = Element.get_by_symbol(element_symbol)
             ElementAbundance.increment(element)
             StructElementRel.create(element, new_chemical, index)
+        return new_chemical
 
     def update(self, summary: dict, elem_dict: (dict, OrderedDict)):
         summary_dict_validation(summary)
