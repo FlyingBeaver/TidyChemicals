@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        .outer_box {
+            display: flex;
+        }
+
+        .inner_box {
+            height: 300px;
+            width:  300px;
+            background: yellowgreen;
+            margin: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content {
+            height: 100px;
+            width: 100px;
+        }
+
+        .yellow {
+            background: yellow;
+        }
+
+        .blue {
+            position: relative;
+            bottom: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="outer_box">
+        <div class="inner_box">1</div>
+        <div class="inner_box">2
+            <div class="content yellow"></div>
+            <div class="content blue">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean rhoncus, est at faucibus tempor, massa urna bibendum est, a porta libero est eget nibh. In hac habitasse platea dictumst. Pellentesque et euismod massa. Maecenas feugiat turpis nec urna imperdiet, ac congue nunc eleifend. Pellentesque sit amet leo nec erat dignissim pharetra. Integer sit amet justo et est suscipit rhoncus vitae id sapien. Nullam ac dignissim nulla. Cras efficitur sem nibh, sit amet fringilla ipsum luctus ac. Cras vestibulum ipsum at augue mollis sodales. Maecenas scelerisque, purus eu interdum imperdiet, lectus sapien semper mauris, quis vulputate massa diam vel nulla.</div>
+        </div>
+    </div>
+</body>
+</html>

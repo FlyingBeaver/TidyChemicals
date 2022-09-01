@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <style>
+        html {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info {
+            flex-basis: 100px;
+            background: bisque;
+        }
+
+        .trees_box {
+            background: bisque;
+            flex-grow: 1;
+            overflow-x: hidden;
+        }
+        
+        .trees_half {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .general_palette {
+            background: bisque;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .general_button {
+            background: whitesmoke;
+            width: 30px;
+            height: 50px;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+
+        .separator {
+            flex-basis: 10px;
+            background: whitesmoke;
+        }
+
+        .tree, .clipboard {
+            background: snow;
+            height: 95%;
+            margin: 10px;
+            resize: horizontal;
+            overflow: auto;
+            float: left;
+        }
+
+        .tree_palette {
+            display: grid;
+            grid-template: repeat(1, 1fr) / repeat(6, 1fr);
+        }
+
+        .tree_button {
+            background: whitesmoke;
+            width: 30px;
+            height: 30px;
+            margin: 2px;
+        }
+
+        .tree_container {
+            position: relative;
+        }
+
+        .background {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
+        .foreground {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .foreground > ul {
+            padding-bottom: 40px;
+        }
+
+        .position_button {
+            background: red;
+            width: 20px;
+            height: 20px;
+            float: right;
+        }
+
+        .position_palette {
+            width: 60px;
+            height: 60px;
+            background: white;
+            float: right;
+            display: grid;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+        }
+
+
+        .triangle_up {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 20px solid black;
+        }
+
+        .triangle_up:hover {
+            border-bottom: 20px solid red;
+        }
+
+        .triangle_left {
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-right: 20px solid black;
+            border-bottom: 10px solid transparent;
+        }
+
+        .triangle_left:hover {
+            border-right: 20px solid red;
+        }
+
+        .triangle_right {
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-left: 20px solid black;
+            border-bottom: 10px solid transparent;
+        }
+
+        .triangle_right:hover {
+            border-left: 20px solid red;
+        }
+
+        .triangle_down {
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid black;
+        }
+
+        .triangle_down:hover {
+            border-top: 20px solid red;
+        }
+
+        .white_square {
+            width: 20px;
+            height: 20px;
+        }
+
+        .invisible {
+            display: none;
+        }
+
+        li.open {
+            list-style-image: url(door-open.svg);
+        }
+
+        li.closed {
+            list-style-image: url(door-closed.svg);
+        }
+
+        li.chemical {
+            list-style-image: none;
+            list-style-type: disc;
+        }
+
+        div.figure {
+            margin-top: 50px;
+            margin-left: 40px;
+            height: 50px;
+            width: 50px;
+            background: bisque;
+            position: relative;
+        }
+
+        .highlighted {
+            background: red;
+        }
+
+        ul {
+            user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        info
+        <button class="position_button"></button>
+        <div class="position_palette invisible">
+            <div class="white_square"></div>
+            <div class="triangle_up"></div>
+            <div class="white_square"></div>
+            <div class="triangle_left"></div>
+            <div class="white_square"></div>
+            <div class="triangle_right"></div>
+            <div class="white_square"></div>
+            <div class="triangle_down"></div>
+            <div class="white_square"></div>
+            <div></div>
+        </div>
+    </div>
+    <div class="separator" draggable="true"></div>
+    <div class="trees_half">
+        <div class="general_palette">
+            <button class="general_button" title="Add a tree">
+                <img src="diagram-3.svg" alt="Add a tree">
+            </button>
+            <button class="general_button" title="Add a clipboard">
+                <img src="clipboard.svg" alt="Add a clipboard">
+            </button>
+        </div>
+        <div class="trees_box">
+            <div class="tree">
+                <div class="tree_palette">
+                    <button class="tree_button" title="Add a storage">
+                        <img src="plus-door.svg" alt="Add a storage">
+                    </button>
+                    <button class="tree_button" title="Add a chemical">
+                        <img src="plus-jar.svg" alt="Add a chemical">
+                    </button>
+                    <button class="tree_button" title="View chemical">
+                        <img src="magnifying-glass-svgrepo-com.svg" alt="View chemical">
+                    </button>
+                    <button class="tree_button" title="Edit">
+                        <img src="pencil.svg" alt="Edit">
+                    </button>
+                    <button class="tree_button" title="Cut">
+                        <img src="scissors.svg" alt="Cut">
+                    </button>
+                    <button class="tree_button" title="Paste">
+                        <img src="paste.svg" alt="Paste">
+                    </button>
+                    <button class="tree_button" title="Move">
+                        <img src="arrow-up-and-down.svg" alt="Move">
+                    </button>
+                    <button class="tree_button" title="Delete a storage">
+                        <img src="trash.svg" alt="Delete a storage">
+                    </button>
+                    <button class="tree_button" title="Move a tree to the left">
+                        <img src="arrow-left.svg" alt="Move a tree to the left">
+                    </button>
+                    <button class="tree_button" title="Move a tree to the right">
+                        <img src="arrow-right.svg" alt="Move a tree to the right">
+                    </button>
+                    <button class="tree_button" title="Close a tree">
+                        <img src="x-lg.svg" alt="Close a tree">
+                    </button>
+                </div>
+                <div class="tree_container">
+                    <div class="background"></div>
+                    <div class="foreground" data-root_id="0" data-root_name="root">
+                        <ul>
+                            <li class="closed"><span data-storage_node_id="0">root</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="clipboard">
+                <div class="tree_palette">
+                    <button class="tree_button" title="Uncut">
+                        U
+                    </button>
+                    <button class="tree_button" title="Paste selected">
+                        <img src="arrow-up.svg" alt="Paste selected">
+                    </button>
+                    <button class="tree_button" title="Paste all">
+                        <img src="arrows-up.svg" alt="Paste all">
+                    </button>
+                    <button class="tree_button" title="Move a tree to the left">
+                        <img src="arrow-left.svg" alt="Move a tree to the left">
+                    </button>
+                    <button class="tree_button" title="Move a tree to the right">
+                        <img src="arrow-right.svg" alt="Move a tree to the right">
+                    </button>
+                    <button class="tree_button" title="Close a tree">
+                        <img src="x-lg.svg" alt="Close a tree">
+                    </button>
+                </div>
+            </div>
+            <div class="tree">tree3</div>
+        </div>
+    </div>
+    <script src="trees_editor04.js">
+    </script>
+</body>
+</html>
