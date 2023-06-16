@@ -15,6 +15,8 @@ class ModelsTestException(BaseException):
 
 
 class ChemicalTestCase(TestCase):
+    """Parent class for all tests in here.
+       It contains setUp() method and all methods needed for setup"""
     def setUp(self):
         self.krtek, self.vigri = self.create_users()
         create_periodic_system()
@@ -164,14 +166,19 @@ class ChemicalCreateTestCase(ChemicalTestCase):
 
 
     def test_chemicals_create1(self):
-        """Checks if StructElementRel are created when a new
-        chemical is created"""
+        """
+        Comparison of StructElementRel.objects.all() before and 
+        after creation of the chemical. Number of new SER must be equal
+        to number of elements in the chemical
+
+        """
         struct_element_rels_after = StructElementRel.objects.all()
         SER_after = set(struct_element_rels_after)
         SER_delta = SER_after - self.struct_element_rels_before
         # length of elements_dict and number of new StructElementRel
         # must be equal
         self.assertEqual(len(self.elements_dict), len(SER_delta))
+        # this cycle must reproduce elements dict from SER_delta
         elements_and_indices = dict()
         for item in SER_delta:
             elements_and_indices[item.element.symbol] = item.index

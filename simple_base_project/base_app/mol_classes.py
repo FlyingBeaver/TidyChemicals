@@ -40,6 +40,7 @@ from rdkit.Chem.rdmolfiles import MolToMolFile
 from rdkit.Chem.rdmolfiles import MolToPDBFile
 from rdkit.Chem.rdmolfiles import MolToPDBBlock
 
+from base_app.path_fingerprint_gen2 import make_fragments
 
 
 class MyMolError(BaseException):
@@ -108,6 +109,8 @@ class LazyMol(object):
         self._image_path = None
         self._elements_list = None
         self._elements_dict = None
+        self._path_dict = None
+        self._ring_dict = None
         self._calc_mwmf = calc_mwmf
         if isinstance(structure, Mol):
             self.process_rdmol(structure)
@@ -284,6 +287,20 @@ class LazyMol(object):
             if not self._elements_dict:
                 self._elements_dict = dictionary
             return dictionary
+    
+    def path_dict(self):
+        if self._path_dict:
+            return self._path_dict
+        else:
+            self._path_dict, self._ring_dict = make_fragments(self._rdmol)
+        return self._path_dict
+
+    def ring_dict(self):
+        if self._ring_dict:
+            return self._ring_dict
+        else:
+            self._path_dict, self._ring_dict = make_fragments(self._rdmol)
+        return self._ring_dict
 
     def __mod__(self, other):
         """Check for presence of substructure in structure.
