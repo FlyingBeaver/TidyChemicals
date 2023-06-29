@@ -32,7 +32,7 @@ def set_pairwise(list_):
 
 
 def make_fragments(molecule,
-                          length_restriction: (int, None.__class__) = 7):
+                   length_restriction: (int, None.__class__) = 7):
     the_graph = nx.Graph()
     list_of_atoms = []
     list_of_pathstrings = []

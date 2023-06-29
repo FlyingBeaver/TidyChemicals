@@ -106,7 +106,6 @@ def find_superstructures(mol_block):
     )
     if "H" in ordered_elements_dict:
         ordered_elements_dict.pop("H")
-    n = 0
     raw_results1 = primary_search(ordered_elements_dict, None)
     path_dict = substructure.path_dict()
     ordered_path_dict = Path.order_path_dict(path_dict)
@@ -121,29 +120,35 @@ def find_superstructures(mol_block):
           f"with paths {len(raw_results2)}\n"
           f"with rings {len(raw_results3)}")
     print(60*"#")
+    # check if there is need to 'clean' results
+    if substructure.is_simple():
+        return raw_results3
+
     cleaned_results = []
-
-    for i in raw_results3:
-        inchi = i.structure['inchi']
-        try:
-            potential_superstructure = LazyMol(inchi, "inchi", False)
-        except MyMolError:
-            with open("errors_log.txt", "at", encoding="utf-8") as log:
-                date_time_string = datetime.datetime.now().strftime("%c")
-                log.write(f"\n{date_time_string}: MyMolError at object "
-                          f"with id={i.id}, name='{i.name}'\n")
+    n = 0
+    for item in raw_results3:
+        if NOTATION_FOR_RENDERING == "inchi":
+            inchi = item.structure['inchi']
+            try:
+                potential_superstructure = LazyMol(inchi, "inchi", False)
+            except MyMolError:
+                with open("errors_log.txt", "at", encoding="utf-8") as log:
+                    date_time_string = datetime.datetime.now().strftime("%c")
+                    log.write(f"\n{date_time_string}: MyMolError at object "
+                              f"with id={item.id}, name='{item.name}'\n")
+                continue
+        elif NOTATION_FOR_RENDERING == "mol":
+            mol_block = item.mol_block
+            try:
+                potential_superstructure = LazyMol(mol_block, "mol_block", False)
+            except MyMolError:
+                with open("errors_log.txt", "at", encoding="utf-8") as log:
+                    date_time_string = datetime.datetime.now().strftime("%c")
+                    log.write(f"\n{date_time_string}: MyMolError at object "
+                              f"with id={item.id}, name='{item.name}'\n")
+                continue
         if potential_superstructure % substructure:
-            if NOTATION_FOR_RENDERING == "inchi":
-                structure_container = potential_superstructure
-            elif NOTATION_FOR_RENDERING == "mol":
-                structure_container = i.mol_block
-            else:
-                raise SearchException(f"Unknown NOTATION_FOR_RENDERING: "
-                                      f"{NOTATION_FOR_RENDERING}")
-            match = {"id": i.id, "name": i.name,
-                     "storage_place": i.storage_place.path_str, 
-                     "structure_container": structure_container}
-
+            match = {"chemical": item, "lazymol": potential_superstructure}
             cleaned_results.append(match)
         n += 1
         if not n % 100:

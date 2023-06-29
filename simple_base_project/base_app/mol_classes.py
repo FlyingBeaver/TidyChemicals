@@ -302,6 +302,19 @@ class LazyMol(object):
             self._path_dict, self._ring_dict = make_fragments(self._rdmol)
         return self._ring_dict
 
+    def is_simple(self):
+        ring_info = self._rdmol.GetRingInfo()
+        if ring_info.NumRings() == 0:
+            if self._rdmol.GetNumAtoms() <= 7:
+                if all(map(lambda x: 0 < len(x.GetNeighbors()) < 3, self._rdmol.GetAtoms())):
+                    return True
+        elif ring_info.NumRings() == 1:
+            single_ring = ring_info.AtomRings()[0]
+            n_of_atoms_in_ring = len(single_ring)
+            if self._rdmol.GetNumAtoms() == n_of_atoms_in_ring:
+                return True
+        return False
+
     def __mod__(self, other):
         """Check for presence of substructure in structure.
         The order is:

@@ -1,10 +1,9 @@
-import networkx as nx
+from itertools import tee, combinations, count
 from collections import Counter
-from pprint import pprint
-from rdkit.Chem import MolFromSmiles, MolFromInchi
-from itertools import tee, permutations, combinations, count
-from treelib import Tree
 from copy import deepcopy
+from pprint import pprint
+import networkx as nx
+from rdkit.Chem import MolFromSmiles
 
 
 BOND_SYMBOLS = {"SINGLE": "-",
@@ -57,7 +56,9 @@ def make_fragments(molecule,
             if (length_restriction and len(path_list) >
                     length_restriction):
                 continue
-            atoms_bonds_list = make_atoms_bonds_list(path_list, molecule, ring=False)
+            atoms_bonds_list = make_atoms_bonds_list(path_list,
+                                                     molecule,
+                                                     ring=False)
             straight_pathstring = ''.join(atoms_bonds_list)
             atoms_bonds_list.reverse()
             reversed_pathstring = ''.join(atoms_bonds_list)
@@ -68,10 +69,14 @@ def make_fragments(molecule,
     list_of_ringstrings = []
     all_ring_lists = find_all_rings(the_graph)
     for ring_list in all_ring_lists:
-        atoms_bonds_list = make_atoms_bonds_list(ring_list, molecule, ring=True)
+        atoms_bonds_list = make_atoms_bonds_list(ring_list,
+                                                 molecule,
+                                                 ring=True)
         canonic_string1 = make_canonic_string(atoms_bonds_list)
         ring_list.reverse()
-        atoms_bonds_list = make_atoms_bonds_list(ring_list, molecule, ring=True)
+        atoms_bonds_list = make_atoms_bonds_list(ring_list,
+                                                 molecule,
+                                                 ring=True)
         canonic_string2 = make_canonic_string(atoms_bonds_list)
         list_of_ringstrings.append(min(canonic_string1, canonic_string2))
     ring_fragments = dict(Counter(list_of_ringstrings))
@@ -142,7 +147,7 @@ class Tree:
             del self.usual_nodes[key]
 
 
-class FrozenDict(dict):
+class HashedDict(dict):
     def __init__(self, usual_dict: dict):
         if not isinstance(usual_dict, dict):
             raise TypeError("usual_dict must be dict")
@@ -151,7 +156,7 @@ class FrozenDict(dict):
 
     def make_repr(self, instance):
         items_list = list(instance.items())
-        return f"FrozenDict({repr(items_list)})"
+        return f"HashedDict({repr(items_list)})"
 
     def __repr__(self):
         return self.make_repr(self)
@@ -177,7 +182,12 @@ def find_all_rings(the_graph):
                          all_cycles,
                          all_cycles_list,
                          all_derived_graphs)
-        unfinished_leaves = list(filter(lambda x: x.tag == "1", tree.leaves()))
+        unfinished_leaves = list(
+            filter(
+                lambda x: x.tag == "1",
+                tree.leaves()
+            )
+        )
         tree.delete_not_leaf_nodes()
     return all_cycles_list
 
@@ -194,7 +204,7 @@ def get_graph_dict(graph):
             temp_dict[node2].add(node1)
         else:
             temp_dict[node2] = {node1}
-    return FrozenDict(temp_dict)
+    return HashedDict(temp_dict)
 
 
 def process_leaf(leaf,
@@ -223,9 +233,9 @@ def process_leaf(leaf,
                 neighbours = True
                 new_graph = deepcopy(graph)
                 new_graph.remove_edge(node1, node2)
-                new_leaf = tree.create_node("1", next(counter),
-                                            parent=leaf.self_id,
-                                            data=new_graph)
+                tree.create_node("1", next(counter),
+                                 parent=leaf.self_id,
+                                 data=new_graph)
         if not neighbours:
             leaf.tag = "0"
         all_derived_graphs.add(graph_dict)
@@ -242,10 +252,9 @@ def make_atoms_bonds_list(path_list, molecule, ring):
         ).GetBondType()
         bond_symbol = BOND_SYMBOLS[str(bond_type)]
         atoms_bonds_list.append(bond_symbol)
-    else:
-        atoms_bonds_list.append(
-            molecule.GetAtomWithIdx(path_list[-1]).GetSymbol()
-        )
+    atoms_bonds_list.append(
+        molecule.GetAtomWithIdx(path_list[-1]).GetSymbol()
+    )
     if ring:
         bond_type = molecule.GetBondBetweenAtoms(
             path_list[0], path_list[-1]
@@ -254,39 +263,12 @@ def make_atoms_bonds_list(path_list, molecule, ring):
     return atoms_bonds_list
 
 
-def is_substructure(substructure, superstructure):
-    sub_paths = make_linear_fragments(substructure)
-    super_paths = make_linear_fragments(superstructure)
-    sub_paths_set = set(sub_paths)
-
-    if sub_paths_set <= set(super_paths):
-        return all([sub_paths[key] <= super_paths[key] for key \
-                    in sub_paths_set])
-    else:
-        return False
-
-
-def compare(sub_smiles, super_smiles):
-    sub = MolFromSmiles(sub_smiles)
-    super_ = MolFromSmiles(super_smiles)
-    print(is_substructure(sub, super_))
-
-
 def main():
-    inchi1 = "InChI=1S/C57H39N5/c1-34-30-38(60-52-29-28-37(57-58-35(2)31-36(3)59-57)32-47(52)54-45-22-6-4-16-39(45)40-17-5-7-23-46(40)56(54)60)33-53(61-48-24-12-8-18-41(48)42-19-9-13-25-49(42)61)55(34)62-50-26-14-10-20-43(50)44-21-11-15-27-51(44)62/h4-33H,1-3H3"
-    inchi2 = "InChI=1S/C52H42/c1-49(2,32-25-27-36-34-17-7-10-21-40(34)50(3,4)44(36)29-32)33-26-28-37-35-18-8-11-22-41(35)52(45(37)30-33)42-23-12-9-19-38(42)47-48(52)39-20-13-15-31-16-14-24-43(46(31)39)51(47,5)6/h7-30H,1-6H3/t52-/m1/s1"
-
     chol_smiles = ("C[C@H](CCCC(C)C)[C@H]1CC[C@@H]2[C@@]1(CC"
                    "[C@H]3[C@H]2CC=C4[C@@]3(CC[C@@H](C4)O)C)C")
     chol = MolFromSmiles(chol_smiles)
     print("Cholesterol linear and ring fragments:")
     pprint(make_fragments(chol))
-
-    stucture1 = MolFromInchi(inchi1)
-    pprint(make_fragments(stucture1))
-
-    stucture2 = MolFromInchi(inchi2)
-    pprint(make_fragments(stucture2))
 
 
 if __name__ == '__main__':

@@ -8,7 +8,7 @@ from base_app.models import Chemical, StructElementRel
 # этот json и восстанавливает базу
 
 
-def create_json:
+def create_json():
     all_chemicals = Chemical.objects.all()
     all_data = []
 
@@ -21,7 +21,7 @@ def create_json:
         chem_dict["molar_mass"] = chemical.molar_mass
         chem_dict["storage_place"] = chemical.storage_place.path_str
         chem_dict["quantity"] = chemical.quantity
-        chem_dict["quantity_unit"] = chemical.quantity_unit.symbol
+        chem_dict["quantity_unit"] = chemical.quantity_unit.unit_symbol
         chem_dict["who_created"] = chemical.who_created.user.username
         
         ser_queryset = StructElementRel.objects.filter(chemical=chemical) \
