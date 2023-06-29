@@ -1,0 +1,62 @@
+{% extends "basic_template.html" %}
+{% load static %}
+{% load filename_item %}
+
+{% block title %}
+Search results
+{% endblock %}
+
+
+{% block head_content %}
+<style>
+	div.grid-container {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+		margin: 10px;
+	}
+
+	div.pagination {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		margin: 10px;
+	}
+</style>
+{% endblock %}
+<!-- Здесь должна быть ссылка на css-файл страницы поиска -->
+
+{% block content %}
+
+<div class="grid-container">
+{% for file_name, chemical in page_obj|filename_item %}
+<span>
+	<img src="/static/base_app/{{ file_name }}" width=200px>
+	<p>{{ chemical.name }}</p>
+</span>
+{% endfor %}
+</div>
+
+<div class="pagination">
+    {% if page_obj.has_previous %}
+	<div>
+		<form method="post">
+			{% csrf_token %}
+			<input type="hidden" name="query_id" value="{{ query_id }}">
+			<input type="hidden" name="page_no" value="{{ page_obj.previous_page_number }}">
+			<input type="submit" value="Previous page">
+		</form>
+	</div>
+	{% endif %}
+	<div>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+    {% if page_obj.has_next %}
+	<div>
+		<form method="post">
+			{% csrf_token %}
+			<input type="hidden" name="query_id" value="{{ query_id }}">
+			<input type="hidden" name="page_no" value="{{ page_obj.next_page_number }}">
+			<input type="submit" value="Next page">
+		</form>
+	</div>
+	{% endif %}
+</div>
+
+{% endblock %}
