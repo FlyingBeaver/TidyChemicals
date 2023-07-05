@@ -1,7 +1,10 @@
 <template>
     <header-component></header-component>
     <div class="content-main">
-        <form method="post">
+        <form method="post"
+              v-on:submit.prevent="doNothing"
+              ref="form"
+        >
             <form-row 
                 v-for="id in rowsIds"
                 v-bind:key="id"
@@ -96,14 +99,22 @@ export default {
         },
         toggleDeletionMode() {
             if (this.deletionMode) {
-                let form = document.querySelector("form");
-                form.classList.remove("deletion_mode");
+                this.$refs.form.classList.remove("deletion_mode");
                 this.deletionMode = false;
             } else {
-                let form = document.querySelector("form");
-                form.classList.add("deletion_mode");
+                this.$refs.form.classList.add("deletion_mode");
                 this.deletionMode = true;
             }
+        },
+        doNothing() {
+        },
+        submitForm() {
+            this.$refs.form.submit();
+        }
+    },
+    provide() {
+        return {
+            submitForm: this.submitForm,
         }
     }
 }
@@ -202,11 +213,11 @@ export default {
       margin: 0 80px 0 80px;
       border: none;
       flex-basis: 100%;
-      height: 300px;
+      /*height: 300px;*/
       flex-direction: row;
       display: grid;
       grid-template-columns: 285px 285px 285px;
-      grid-template-rows: 65px;
+      grid-template-rows: auto auto;
       grid-column-gap: 20px;
       justify-content: space-between;
   }
@@ -216,7 +227,8 @@ export default {
   }
 
   div.row > p {
-      height: 50px;
+      min-height: 65px;
+      height: auto;
       margin: 0;
   }
 
@@ -408,6 +420,8 @@ export default {
       grid-column: 2/4;
       display: flex;
       justify-content: center;
+      padding-bottom: 30px;
+      padding-top: 30px;
   }
 
   div.row.fired {

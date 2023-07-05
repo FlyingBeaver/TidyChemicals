@@ -4,7 +4,11 @@
         <button class="dark_button" id="more_conditions_disabled" disabled>Add one more search condition</button>
         <button class="dark_button" id="exit_from_deletion" v-on:click.prevent="toggleDeletionMode">Exit from deletion mode</button>
         <button class="dark_button" id="delete_button" v-on:click.prevent="toggleDeletionMode">Delete a search condition</button>
-        <button type="submit" class="dark_button" id="search_button">SEARCH</button>
+        <button type="submit"
+                class="dark_button"
+                id="search_button"
+                v-on:click.prevent="submitForm"
+        >SEARCH</button>
     </div>
 </template>
 
@@ -17,7 +21,8 @@ export default {
         },
         toggleDeletionMode() {
             this.$emit("toggle-deletion-mode");
-        }
+        },
     },
+    inject: ["submitForm"]
 }
 </script>
