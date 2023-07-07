@@ -1,5 +1,5 @@
 <template>
-    <div id="standalone-container">
+    <div id="standalone-container" v-bind:class="{disabled: disabled}">
         <div id="toolbar-container" ref="toolbar">
         <span class="ql-formats">
             <button class="ql-bold"></button>
@@ -68,7 +68,11 @@
             </div>
         </span>
         </div>
-        <div class="editor-container" id="editor-container" ref="editor"></div>
+        <div
+            class="editor-container"
+            id="editor-container"
+            ref="editor"
+        ></div>
         <!-- здесь будет всплывать предупреждение при вводе недопустимых символов -->
         <div v-bind:class="{warning: true, 'hide-me': warningHidden}">You are trying to enter a character that is not allowed in this field. Only digits, latin and greek letters with no diacritics, space, full stop (period), comma, (), [], {}, +, -, /, :, ;, ±, — and ′ are allowed.</div>
     </div>
@@ -89,7 +93,7 @@ export default {
         }
     },
     props:
-        ["inputName"],
+        ["inputName", "disabled"],
     methods: {
         showWarning() {
             this.warningHidden = false
@@ -213,5 +217,10 @@ export default {
         font-family: sans-serif;
         color: maroon;
         padding: 10px 10px 10px 10px;
+    }
+
+    div.disabled {
+        opacity: 50%;
+        background-color: azure;
     }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div id="ifKetcher" v-on:click="getMolPromise">
+    <div id="ifKetcher" v-on:click="getMolPromise" v-bind:class="{disabled: disabled}">
         <html lang="en">
             <head>
                 <meta charset="utf-8" />
@@ -37,7 +37,7 @@ export default {
             molPromise.then(this.updateInput)
         }
     },
-    props: ["inputName"]
+    props: ["inputName", "disabled"]
 }
 </script>
 
@@ -48,4 +48,8 @@ div#ifKetcher {
     height: 400px;
 }
 
+div.disabled {
+    opacity: 50%;
+    background-color: azure;
+}
 </style>

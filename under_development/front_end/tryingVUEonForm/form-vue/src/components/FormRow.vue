@@ -66,6 +66,16 @@
                 v-on:toggle-editor="toggleEditor"
             >
             </structure-input-toggle>
+            <numeral-input
+                v-if="widget === 'numeral_input'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></numeral-input>
+            <date-input
+                v-if="widget === 'date_input'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></date-input>
         </p>
         <p class="column ketcher-container"
            v-if="widget === 'jsme_input'"
@@ -97,14 +107,18 @@ import TextInput from './TextInput.vue';
 import TextInputWithFormat from "@/components/TextInputWithFormat";
 import StructureInput from "@/components/StructureInput";
 import StructureInputToggle from "@/components/StructureInputToggle";
+import NumeralInput from "@/components/NumeralInput";
+import DateInput from "@/components/DateInput";
 
 export default {
 
     components: {
+        NumeralInput,
         StructureInput,
         TextInput,
         TextInputWithFormat,
-        StructureInputToggle
+        StructureInputToggle,
+        DateInput,
     },
     computed: {
         operatorOptions() {
@@ -158,7 +172,13 @@ export default {
     data() {
         return {
             validWidgets:
-                ['text_input', 'text_input_with_format', 'jsme_input'],
+                [
+                    'text_input',
+                    'text_input_with_format',
+                    'jsme_input',
+                    'numeral_input',
+                    'date_input',
+                ],
             operatorValue: "",
             termValue: "",
             tree,
