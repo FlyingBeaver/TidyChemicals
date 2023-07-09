@@ -76,6 +76,11 @@
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></date-input>
+            <date-range-input
+                v-if="widget === 'date_range_input'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></date-range-input>
         </p>
         <p class="column ketcher-container"
            v-if="widget === 'jsme_input'"
@@ -109,6 +114,7 @@ import StructureInput from "@/components/StructureInput";
 import StructureInputToggle from "@/components/StructureInputToggle";
 import NumeralInput from "@/components/NumeralInput";
 import DateInput from "@/components/DateInput";
+import DateRangeInput from "@/components/DateRangeInput";
 
 export default {
 
@@ -119,6 +125,7 @@ export default {
         TextInputWithFormat,
         StructureInputToggle,
         DateInput,
+        DateRangeInput,
     },
     computed: {
         operatorOptions() {
@@ -178,6 +185,7 @@ export default {
                     'jsme_input',
                     'numeral_input',
                     'date_input',
+                    'date_range_input',
                 ],
             operatorValue: "",
             termValue: "",
