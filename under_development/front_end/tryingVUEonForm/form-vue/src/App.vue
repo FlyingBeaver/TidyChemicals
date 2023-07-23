@@ -4,6 +4,7 @@
         <form method="post"
               v-on:submit.prevent="doNothing"
               ref="form"
+              action="http://127.0.0.1:5000/show_request/"
         >
             <form-row 
                 v-for="id in rowsIds"
@@ -43,7 +44,8 @@ export default {
             rowsIds: ["subform0"],
             subformsCounter: 1,
             deletionMode: false,
-            firedId: ""
+            firedId: "",
+            debug: true,
         }
     },
     methods: {
@@ -87,7 +89,6 @@ export default {
         },
         unfire() {
             this.firedId = "";
-            console.log("now!");
         },
         addCondition() {
             let oldLastSubform = this.rowsIds.slice(-1)[0];
@@ -115,6 +116,14 @@ export default {
     provide() {
         return {
             submitForm: this.submitForm,
+        }
+    },
+    mounted() {
+        if (!this.debug) {
+            let csrfContainer = document.querySelector("#csrf")
+            let csrfInput = csrfContainer.querySelector("input")
+            let newCsrfInput = csrfInput.cloneNode(true)
+            this.$refs.form.prepend(newCsrfInput)
         }
     }
 }

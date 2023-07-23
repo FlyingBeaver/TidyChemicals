@@ -175,7 +175,7 @@ export const tree = {
     who_created: {
         choose_profile_from_list: {
             verbose: 'choice of profile from the list',
-                widget: 'select_profile_from_list'
+                widget: 'user_input'
         },
         type: {
             verbose: 'text input',
@@ -190,7 +190,7 @@ export const tree = {
     who_updated: {
         choose_profile_from_list: {
             verbose: 'choice of profile from the list',
-                widget: 'select_profile_from_list'
+                widget: 'user_input'
         },
         type: {
             verbose: 'text input',

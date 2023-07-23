@@ -81,6 +81,16 @@
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></date-range-input>
+            <storage-place-input
+                v-if="widget === 'storage_place_input'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></storage-place-input>
+            <user-input
+                v-if="widget === 'user_input'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></user-input>
         </p>
         <p class="column ketcher-container"
            v-if="widget === 'jsme_input'"
@@ -115,10 +125,14 @@ import StructureInputToggle from "@/components/StructureInputToggle";
 import NumeralInput from "@/components/NumeralInput";
 import DateInput from "@/components/DateInput";
 import DateRangeInput from "@/components/DateRangeInput";
+import StoragePlaceInput from "@/components/StoragePlaceInput";
+import UserInput from "@/components/UserInput";
 
 export default {
 
     components: {
+        UserInput,
+        StoragePlaceInput,
         NumeralInput,
         StructureInput,
         TextInput,
@@ -186,6 +200,8 @@ export default {
                     'numeral_input',
                     'date_input',
                     'date_range_input',
+                    'storage_place_input',
+                    'user_input',
                 ],
             operatorValue: "",
             termValue: "",
