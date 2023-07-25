@@ -10,6 +10,7 @@
         v-bind:name="inputName"
         v-bind:disabled="disabled"
         v-show="editorIsOn"
+        v-model="inputContent"
     >
     <p
         v-show="editorIsOn"
@@ -31,14 +32,35 @@
         </p>
         <p v-if="chosenUsersEmpty">No one chosen!</p>
     </div>
-    <div class="users" v-show="editorIsOn">
-        <p
-            v-for="id in usersToChoose"
-            v-bind:key="id"
-            v-on:click="selectUser(id)"
-        >{{ showName(id) }}
-        </p>
+    <div v-bind:class="{users:true, 'small-grid':recentShown}" v-show="editorIsOn">
+        <div>
+            <p
+                v-for="id in usersToChoose"
+                v-bind:key="id"
+                v-on:click="selectUser(id)"
+            >{{ showName(id) }}
+            </p>
+        </div>
+        <div v-if="recentShown">
+            <p
+                v-for="id in usersToChoose"
+                v-bind:key="id"
+                v-on:click="deleteUserFromRecent(id)"
+            >X</p>
+        </div>
     </div>
+    <input
+        type="hidden"
+        v-bind:name="'real_' + inputName"
+        ref="real_input"
+        v-bind:value="chosenUsersStr"
+    >
+    <input
+        type="hidden"
+        v-bind:name="'delFromRecent_' + inputName"
+        ref="delFromRecent"
+        v-bind:value="deletedFromRecentStr"
+    >
 </template>
 
 <script>
@@ -49,9 +71,13 @@ export default {
         return {
             editorIsOn: false,
             usernameIsOn: false,
+            recentShown: true,
             usersObject: {},
             chosenUsers: [],
-            usersToChoose: []
+            usersToChoose: [],
+            recent: [],
+            deletedFromRecent: [],
+            inputContent: "",
         }
     },
     methods: {
@@ -59,10 +85,10 @@ export default {
             this.editorIsOn = !this.editorIsOn
         },
         async getUsers(response) {
-            this.usersObject = await response.json()
-            for (let id in this.usersObject) {
-                this.usersToChoose.push(id)
-            }
+            let responseObj = await response.json()
+            this.usersObject = responseObj["users"]
+            this.usersToChoose = responseObj["recent"]
+            this.recent = responseObj["recent"]
         },
         showName(id) {
             if (this.usernameIsOn) {
@@ -81,11 +107,51 @@ export default {
             this.chosenUsers.splice(index, 1)
             this.usersToChoose.push(id)
         },
+        deleteUserFromRecent(id) {
+            let index = this.recent.indexOf(id)
+            if (index !== -1) {
+                this.recent.splice(index, 1)
+                this.deletedFromRecent.push(id)
+            }
+        },
     },
     computed: {
         chosenUsersEmpty() {
             return (JSON.stringify(this.chosenUsers) === '[]')
+        },
+        chosenUsersStr() {
+            return JSON.stringify(this.chosenUsers)
+        },
+        deletedFromRecentStr() {
+            return JSON.stringify(this.deletedFromRecent)
         }
+    },
+    watch: {
+        inputContent(value) {
+            if (value === "") {
+                this.usersToChoose = this.recent
+                this.recentShown = true
+            } else {
+                let usersToShow = []
+                if (this.usernameIsOn) {
+                    for (let username in this.usersObject) {
+                        if (username.toLowerCase()
+                                .indexOf(value.toLowerCase()) !== -1) {
+                            usersToShow.push(username)
+                        }
+                    }
+                } else {
+                    for (let username in this.usersObject) {
+                        if (this.usersObject[username].toLowerCase()
+                                .indexOf(value.toLowerCase()) !== -1) {
+                            usersToShow.push(username)
+                        }
+                    }
+                }
+                this.usersToChoose = usersToShow
+                this.recentShown = false
+            }
+        },
     },
     beforeMount() {
         let usersPromise = fetch("http://127.0.0.1:5000/users/")
@@ -143,5 +209,9 @@ div.users p {
 }
 div.users p:hover {
     background-color: white;
+}
+div.small-grid {
+    display: grid;
+    grid-template-columns: 1fr 20px;
 }
 </style>
