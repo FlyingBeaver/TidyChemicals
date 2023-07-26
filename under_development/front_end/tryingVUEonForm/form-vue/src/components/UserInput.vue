@@ -4,51 +4,51 @@
         v-on:click.prevent="toggleEditor"
     >{{ editorIsOn ? "Hide widget" : "Show widget" }}
     </button>
-    <input
-        type="text"
-        class="simple_text_value"
-        v-bind:name="inputName"
-        v-bind:disabled="disabled"
-        v-show="editorIsOn"
-        v-model="inputContent"
-    >
-    <p
-        v-show="editorIsOn"
-    >Start typing name of user you want to select</p>
-    <div class="username-toggle" v-show="editorIsOn">
-        <div>Username</div>
-        <label class="pretty-toggle">
+    <div class="user-input-container" v-show="editorIsOn">
+        <input
+            type="text"
+            class="simple_text_value wide"
+            v-bind:name="inputName"
+            v-bind:disabled="disabled"
+            v-model="inputContent"
+        >
+        <p
+            class="wide hint"
+        >Start typing above name of user you want to select</p>
+        <div class="narrow left-label">Full name</div>
+        <label class="pretty-toggle narrow">
             <input type="checkbox" v-model="usernameIsOn">
             <div class="toggle-inside"></div>
         </label>
-        <div>Full name</div>
-    </div>
-    <div class="users" v-show="editorIsOn">
-        <p
-            v-for="id in chosenUsers"
-            v-bind:key="id"
-            v-on:click="unselectUser(id)"
-        >{{ showName(id) }}
-        </p>
-        <p v-if="chosenUsersEmpty">No one chosen!</p>
-    </div>
-    <div v-bind:class="{users:true, 'small-grid':recentShown}" v-show="editorIsOn">
-        <div>
+        <div class="narrow right-label">Username</div>
+        <div class="users wide">
             <p
-                v-for="id in usersToChoose"
+                v-for="id in chosenUsers"
                 v-bind:key="id"
-                v-on:click="selectUser(id)"
+                v-on:click="unselectUser(id)"
             >{{ showName(id) }}
             </p>
+            <p v-if="chosenUsersEmpty">No one chosen!</p>
         </div>
-        <div v-if="recentShown">
-            <p
-                v-for="id in usersToChoose"
-                v-bind:key="id"
-                v-on:click="deleteUserFromRecent(id)"
-            >X</p>
+        <div v-bind:class="{users:true, wide:true, 'small-grid':recentShown}">
+            <div>
+                <p
+                    v-for="id in usersToChoose"
+                    v-bind:key="id"
+                    v-on:click="selectUser(id)"
+                >{{ showName(id) }}
+                </p>
+            </div>
+            <div v-if="recentShown">
+                <p
+                    v-for="id in usersToChoose"
+                    v-bind:key="id"
+                    v-on:click="deleteUserFromRecent(id)"
+                >X</p>
+            </div>
         </div>
     </div>
+
     <input
         type="hidden"
         v-bind:name="'real_' + inputName"
@@ -161,10 +161,10 @@ export default {
 </script>
 
 <style scoped>
-div.username-toggle {
-    display: grid;
-    grid-template-columns: 40% 20% 40%;
+p {
+    margin: 0;
 }
+
 input[type=checkbox] {
     height: 0;
     width: 0;
@@ -176,6 +176,8 @@ label.pretty-toggle {
     height: 25px;
     cursor: pointer;
     position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 /*unchecked*/
 div.toggle-inside {
@@ -206,6 +208,8 @@ div.users:last-child {
 div.users p {
     color: cornflowerblue;
     padding-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 div.users p:hover {
     background-color: white;
@@ -213,5 +217,33 @@ div.users p:hover {
 div.small-grid {
     display: grid;
     grid-template-columns: 1fr 20px;
+}
+div.user-input-container {
+    display: grid;
+    grid-template-columns: 40% 20% 40%;
+    grid-template-rows: auto;
+    margin-top: 5px;
+}
+.wide {
+    grid-column-start: span 3;
+}
+.narrow {
+    grid-column-start: span 1;
+}
+.left-label {
+    justify-self: end;
+    align-self: center;
+    margin-right: 10px;
+    color: cornflowerblue;
+}
+.right-label {
+    justify-self: start;
+    align-self: center;
+    margin-left: 10px;
+    color: cornflowerblue;
+}
+.hint {
+    color: cornflowerblue;
+    font-style: italic;
 }
 </style>
