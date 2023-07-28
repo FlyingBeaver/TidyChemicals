@@ -91,6 +91,11 @@
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></user-input>
+            <cas-input
+                v-if="widget === 'cas_input'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></cas-input>
         </p>
         <p class="column ketcher-container"
            v-if="widget === 'jsme_input'"
@@ -127,10 +132,12 @@ import DateInput from "@/components/DateInput";
 import DateRangeInput from "@/components/DateRangeInput";
 import StoragePlaceInput from "@/components/StoragePlaceInput";
 import UserInput from "@/components/UserInput";
+import CasInput from "@/components/CasInput";
 
 export default {
 
     components: {
+        CasInput,
         UserInput,
         StoragePlaceInput,
         NumeralInput,
@@ -202,6 +209,7 @@ export default {
                     'date_range_input',
                     'storage_place_input',
                     'user_input',
+                    'cas_input',
                 ],
             operatorValue: "",
             termValue: "",

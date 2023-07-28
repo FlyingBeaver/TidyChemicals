@@ -2,7 +2,7 @@ export const tree = {
     cas: {
         equals: {
             verbose: 'equals',
-                widget: 'numeral_input_cas'
+                widget: 'cas_input'
         },
         verbose: 'CAS RN'
     },
