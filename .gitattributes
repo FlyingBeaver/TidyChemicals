@@ -1,3 +1,3 @@
-simple_base_project/base_app/static/base_app/dist/css/* linguist-generated
-simple_base_project/base_app/static/base_app/dist/js/* linguist-generated
+simple_base_project/base_app/static/base_app/dist/css/** linguist-generated
+simple_base_project/base_app/static/base_app/dist/js/** linguist-generated
 simple_base_project/base_app/static/base_app/jsme_files/** linguist-vendored

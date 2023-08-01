@@ -96,6 +96,11 @@
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></cas-input>
+            <two-numeral-inputs
+                v-if="widget === 'two_numeral_inputs'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></two-numeral-inputs>
         </p>
         <p class="column ketcher-container"
            v-if="widget === 'jsme_input'"
@@ -133,6 +138,7 @@ import DateRangeInput from "@/components/DateRangeInput";
 import StoragePlaceInput from "@/components/StoragePlaceInput";
 import UserInput from "@/components/UserInput";
 import CasInput from "@/components/CasInput";
+import TwoNumeralInputs from "@/components/TwoNumeralInputs";
 
 export default {
 
@@ -147,6 +153,7 @@ export default {
         StructureInputToggle,
         DateInput,
         DateRangeInput,
+        TwoNumeralInputs,
     },
     computed: {
         operatorOptions() {
@@ -210,6 +217,7 @@ export default {
                     'storage_place_input',
                     'user_input',
                     'cas_input',
+                    'two_numeral_inputs',
                 ],
             operatorValue: "",
             termValue: "",
