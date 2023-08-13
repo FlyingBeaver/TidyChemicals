@@ -518,4 +518,4 @@ class QuantityUnit(models.Model):
     # Как минимум кг, г, л, мл, мг
 
     def __str__(self):
-        return str(self.name) + f"; symbol: {self.unit_symbol}"
+        return self.unit_symbol

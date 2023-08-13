@@ -11,26 +11,133 @@ Search results
 <style>
 	div.grid-container {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+		grid-template-columns: 1fr;
 		margin: 10px;
 	}
+
+	span.inner-grid {
+        display: grid;
+        grid-template-columns: 32% 2% 32% 2% 32%;
+        border: solid 1px black;
+        margin: 10px;
+        padding: 20px;
+	}
+
+    span.border {
+    	width:0px;
+    	height: 100%;
+    	border: solid 1px rgb(150, 150, 150, 1.0);
+    }
+
+    div.image {
+    	justify-self: center;
+    	display: grid;
+    	grid-template-columns: minmax(0, 250px) auto;
+    }
 
 	div.pagination {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		margin: 10px;
 	}
+
+	p, span.aq, a {
+		font-family: "Roboto", sans-serif;
+		margin: 0;
+		font-size: 20px;
+	}
+
+	a.substance-title {
+		font-weight: bold;
+	}
+
+	p.substance-quantity {
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+
+	span.aq {
+		justify-self: center;
+		align-self: center;
+		font-size: 25px;
+	}
+
+	div#popup.hidden, div#popup-background.hidden {
+		display: none;
+	}
+
+	div#popup-background {
+		margin-top: -130px;
+        width: 100%;
+        height: 150%;
+        background-color: gray;
+        opacity: 50%;
+        position: fixed;
+        z-index: 9;
+        padding-top: 100px;
+	}
+
+	div#popup {
+        position: fixed;
+        z-index: 10;
+        margin: -5% 10% 10% 10%;
+        height: 80%;
+        width: 80%;
+        background-color: white;
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-template-rows: repeat(10, 1fr);
+	}
+	img.cross {
+		grid-column-start: 10;
+		grid-column-end: 11;
+		grid-row-start: 1;
+		grid-row-end: 3;
+		align-self: start;
+		justify-self: end;
+	}
+	img.structure {
+		grid-column-start: 1;
+		grid-column-end: 11;
+		grid-row-start: 2;
+		grid-row-end: 10;
+		justify-self: center;
+	}
+
 </style>
 {% endblock %}
 <!-- Здесь должна быть ссылка на css-файл страницы поиска -->
 
 {% block content %}
 
+<div class="hidden" id="popup-background"></div>
+
+<div class="hidden" id="popup">
+	<img class="cross" src="/static/base_app/x-lg.svg" width="100%" height="100%">
+	<img class="structure" height="100%">
+</div>
+
 <div class="grid-container">
 {% for file_name, chemical in page_obj|filename_item %}
-<span>
-	<img src="/static/base_app/{{ file_name }}" width=200px>
-	<p>{{ chemical.name }}</p>
+<span class="inner-grid">
+	<div class="image">
+		<img src="/static/base_app/structures/{{ file_name }}" width=100%>
+		{% if 'aq' in chemical.structure %}
+		<span class="aq"><b>·</b>{{chemical.structure.aq}} H<sub>2</sub>O</span>
+		{% endif %}
+	</div>
+	<span class="border"></span>
+	<div>
+		<a class="substance-title" href="/chemical/{{ chemical.id }}/">{{ chemical.name }}</a>
+		<p>{{ chemical.synonyms }}</p>
+		<p class="substance-quantity">{{ chemical.quantity|custom_floatformat }} {{ chemical.quantity_unit }}</p>
+	</div>
+	<span class="border"></span>
+	<div>
+        {% for storage_name in chemical.storage_place|split_path:"root" %}
+	        <p>{{ storage_name }}</p>
+	    {% endfor %}
+	</div>
 </span>
 {% endfor %}
 </div>
@@ -58,5 +165,24 @@ Search results
 	</div>
 	{% endif %}
 </div>
+
+<script type="text/javascript">
+	const togglePopup = function(event) {
+		let target = event.target
+		let pictureSrc = target.getAttribute("src")
+		let popup = document.querySelector("#popup")
+		let popupBack = document.querySelector("#popup-background")
+		let bigPicture = popup.querySelector("img.structure")
+        bigPicture.setAttribute("src", pictureSrc)
+        popup.classList.toggle("hidden")
+        popupBack.classList.toggle("hidden")
+	}
+	for (let element of document.querySelectorAll("img")) {
+        if (!element.classList.contains("structure")) {
+        	element.addEventListener("click", togglePopup)
+        }
+		
+	}
+</script>
 
 {% endblock %}

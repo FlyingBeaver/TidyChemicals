@@ -89,7 +89,7 @@ export const tree = {
         },
         in_interval_between: {
             verbose: 'in interval between',
-                widget: 'two_numerals_and_unit'
+                widget: 'two_numeral_and_unit'
         },
         less_than: {
             verbose: 'less than',

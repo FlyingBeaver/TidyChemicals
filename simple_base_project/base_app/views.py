@@ -7,18 +7,26 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
-from django import template
-from base_app.models import StoragePlace, DatabaseException
+from django.views.defaults import page_not_found
+from base_app.models import Chemical, StoragePlace, DatabaseException
 from base_app.search import find_superstructures
-from base_app.rendering_paginator import RenderingPaginator
+from base_app.rendering_paginator import (RenderingPaginator,
+                                          create_svg,
+                                          PICS_DIRECTORY_PATH)
 
 
-register = template.Library()
-
-
-@register.filter()
-def filename_item(page_obj):
-    return page_obj.filename_item()
+HAZARD_URLS = {
+    "compressed_gas": "/static/base_app/hazard_pictograms/compressed_gas.svg",
+    "corrosive": "/static/base_app/hazard_pictograms/corrosive.svg",
+    "environmental_hazard": "/static/base_app/hazard_pictograms/environmental_hazard.svg",
+    "explosive": "/static/base_app/hazard_pictograms/explosive.svg",
+    "flammable": "/static/base_app/hazard_pictograms/flammable.svg",
+    "harmful": "/static/base_app/hazard_pictograms/harmful.svg",
+    "health_hazard": "/static/base_app/hazard_pictograms/health_hazard.svg",
+    "ionizing_radiation": "/static/base_app/hazard_pictograms/ionizing_radiation.svg",
+    "oxidizing": "/static/base_app/hazard_pictograms/oxidizing.svg",
+    "toxic": "/static/base_app/hazard_pictograms/toxic.svg"
+}
 
 
 def process_mol_block(mol_block, request, page_number=1):
@@ -96,6 +104,28 @@ def tree_api(request):
                 for child in children:
                     response_dict[child.id] = [child.name, child.terminal]
                 return JsonResponse(response_dict)
+
+
+def chemical_view(request, chemical_id):
+    try:
+        chemical = Chemical.objects.get(id=chemical_id)
+        if chemical.hazard_pictograms is None:
+            hazard_list = []
+        else:
+            hazard_list = chemical.hazard_pictograms.split(", ")
+        hazards = []
+        for item in hazard_list:
+            hazards.append(HAZARD_URLS[item])
+        picture_file = create_svg(None, chemical)
+        context = {
+            "chemical": chemical,
+            "picture_file": picture_file,
+            "hazards": hazards
+        }
+        return render(request, "chemical_view.html", context)
+    except ObjectDoesNotExist:
+        return page_not_found(request)
+
 
 
 def new_search(request):

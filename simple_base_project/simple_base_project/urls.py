@@ -9,6 +9,7 @@ urlpatterns = [
     path('search/', login_required(base_app.views.search_view)),
     path('tree_api/', login_required(base_app.views.tree_api)),
     path('new_search/', login_required(base_app.views.new_search)),
+    path('chemical/<int:chemical_id>/', login_required(base_app.views.chemical_view)),
     path('', profiles.views.HomePage),
     path('registration/', profiles.views.RegistrationPage.as_view()),
     path('login/', profiles.views.LoginPage.as_view()),

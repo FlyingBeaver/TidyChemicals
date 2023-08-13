@@ -101,6 +101,11 @@
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></two-numeral-inputs>
+            <two-numeral-and-unit
+                v-if="widget === 'two_numeral_and_unit'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></two-numeral-and-unit>
         </p>
         <p class="column ketcher-container"
            v-if="widget === 'jsme_input'"
@@ -139,10 +144,12 @@ import StoragePlaceInput from "@/components/StoragePlaceInput";
 import UserInput from "@/components/UserInput";
 import CasInput from "@/components/CasInput";
 import TwoNumeralInputs from "@/components/TwoNumeralInputs";
+import TwoNumeralAndUnit from "@/components/TwoNumeralAndUnit";
 
 export default {
 
     components: {
+        TwoNumeralAndUnit,
         CasInput,
         UserInput,
         StoragePlaceInput,
@@ -218,6 +225,7 @@ export default {
                     'user_input',
                     'cas_input',
                     'two_numeral_inputs',
+                    'two_numeral_and_unit',
                 ],
             operatorValue: "",
             termValue: "",
