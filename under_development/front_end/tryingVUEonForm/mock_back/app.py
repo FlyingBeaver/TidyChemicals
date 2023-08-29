@@ -2,6 +2,7 @@ import json
 from flask import Flask, request
 from flask_cors import CORS
 from instead_of_db import storages, users_dict, recent
+from mol import mol
 
 
 storages_dict = dict()
@@ -14,6 +15,7 @@ for item in storages:
 
 app = Flask(__name__)
 CORS(app)
+delta = {"ops":[{"insert":"tret-Butyldimethylsilyl chloride\n"}]}
 
 
 @app.route("/check/")
@@ -66,6 +68,30 @@ def show_request():
 def users():
     return {"users": users_dict, "recent": recent}
     # Будет возвращать словарь формата {id_юзера: имя_юзера}
+
+
+@app.route("/chemical/", methods=("POST", "GET"))
+def chemical_data():
+    return {"name_code": "<p>tret-Butyldimethylsilyl chloride</p>",
+            "name_delta": delta,
+            "structure_pic": "TBDMSCl.png",
+            "structure_mol": mol,
+            "location": "root/Лаборатория 1/Холодильник/Нижняя полка",
+            "quantity": "50 g",
+            "hazard_pictograms": ["flammable", "corrosive", "environmental_hazard"],
+            "molar_mass": "150,72",
+            "cas": "18162-48-6",
+            "synonyms": ("tret-Butyl(chloro)dimethylsilane, "
+                         "tret-Butyldimethychlorosilane, TBDMSCl"),
+            "comments": "Use parafilm to seal the bottle",
+            "tags": ["#protecting_groups",
+                     "&silyl_chlorides",
+                     "Favorites"],
+            "created_by": "@johndoe",
+            "creation_date": "22.01.2023",
+            "last_change_by": "@janedoe",
+            "last_change_date": "23.01.2023"
+            }
 
 
 if __name__ == '__main__':

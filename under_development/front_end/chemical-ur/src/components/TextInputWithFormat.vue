@@ -1,5 +1,5 @@
 <template>
-    <div id="standalone-container" v-bind:class="{disabled: disabled}">
+    <div id="standalone-container">
         <div id="toolbar-container" ref="toolbar">
             <span class="ql-formats">
                 <button class="ql-bold"></button>
@@ -76,20 +76,10 @@
         <!-- здесь будет всплывать предупреждение при вводе недопустимых символов -->
         <div v-bind:class="{warning: true, 'hide-me': warningHidden}">You are trying to enter a character that is not allowed in this field. Only digits, latin and greek letters with no diacritics, space, full stop (period), comma, (), [], {}, +, -, /, :, ;, ±, — and ′ are allowed.</div>
     </div>
-    <input
-        type="hidden"
-        v-bind:name="inputName + '_content'"
-        v-model="contentInputContent"
-    >
-    <input
-        type="hidden"
-        v-bind:name="inputName + '_format'"
-        v-model="formattingInputContent"
-    >
 </template>
 
 <script>
-import {characters, characters_in_string, difference} from "@/components/constants";
+import {characters, characters_in_string, difference} from "./constants.js";
 import Quill from "quill"
 export default {
     name: "TextInputWithFormat",
@@ -106,7 +96,7 @@ export default {
         }
     },
     props:
-        ["inputName", "disabled"],
+        ["content"],
     methods: {
         showWarning() {
             this.warningHidden = false
@@ -123,13 +113,14 @@ export default {
             let selection_start = quill_range.index
             let selection_length = quill_range.length
             if (selection_length > 0) {
+                console.log("delete3")
                 this.editor.deleteText(selection_start, selection_length)
             }
             this.editor.insertText(selection_start, character)
             this.editor.setSelection(selection_start + 1)
         },
         checkInserted(delta, oldDelta, source) {
-            console.log(oldDelta, source)
+            console.log(delta)
             let insertedCharacter = ""
             let delta_ops = delta.ops
             for (let i = 0; i < delta_ops.length; i++) {
@@ -142,6 +133,7 @@ export default {
                 this.showWarning()
                 let fullText = this.editor.getText(0, this.editor.getLength())
                 let position = fullText.indexOf(insertedCharacter)
+                console.log("delete1")
                 this.editor.deleteText(position, 1, "silent")
                 let selectionRange = this.editor.getSelection()
                 let newPosition = selectionRange.index
@@ -155,9 +147,10 @@ export default {
                 this.showWarning()
                 let fullText = this.editor.getText(0, this.editor.getLength() - 1)
                 let oddChars = difference(new Set(fullText), this.charactersSet)
+                console.log(oddChars)
                 for (let char of oddChars) {
                     while (fullText.indexOf(char) !== -1) {
-                        console.log(char)
+                        console.log("delete2")
                         let charPosition = fullText.indexOf(char)
                         this.editor.deleteText(charPosition, 1, "silent")
                         fullText = this.editor.getText(0, this.editor.getLength() - 1)
@@ -173,6 +166,10 @@ export default {
             this.contentInputContent = this
                 .editor.getText(0, this.editor.getLength() - 1)
             this.formattingInputContent = this.qlEditor.innerHTML
+        },
+        localCompleteEditing() {
+            this.completeEditing("name_delta", this.editor.getContents())
+            this.completeEditing("name_code", this.formattingInputContent)
         }
     },
     mounted() {
@@ -192,7 +189,9 @@ export default {
         this.editor.on("text-change", this.checkInserted)
         this.qlEditor = this.$refs.editor.querySelector(".ql-editor")
         this.editor.on("text-change", this.updateInputs)
-    }
+        this.editor.setContents(this.content)
+    },
+    inject: ["completeEditing"]
 }
 </script>
 

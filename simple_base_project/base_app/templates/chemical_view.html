@@ -1,0 +1,89 @@
+{% extends "basic_template.html" %}
+{% load static %}
+{% load filename_item %}
+
+{% block title %}
+Chemical view
+{% endblock %}
+
+
+{% block head_content %}
+<style>
+	div.grid-container {
+		display: grid;
+		grid-template-columns: 1fr;
+		margin: 10px;
+	}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="grid-container">
+	<div>
+		<p class="label">Name:</p>
+	    <p class="value name">{{ chemical.name }}</p>
+	</div>
+	<div>
+		<p class="label">Structure:</p>
+		<p class="value"><img src="/static/base_app/structures/{{ picture_file }}"></p>
+	</div>
+	<div>
+		<p class="label">Location:</p>
+		<p class="value">{{ chemical.storage_place }}</p>
+	</div>
+	<div>
+		<p class="label">Quantity:</p>
+		<p class="value quantity">
+			{{ chemical.quantity|custom_floatformat }} {{chemical.unit}}
+		</p>
+	</div>
+	<div>
+		<p class="label">Hazard pictograms:</p>
+		<p class="value">
+			{% for hazard_url in data.hazards %}
+			<img src="{{ hazard_url }}">
+			{% endfor %}
+		</p>
+	</div>
+	<div>
+		<p class="label">Molar mass:</p>
+		<p class="value">{{ chemical.molar_mass|floatformat:2 }}</p>
+	</div>
+	<div>
+		<p class="label">CAS RN:</p>
+		<p class="value">{{ chemical.cas|cas_format }}</p>
+	</div>
+	<div>
+		<p class="label">Synonyms:</p>
+		<p class="value">{{ chemical.synonyms }}</p>
+	</div>
+	<div>
+		<p class="label">Comments:</p>
+		<p class="value">{{ chemical.comment }}</p>
+	</div>
+	<div>
+		<p class="label">Tags:</p>
+		<p class="value"></p>
+	</div>
+	<div>
+		<p class="label">Created by:</p>
+		<p class="value">{{ chemical.who_created }}</p>
+	</div>
+	<div>
+		<p class="label">Creation date:</p>
+		<p class="value">{{ chemical.when_created|date:"d.m.Y" }}</p>
+	</div>
+	<div>
+		<p class="label">Last change by:</p>
+		<p class="value">{{ chemical.who_updated }}</p>
+	</div>
+	<div>
+		<p class="label">Last change date:</p>
+		<p class="value">{{ chemical.when_updated|date:"d.m.Y" }}</p>
+	</div>
+</div>
+
+
+{% endblock %}

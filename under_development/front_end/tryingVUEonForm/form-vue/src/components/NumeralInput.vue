@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import {difference} from "@/components/constants";
+
 export default {
     name: "NumeralInput",
     props: ["inputName", "disabled"],
@@ -32,7 +34,7 @@ export default {
         inputValidation() {
             this.warningOddDelimiter = false
             let valueSet = new Set(this.inputValue)
-            if (this.difference(valueSet, this.numericSymbols).size > 0) {
+            if (difference(valueSet, this.numericSymbols).size > 0) {
                 this.inputValue = this.oldInputValue
                 this.warningWrongSymbol = true
             } else if (this.warningWrongSymbol) {
@@ -52,13 +54,7 @@ export default {
                 }
             }
         },
-        difference(setA, setB) {
-            const _difference = new Set(setA);
-            for (const elem of setB) {
-                _difference.delete(elem);
-            }
-            return _difference;
-        }
+
     }
 }
 </script>
