@@ -3,38 +3,71 @@
         <p class="section-header">
             Hazard pictograms:
         </p>
-        <p
-            v-if="status !== 'hazardpictograms'"
-        >
-            <img v-for="picture in picUrls" v-bind:src="picture" width="100" height="100">
-            <div v-if="picUrls.length === 0">No hazard pictograms</div>
+        <p v-if="status !== 'hazardpictograms'">
+            <img v-for="(value, key) in picUrls"
+                 v-bind:src="value"
+                 v-bind:alt="key"
+                 width="100"
+                 height="100">
+            <div v-if="Object.keys(picUrls).length === 0">No hazard pictograms</div>
         </p>
         <p v-else>
             <table>
-                <tr>
+                <tr class="table-header">
                     <td>Chosen:</td>
                     <td>Available:</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td>
+                    <td>
+                        <img
+                            v-for="(value, key) in chosenPictograms"
+                            v-bind:src="value"
+                            v-bind:alt="key"
+                            v-bind:class="{frame: key === this.highlighted}"
+                            v-on:click="highlightPictogram"
+                            v-on:dblclick="unChoose"
+                            width="100"
+                            height="100">
+                    </td>
+                    <td>
+                        <img
+                            v-for="(value, key) in unChosenPictograms"
+                            v-bind:src="value"
+                            v-bind:alt="key"
+                            v-bind:class="{frame: key === this.highlighted}"
+                            v-on:click="highlightPictogram"
+                            v-on:dblclick="choose"
+                            width="100"
+                            height="100"
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">{{ descriptionOfHighlighted }}</td>
                 </tr>
             </table>
+            <button
+                v-on:click="completeEditing('hazard_pictograms',
+                                            Object.keys(chosenPictograms))"
+            >Complete Editing</button>
         </p>
     </div>
     <div>
         <button
             v-if="status === 'choose'"
-            v-on:click="sectionChosen($options.name.toLowerCase())"
+            v-on:click="localSectionChosen"
         >
             Edit
         </button>
     </div>
-    <div
-        v-if="status === 'name'"
-    >
-        <button v-on:click="completeEditing">Complete Editing</button>
-    </div>
+<!--    <div-->
+<!--        v-if="status === 'hazardpictograms'"-->
+<!--    >-->
+<!--        <button-->
+<!--            v-on:click="completeEditing('hazard_pictograms',-->
+<!--                                        Object.keys(chosenPictograms))"-->
+<!--        >Complete Editing</button>-->
+<!--    </div>-->
 </template>
 
 <script>
@@ -52,7 +85,6 @@ import toxicUrl from "../assets/hazard_pictograms/toxic.svg"
 export default {
     data() {
         return {
-            corrosiveUrlHere: corrosiveUrl,
             picturesUrls: {
                 compressed_gas: compressedGasUrl,
                 corrosive: corrosiveUrl,
@@ -64,14 +96,44 @@ export default {
                 ionizing_radiation: ionizingRadiationUrl,
                 oxidizing: oxidizingUrl,
                 toxic: toxicUrl
-            }
+            },
+            chosenPictograms: [],
+            unChosenPictograms: [],
+            highlighted: "",
         }
     },
     name: "HazardPictograms",
     props: ["initialData", "editedData", "status"],
-    inject: ["sectionChosen"],
+    inject: ["sectionChosen", "completeEditing"],
     methods: {
-        completeEditing() {}
+        localSectionChosen() {
+            this.sectionChosen(this.$options.name.toLowerCase())
+            this.chosenPictograms = this.picUrls
+            let unChosen = {}
+            for (let hazard in this.picturesUrls) {
+                if (!(hazard in this.chosenPictograms)) {
+                    unChosen[hazard] = this.picturesUrls[hazard]
+                }
+            }
+            this.unChosenPictograms = unChosen
+        },
+        highlightPictogram(event) {
+            this.highlighted = event.target.alt
+        },
+        choose(event) {
+            let chosen = event.target.alt
+            this.chosenPictograms[chosen] = this.picturesUrls[chosen]
+            if (chosen in this.unChosenPictograms) {
+                delete this.unChosenPictograms[chosen]
+            }
+        },
+        unChoose(event) {
+            let unChosen = event.target.alt
+            this.unChosenPictograms[unChosen] = this.picturesUrls[unChosen]
+            if (unChosen in this.chosenPictograms) {
+                delete this.chosenPictograms[unChosen]
+            }
+        }
     },
     computed: {
         picUrls() {
@@ -81,23 +143,47 @@ export default {
             } else if ("hazard_pictograms" in this.initialData) {
                 actual_list = this.initialData["hazard_pictograms"]
             } else {
-                return []
+                return {}
             }
-            let result = []
+            let result = {}
             for (let hazard of actual_list) {
-                console.log(hazard)
-                result.push(this.picturesUrls[hazard])
+                result[hazard] = this.picturesUrls[hazard]
             }
-            console.log(result)
             return result
+        },
+        descriptionOfHighlighted() {
+            if (this.highlighted === "") {
+                return "Double-click on pictogram to choose it"
+            } else {
+                let withSpaces = this.highlighted.replace("_", " ")
+                return withSpaces[0].toUpperCase() + withSpaces.slice(1)
+            }
         }
     },
     mounted() {
-        console.log(this.initialData)
+        //console.log(JSON.stringify(this.initialData))
     }
 }
 </script>
 
-<style scoped>
+<style>
+table {
+    border: solid black 1px;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
 
+td {
+    border: solid black 1px;
+}
+
+tr.table-header {
+    text-align: center;
+    background-color: lightgray;
+    font-weight: bold;
+}
+
+img.frame {
+    border: 3px solid black;
+}
 </style>

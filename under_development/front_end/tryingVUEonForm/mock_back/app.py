@@ -1,8 +1,12 @@
 import json
-from flask import Flask, request
-from flask_cors import CORS
+from flask import Flask, request, url_for, render_template, redirect
+from flask_cors import CORS, cross_origin
 from instead_of_db import storages, users_dict, recent
 from mol import mol
+from rdkit.Chem.rdmolfiles import MolFromMolBlock
+from rdkit.Chem.Draw import MolToFile
+from uuid import uuid4
+from storages_dict import children_of, path_children
 
 
 storages_dict = dict()
@@ -18,8 +22,29 @@ CORS(app)
 delta = {"ops":[{"insert":"tret-Butyldimethylsilyl chloride\n"}]}
 
 
-@app.route("/check/")
+@app.route('/', methods=['GET', 'POST'])
+@cross_origin()
 def index():
+    return render_template('index.html')
+
+
+@app.route('/templates/fg.sdf')
+def fg_redirect():
+    return redirect("/static/templates/fg.sdf", code=302)
+
+
+@app.route('/templates/library.sdf')
+def library_redirect():
+    return redirect("/static/templates/library.sdf", code=302)
+
+
+@app.route('/templates/library.svg')
+def library_svg_redirect():
+    return redirect("/static/templates/library.svg", code=302)
+
+
+@app.route("/check/")
+def check():
     return """<form action="http://127.0.0.1:5000/" method="POST">
         <p>Children of:</p>
         <input type="text" name="give_children_of">
@@ -72,10 +97,12 @@ def users():
 
 @app.route("/chemical/", methods=("POST", "GET"))
 def chemical_data():
-    return {"name_code": "<p>tret-Butyldimethylsilyl chloride</p>",
+    return {"id": 29,
+            "name_code": "<p>tret-Butyldimethylsilyl chloride</p>",
             "name_delta": delta,
-            "structure_pic": "TBDMSCl.png",
+            "structure_pic": url_for("static", filename="TBDMSCl.png"),
             "structure_mol": mol,
+            "structure_aq": 5,
             "location": "root/Лаборатория 1/Холодильник/Нижняя полка",
             "quantity": "50 g",
             "hazard_pictograms": ["flammable", "corrosive", "environmental_hazard"],
@@ -92,6 +119,36 @@ def chemical_data():
             "last_change_by": "@janedoe",
             "last_change_date": "23.01.2023"
             }
+
+
+@app.route("/tags/", methods=("POST", "GET"))
+def tags():
+    return {"ampersandtags": ["tag_one", "tagTwo", "Tag_three"],
+            "hashtags": ["tag_four", "tagFIVE", "tagSix"]}
+
+
+@app.route("/convert/", methods=["POST"])
+def convert():
+    mol_block = request.json["molBlock"]
+    structure = MolFromMolBlock(mol_block)
+    name = f"/static/{uuid4()}.svg"
+    MolToFile(structure, "." + name, imageType="svg")
+    return {"link_to_file": name}
+
+
+@app.route("/root/", methods=("POST", "GET"))
+def root():
+    return {"name": "root", "type": 0, "id": 0}
+
+
+@app.route("/children/<id>", methods=("POST", "GET"))
+def children(id):
+    return children_of(int(id))
+
+
+@app.route("/path_to_chemical/<id>", methods=("POST", "GET"))
+def path_to_chemical(id):
+    return path_children(int(id))
 
 
 if __name__ == '__main__':

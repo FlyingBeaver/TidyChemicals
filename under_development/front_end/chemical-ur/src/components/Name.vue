@@ -1,6 +1,8 @@
 <template>
     <div>
-        <p class="section-header">
+        <p class="section-header"
+           v-bind:class="{'additional-padding': status === 'name'}"
+        >
             <span v-if="status === 'name'">*</span>
             Name:
         </p>
@@ -12,10 +14,15 @@
         <p v-else>
             <text-input-with-format
                 ref="TextInputWithFormat"
-                v-bind:content="nameDelta"
+                v-bind:content="nameCode"
             >
             </text-input-with-format>
         </p>
+        <div
+            v-if="status === 'name'"
+        >
+            <button v-on:click="completeEditing">Complete Editing</button>
+        </div>
     </div>
     <div>
         <button
@@ -24,11 +31,6 @@
         >
             Edit
         </button>
-    </div>
-    <div
-        v-if="status === 'name'"
-    >
-        <button v-on:click="completeEditing">Complete Editing</button>
     </div>
 </template>
 
@@ -63,6 +65,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+p.section-header {
+    font-weight: bold;
+}
 
+.additional-padding {
+    padding-bottom: 10px;
+}
 </style>
+

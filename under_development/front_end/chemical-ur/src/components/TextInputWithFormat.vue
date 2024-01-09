@@ -170,6 +170,9 @@ export default {
         localCompleteEditing() {
             this.completeEditing("name_delta", this.editor.getContents())
             this.completeEditing("name_code", this.formattingInputContent)
+        },
+        insertInitialText() {
+            this.qlEditor.innerHTML = this.content
         }
     },
     mounted() {
@@ -189,7 +192,7 @@ export default {
         this.editor.on("text-change", this.checkInserted)
         this.qlEditor = this.$refs.editor.querySelector(".ql-editor")
         this.editor.on("text-change", this.updateInputs)
-        this.editor.setContents(this.content)
+        this.insertInitialText()
     },
     inject: ["completeEditing"]
 }

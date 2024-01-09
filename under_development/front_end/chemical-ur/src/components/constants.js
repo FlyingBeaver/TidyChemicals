@@ -269,3 +269,6 @@ export const difference = function (setA, setB) {
     }
     return _difference;
 }
+
+export const charactersForTags = ("#&0123456789abcdefghijklmnopqrstu" +
+                                  "vwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")

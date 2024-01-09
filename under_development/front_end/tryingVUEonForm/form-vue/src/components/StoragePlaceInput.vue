@@ -37,10 +37,18 @@ export default {
             this.selectedStorages = JSON.stringify(newValue)
         }
     },
-    mounted() {
+    async mounted() {
+        let response = await fetch("http://localhost:5000/root/")
+        let root
+        if (response.ok) {
+            root = await response.json()
+        } else {
+            root = "error"
+        }
         this.tree = new Tree(
             this.$refs.tree_container,
-            this.inputName
+            this.inputName,
+            root
         )
     },
 }
