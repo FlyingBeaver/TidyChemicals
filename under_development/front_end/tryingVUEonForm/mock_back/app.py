@@ -102,7 +102,7 @@ def chemical_data():
             "name_delta": delta,
             "structure_pic": url_for("static", filename="TBDMSCl.png"),
             "structure_mol": mol,
-            "structure_aq": 5,
+            "structure_aq": 0,
             "location": "root/Лаборатория 1/Холодильник/Нижняя полка",
             "quantity": "50 g",
             "hazard_pictograms": ["flammable", "corrosive", "environmental_hazard"],
