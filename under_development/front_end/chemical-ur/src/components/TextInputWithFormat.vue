@@ -89,14 +89,17 @@ export default {
             greekAlphabetHidden: true,
             warningHidden: true,
             text: "",
-            charactersSet: new Set(characters_in_string),
+            charactersSet: null,
+            charactersString: "",
             qlEditor: null,
             contentInputContent: "",
             formattingInputContent: "",
         }
     },
     props:
-        ["content"],
+        {"content": String, "allowLineBreak": Boolean, "charRestriction": Boolean},
+    emits: ["editing-complete"],
+    inject: ["completeEditing"],
     methods: {
         showWarning() {
             this.warningHidden = false
@@ -113,14 +116,25 @@ export default {
             let selection_start = quill_range.index
             let selection_length = quill_range.length
             if (selection_length > 0) {
-                console.log("delete3")
                 this.editor.deleteText(selection_start, selection_length)
             }
             this.editor.insertText(selection_start, character)
             this.editor.setSelection(selection_start + 1)
         },
+        deleteEnteredChar(insertedCharacter) {
+            this.showWarning()
+            let fullText = this.editor.getText(0, this.editor.getLength())
+            let position = fullText.indexOf(insertedCharacter)
+            this.editor.deleteText(position, 1, "silent")
+            let selectionRange = this.editor.getSelection()
+            let newPosition = selectionRange.index
+            // Otherwise, cursor moves forward. Strange, but works:
+            setTimeout(
+                () => this.editor.setSelection(newPosition, 0),
+                0
+            )
+        },
         checkInserted(delta, oldDelta, source) {
-            console.log(delta)
             let insertedCharacter = ""
             let delta_ops = delta.ops
             for (let i = 0; i < delta_ops.length; i++) {
@@ -128,38 +142,43 @@ export default {
                     insertedCharacter = delta_ops[i].insert
                 }
             }
-            if (insertedCharacter !== "" && insertedCharacter.length === 1 &&
-                characters_in_string.indexOf(insertedCharacter) === -1) {
-                this.showWarning()
-                let fullText = this.editor.getText(0, this.editor.getLength())
-                let position = fullText.indexOf(insertedCharacter)
-                console.log("delete1")
-                this.editor.deleteText(position, 1, "silent")
-                let selectionRange = this.editor.getSelection()
-                let newPosition = selectionRange.index
-                // Otherwise, cursor moves forward. Strange, but works:
-                setTimeout(
-                    () => this.editor.setSelection(newPosition, 0),
-                    0
-                )
-            } else if (insertedCharacter !== "" && insertedCharacter.length > 1 &&
-                difference(new Set(insertedCharacter), this.charactersSet).size > 0) {
-                this.showWarning()
-                let fullText = this.editor.getText(0, this.editor.getLength() - 1)
-                let oddChars = difference(new Set(fullText), this.charactersSet)
-                console.log(oddChars)
-                for (let char of oddChars) {
-                    while (fullText.indexOf(char) !== -1) {
-                        console.log("delete2")
-                        let charPosition = fullText.indexOf(char)
-                        this.editor.deleteText(charPosition, 1, "silent")
-                        fullText = this.editor.getText(0, this.editor.getLength() - 1)
+            if (this.charRestriction === true) {
+                if (insertedCharacter !== "" && insertedCharacter.length === 1 &&
+                    this.charactersString.indexOf(insertedCharacter) === -1) {
+                    this.deleteEnteredChar(insertedCharacter)
+                } else if (insertedCharacter !== "" && insertedCharacter.length > 1 &&
+                    difference(new Set(insertedCharacter), this.charactersSet).size > 0) {
+                    this.showWarning()
+                    let fullText = this.editor.getText(0, this.editor.getLength() - 1)
+                    let oddChars = difference(new Set(fullText), this.charactersSet)
+                    for (let char of oddChars) {
+                        while (fullText.indexOf(char) !== -1) {
+                            let charPosition = fullText.indexOf(char)
+                            this.editor.deleteText(charPosition, 1, "silent")
+                            fullText = this.editor.getText(0, this.editor.getLength() - 1)
+                        }
                     }
                 }
-            }
-            if (!this.warningHidden &&
-                characters_in_string.indexOf(insertedCharacter) !== -1) {
-                this.hideWarning()
+                if (!this.warningHidden &&
+                    this.charactersString.indexOf(insertedCharacter) !== -1) {
+                    this.hideWarning()
+                }
+            } else {
+                if (this.allowLineBreak === false) {
+                    if (insertedCharacter === "\n") {
+                        this.deleteEnteredChar(insertedCharacter)
+                    } else if (insertedCharacter.indexOf("\n") !== -1) {
+                        let fullText = this.editor.getText(0, this.editor.getLength() - 1)
+                        console.log(fullText)
+                        while (fullText.indexOf("\n") !== -1) {
+                            let charPosition = fullText.indexOf("\n")
+                            this.editor.deleteText(charPosition, 1, "silent")
+                            fullText = this.editor.getText(0, this.editor.getLength() - 1)
+                        }
+                    } else if (!this.warningHidden) {
+                        this.hideWarning()
+                    }
+                }
             }
         },
         updateInputs() {
@@ -168,8 +187,9 @@ export default {
             this.formattingInputContent = this.qlEditor.innerHTML
         },
         localCompleteEditing() {
-            this.completeEditing("name_delta", this.editor.getContents())
-            this.completeEditing("name_code", this.formattingInputContent)
+            let delta = this.editor.getContents()
+            let html = this.formattingInputContent
+            this.$emit("editing-complete", {html: html, delta: delta})
         },
         insertInitialText() {
             this.qlEditor.innerHTML = this.content
@@ -193,8 +213,14 @@ export default {
         this.qlEditor = this.$refs.editor.querySelector(".ql-editor")
         this.editor.on("text-change", this.updateInputs)
         this.insertInitialText()
+        if (this.allowLineBreak) {
+            this.charactersSet = new Set(characters_in_string + "\n")
+            this.charactersString = characters_in_string + "\n"
+        } else {
+            this.charactersSet = new Set(characters_in_string)
+            this.charactersString = characters_in_string
+        }
     },
-    inject: ["completeEditing"]
 }
 </script>
 
@@ -203,6 +229,7 @@ export default {
     #standalone-container {
         margin: auto;
         max-width: 720px;
+        padding-top: 30px;
     }
     #editor-container {
         height: 45px;

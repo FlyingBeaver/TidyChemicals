@@ -1,30 +1,28 @@
 <template>
     <div>
-        <p class="section-header"
-        >
-            <span v-if="status === 'name'">*</span>
-            Name:
+        <p class="section-header">
+            Comment:
         </p>
         <p
             class="name-value"
-            v-if="status !== 'name'"
-            v-html="nameCode"
+            v-if="status !== 'comment'"
+            v-html="commentCode"
         ></p>
         <p v-else>
             <text-input-with-format
                 ref="TextInputWithFormat"
-                v-bind:content="nameCode"
+                v-bind:content="commentCode"
+                v-bind:allow-line-break="true"
+                v-bind:char-restriction="false"
                 v-on:editing-complete="editingCompleteListener"
-                v-bind:allow-line-break="false"
-                v-bind:char-restriction="true"
             >
             </text-input-with-format>
         </p>
         <div
-            v-if="status === 'name'"
+            v-if="status === 'comment'"
         >
-            <button v-on:click="localCompleteEditing">Complete editing</button>
-            <button v-on:click="setChoose">Discard changes</button>
+            <button v-on:click="localCompleteEditing">Save</button>
+            <button v-on:click="setChoose">Don't save</button>
         </div>
     </div>
     <div>
@@ -40,7 +38,7 @@
 <script>
 import TextInputWithFormat from "./TextInputWithFormat.vue";
 export default {
-    name: "Name",
+    name: "Comment",
     components: {TextInputWithFormat},
     props: ["status", "initialData", "editedData"],
     inject: ["sectionChosen", "completeEditing", "setChoose"],
@@ -49,25 +47,24 @@ export default {
             this.$refs.TextInputWithFormat.localCompleteEditing()
         },
         editingCompleteListener(data) {
-            console.log(data)
-            this.completeEditing("name_data", data)
+            this.completeEditing("comment", data)
         }
     },
     computed: {
-        nameCode() {
-            if ('name_data' in this.editedData) {
-                return this.editedData.name_data.html
-            } else if ('name_data' in this.initialData) {
-                return this.initialData.name_data.html
+        commentCode() {
+            if ('comment' in this.editedData) {
+                return this.editedData.comment.html
+            } else if ('comment' in this.initialData) {
+                return this.initialData.comment.html
             } else {
                 return null
             }
         },
-        nameDelta() {
-            if ('name_data' in this.editedData) {
-                return this.editedData.name_data.delta
-            } else if ('name_data' in this.initialData) {
-                return this.initialData.name_data.delta
+        commentDelta() {
+            if ('comment' in this.editedData) {
+                return this.editedData.comment.delta
+            } else if ('comment' in this.initialData) {
+                return this.initialData.comment.delta
             } else {
                 return null
             }

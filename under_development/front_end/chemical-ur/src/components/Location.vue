@@ -17,10 +17,14 @@
             </div>
         </div>
         <input type="hidden" name="treeOutput" ref="treeOutput">
-        <button
-            v-if="status === 'location'"
-            v-on:click="localCompleteEditing"
-        >Complete editing</button>
+        <div v-if="status === 'location'">
+            <button
+                v-on:click="localCompleteEditing"
+            >Complete editing</button>
+            <button
+                v-on:click="setChoose"
+            >Discard changes</button>
+        </div>
     </div>
     <div>
         <button
@@ -38,7 +42,12 @@ import {Tree} from "./trees_editor05.js";
 export default {
     name: "Location",
     props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing", "updateStorageId"],
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "updateStorageId",
+        "setChoose",
+    ],
     data() {
         return {
             editorIsOn: false,
@@ -65,6 +74,7 @@ export default {
             } else {
                 root = "error"
             }
+            console.log(this.initialData.id)
             let response2 = await fetch(
                 "http://localhost:5000/path_to_chemical/" +
                 String(this.initialData.id)
@@ -93,6 +103,7 @@ export default {
 </script>
 
 <style>
+/*Not scoped! It breaks tree!*/
 .tree {
     background: snow;
     min-height: 100px;

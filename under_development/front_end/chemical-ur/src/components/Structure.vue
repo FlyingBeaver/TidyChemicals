@@ -7,7 +7,7 @@
              v-if="status !== 'structure'"
         >
             <img v-bind:src="structurePic">
-            <span class="water-number" v-if="waterNumberType !== 'dry'">
+            <span class="water-number" v-if="waterNumberType !== 'dry' && Number(waterNumber) !== 0">
                 <span class="dot">⋅</span>
                 <span class="fraction" v-if="waterNumberType === 'fractional'">
                     <span>{{numerator}}</span>
@@ -25,7 +25,8 @@
                 v-on:ketcher-loaded="ketcherLoadListener">
             </structure-input>
             <div>
-                <button v-on:click="localCompleteEditing">Complete Editing</button>
+                <button v-on:click="localCompleteEditing">Complete editing</button>
+                <button v-on:click="setChoose">Discard changes</button>
             </div>
         </div>
     </div>
@@ -48,7 +49,7 @@ export default {
     name: "Structure",
     components: {StructureInput},
     props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing"],
+    inject: ["sectionChosen", "completeEditing", "setChoose"],
     data() {
         return {
             waterNumber: "",

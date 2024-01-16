@@ -3,14 +3,15 @@
         <p class="section-header">
             Tags
         </p>
-        <div v-if="status === 'tags'"
-             v-for="(tag, index) in editableTagsList"
-             class="tag"
-             v-bind:data-key="index">
-            {{ tag }}
-            <span v-on:click="deleteTag"
-                  class="delete-x"
-            >X</span>
+        <div v-if="status === 'tags'">
+            <div v-for="(tag, index) in editableTagsList"
+                 class="tag"
+                 v-bind:data-key="index">
+                {{ tag }}
+                <span v-on:click="deleteTag"
+                      class="delete-x"
+                >X</span>
+            </div>
         </div>
         <div v-if="status === 'tags'"
              class="tags-grid"
@@ -82,6 +83,10 @@
             <button
                 v-on:click="localCompleteEditing"
             >Complete Editing</button>
+            <button
+                v-on:click="setChoose"
+            >Discard changes</button>
+
         </div>
     </div>
     <div>
@@ -92,8 +97,13 @@
 import {difference, charactersForTags} from "./constants.js";
 export default {
     name: "Tags",
-    props: ["status", "initialData", "editedData", "availableTags"],
-    inject: ["sectionChosen", "completeEditing"],
+    props: [
+        "status",
+        "initialData",
+        "editedData",
+        "tagsAddress",
+    ],
+    inject: ["sectionChosen", "completeEditing", "setChoose"],
     data() {
         return {
             startOfTagsUrl: "",
@@ -109,6 +119,7 @@ export default {
             oddCharsWarning: false,
             tooManySpecialCharsWarning: false,
             specialCharNotInStartWarning: false,
+            availableTags: []
         }
     },
     methods: {
@@ -150,7 +161,6 @@ export default {
                     this.highlightedTagIndex -= 1
                 }
             }
-            console.log(this.highlightedTagIndex)
         },
         inputEnterKey() {
             if (this.highlightedTagIndex === null &&
@@ -211,7 +221,6 @@ export default {
         },
         localCompleteEditing() {
             this.completeEditing("tags", this.editableTagsList)
-            this.status = "view"
         }
     },
     computed: {
@@ -254,34 +263,49 @@ export default {
         },
         tagsArray () {
             let result = []
-            for (let item of this.availableTags.hashtags) {
-                result.push("#" + item.toLowerCase())
+            if ("hashtags" in this.availableTags) {
+                for (let item of this.availableTags.hashtags) {
+                    result.push("#" + item.toLowerCase())
+                }
             }
-            for (let item of this.availableTags.ampersandtags) {
-                result.push("&" + item.toLowerCase())
+            if ("ampersandtags" in this.availableTags) {
+                for (let item of this.availableTags.ampersandtags) {
+                    result.push("&" + item.toLowerCase())
+                }
             }
             return result
         },
         availableHashtags() {
             let result = []
-            for (let item of this.availableTags.hashtags) {
-                if (this.chosenHints.indexOf("#" + item) === -1) {
-                    result.push(item)
+            if ("hashtags" in this.availableTags) {
+                for (let item of this.availableTags.hashtags) {
+                    if (this.chosenHints.indexOf("#" + item) === -1) {
+                        result.push(item)
+                    }
                 }
             }
             return result
         },
         availableAmpersandtags() {
             let result = []
-            for (let item of this.availableTags.ampersandtags) {
-                if (this.chosenHints.indexOf("&" + item) === -1) {
-                    result.push(item)
+            if ("ampersandtags" in this.availableTags) {
+                for (let item of this.availableTags.ampersandtags) {
+                    if (this.chosenHints.indexOf("&" + item) === -1) {
+                        result.push(item)
+                    }
                 }
             }
             return result
         }
     },
     watch: {
+        async status(newStatus) {
+            if (newStatus === "tags") {
+                let tagsResponse = await fetch(this.tagsAddress)
+                this.availableTags = await tagsResponse.json()
+                this.fillTagsList()
+            }
+        },
         inputValue(newValue, oldValue) {
             this.highlightedTagIndex = null
             //Check for odd chars
@@ -300,7 +324,7 @@ export default {
                 this.specialCharNotInStartWarning = true
             }
         }
-    }
+    },
 }
 </script>
 

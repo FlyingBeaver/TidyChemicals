@@ -50,6 +50,9 @@
                 v-on:click="completeEditing('hazard_pictograms',
                                             Object.keys(chosenPictograms))"
             >Complete Editing</button>
+            <button
+                v-on:click="discardChanges"
+            >Discard changes</button>
         </p>
     </div>
     <div>
@@ -104,11 +107,14 @@ export default {
     },
     name: "HazardPictograms",
     props: ["initialData", "editedData", "status"],
-    inject: ["sectionChosen", "completeEditing"],
+    inject: ["sectionChosen", "completeEditing", "setChoose"],
     methods: {
-        localSectionChosen() {
-            this.sectionChosen(this.$options.name.toLowerCase())
-            this.chosenPictograms = this.picUrls
+        discardChanges() {
+            this.setup()
+            this.setChoose()
+        },
+        setup() {
+            this.chosenPictograms = Object.assign({}, this.picUrls)
             let unChosen = {}
             for (let hazard in this.picturesUrls) {
                 if (!(hazard in this.chosenPictograms)) {
@@ -116,6 +122,10 @@ export default {
                 }
             }
             this.unChosenPictograms = unChosen
+        },
+        localSectionChosen() {
+            this.sectionChosen(this.$options.name.toLowerCase())
+            this.setup()
         },
         highlightPictogram(event) {
             this.highlighted = event.target.alt

@@ -17,6 +17,11 @@
             v-if="status === 'waternumber'"
         >
         </water-number>
+        <quantity
+            v-bind:initialData="initialData"
+            v-bind:editedData="editedData"
+            v-bind:status="status"
+        ></quantity>
         <location
             v-bind:initialData="initialData"
             v-bind:editedData="editedData"
@@ -28,11 +33,27 @@
             v-bind:status="status"
         >
         </hazard-pictograms>
+        <cas-rn
+            v-bind:initialData="initialData"
+            v-bind:editedData="editedData"
+            v-bind:status="status"
+        ></cas-rn>
+        <synonyms
+            ref="synonyms"
+            v-bind:initialData="initialData"
+            v-bind:editedData="editedData"
+            v-bind:status="status"
+        ></synonyms>
+        <comment
+            v-bind:initialData="initialData"
+            v-bind:editedData="editedData"
+            v-bind:status="status"
+        ></comment>
         <tags
             v-bind:initialData="initialData"
             v-bind:editedData="editedData"
             v-bind:status="status"
-            v-bind:availableTags="availableTags"
+            v-bind:tags-address="tagsAddress"
             ref="tags"
         ></tags>
     </div>
@@ -48,6 +69,9 @@
         <button v-on:click="dontSaveChanges">Don't save changes</button>
         <button v-on:click="saveChanges">Save changes</button>
     </div>
+    <div v-if="status !== 'choose' && status !== 'view'">
+        <button v-on:click="dontSaveChanges">Exit without saving</button>
+    </div>
 <!--    <div v-if="status !== 'view'">-->
 <!--        <button v-on:click="dontSaveChanges">Don't save changes</button>-->
 <!--    </div>-->
@@ -60,9 +84,24 @@ import WaterNumber from "./components/WaterNumber.vue";
 import Structure from "./components/Structure.vue";
 import Tags from "./components/Tags.vue";
 import Location from "./components/Location.vue";
+import Quantity from "./components/Quantity.vue";
+import CasRn from "./components/CasRn.vue";
+import Synonyms from "./components/Synonyms.vue";
+import Comment from "./components/Comment.vue";
 export default {
     name: "App",
-    components: {Tags, Structure, WaterNumber, HazardPictograms, Name, Location},
+    components: {
+        Tags,
+        Structure,
+        WaterNumber,
+        HazardPictograms,
+        Name,
+        Location,
+        Quantity,
+        CasRn,
+        Synonyms,
+        Comment,
+    },
     data() {
         return {
             status: "view",
@@ -89,10 +128,6 @@ export default {
         },
         async addTag() {
             this.sectionChosen('tags')
-            let tagsResponse = await fetch(this.tagsAddress)
-            this.availableTags = await tagsResponse.json()
-            this.$refs.tags.fillTagsList()
-
         },
         async saveChanges() {
             let formData = new FormData()
@@ -108,6 +143,7 @@ export default {
             } else {
                 address = window.location.href
             }
+            console.log(address)
             let response = await fetch(address, {
                 method: "POST",
                 body: formData,
@@ -141,6 +177,13 @@ export default {
             return !(JSON.stringify(this.editedData) === "{}")
         }
     },
+    watch: {
+        status(newStatus, oldStatus) {
+            if (oldStatus === "synonyms" && newStatus !== "synonyms") {
+                this.$refs.synonyms.exitWithoutSaving()
+            }
+        }
+    },
     provide() {
         return {
             sectionChosen: this.sectionChosen,
@@ -149,6 +192,7 @@ export default {
             editedData: this.editedData,
             status: this.status,
             updateStorageId: this.updateStorageId,
+            setChoose: this.setChoose,
         }
     },
     async created() {
@@ -174,5 +218,14 @@ div.grid-container {
 
 div.buttons-container {
     padding: 10px
+}
+
+p {
+    margin: 0;
+}
+
+p.section-header {
+    margin-top: 16px;
+    margin-bottom: 8px;
 }
 </style>

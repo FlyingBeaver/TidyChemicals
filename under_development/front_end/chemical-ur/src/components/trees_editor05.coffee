@@ -44,9 +44,10 @@ export class Tree
 
         Tree.instances.push(@)
         @frame_maker = new FrameMaker(@)
-        @tree_container.addEventListener("mousedown", @tree_container_mouse)
-        @tree_container.addEventListener("mouseup", @tree_container_mouse)
-        @tree_container.addEventListener("mousemove", @tree_container_mouse)
+        if @mode != "chemical_edit"
+            @tree_container.addEventListener("mousedown", @tree_container_mouse)
+            @tree_container.addEventListener("mouseup", @tree_container_mouse)
+            @tree_container.addEventListener("mousemove", @tree_container_mouse)
         @there_was_mousedown = false
 
         if path_to_node != undefined
@@ -246,12 +247,12 @@ class Storage extends Chemical
 
     @open_with_path: (path_to_node) =>
         full_path = path_to_node.full_path
-        children_data = path_to_node.children
-        for i in [0..full_path.length - 2]
+        children_obj = path_to_node.children
+        Receiver.register_children(children_obj)
+        for i in [0..full_path.length - 1]
             node_id_to_open = full_path[i]
             node_to_open = Chemical.chemicals_and_storages[node_id_to_open]
-            node_children = children_data[node_id_to_open]
-            node_to_open.create_children_from_list(node_children)
+            await node_to_open.open()
         last_node_id = full_path.slice(-1)
         last_node = Chemical.chemicals_and_storages[last_node_id]
         last_node.tree.highlight(last_node_id)
@@ -259,22 +260,28 @@ class Storage extends Chemical
     open_close: (event) =>
         @tree.unhighlight(event.target.dataset.storage_node_id)
         if @is_open and event.target == @span
-            ul = @li.querySelector("ul")
-            ul.remove()
-            @children = []
-            @is_open = false
-            @li.classList.remove("open")
-            @li.classList.add("closed")
+            @close()
         else
             if event.target == @span
-                children = await Receiver.get_children(@id)
-                @create_children_from_list(children)
-                if JSON.stringify(children) != "{}"
-                    @is_open = true
-                    @li.classList.remove("closed")
-                    @li.classList.add("open")
+                @open()
         @tree.frame_maker.destructor()
         @tree.frame_maker = new FrameMaker(@tree)
+
+    close: () =>
+        ul = @li.querySelector("ul")
+        ul.remove()
+        @children = []
+        @is_open = false
+        @li.classList.remove("open")
+        @li.classList.add("closed")
+
+    open: () =>
+        children = await Receiver.get_children(@id)
+        @create_children_from_list(children)
+        if JSON.stringify(children) != "{}"
+            @is_open = true
+            @li.classList.remove("closed")
+            @li.classList.add("open")
 
     create_children_from_list: (children) ->
         ul = document.createElement("ul")
@@ -308,16 +315,17 @@ class Storage extends Chemical
 
 
 class Receiver
-    @content = {
-        1: {name: "One", parent: 0}
-        2: {name: "Two", parent: 0}
-        3: {name: "Three", parent: 0}
-        4: {name: "Four", parent: 2}
-        "chem5": {name: "Five", parent: 4}
-    }
+#    @content = {
+#        1: {name: "One", parent: 0}
+#        2: {name: "Two", parent: 0}
+#        3: {name: "Three", parent: 0}
+#        4: {name: "Four", parent: 2}
+#        "chem5": {name: "Five", parent: 4}
+#    }
     # content format: {1: {name: "One", parent: 0, terminal: false}}
     # where 1 is storage id
     @debug = true
+    @content = {}
 
     @call: (parent_id) ->
         result = {}
@@ -334,7 +342,6 @@ class Receiver
             csrfInput = csrfContainer.querySelector("input")
             return csrfInput.getAttribute("value")
 
-
     @tree_api_address: () ->
         return "http://127.0.0.1:5000/children/"
 #        if @debug
@@ -342,14 +349,19 @@ class Receiver
 #        else
 #            window.location.href
 
-
     @get_children: (parent_id) ->
+        if parent_id in @content
+            return @content[parent_id]
         response = await fetch(@tree_api_address() + String(parent_id))
         if response.ok
-            return await response.json()
+            answer = await response.json()
+            Object.assign(@content, answer)
+            return answer
         else
             return "error"
 
+    @register_children: (children_obj) ->
+        Object.assign(@content, children_obj)
 
     @record_creation: () ->
         null

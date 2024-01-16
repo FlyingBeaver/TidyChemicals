@@ -49,7 +49,11 @@
             <button
                 v-on:click="localCompleteEditing"
                 class="bottom"
-            >Complete Editing</button>
+            >Complete editing</button>
+            <button
+                v-on:click="setChoose"
+                class="bottom"
+            >Discard changes</button>
         </div>
     </div>
     <div>
@@ -60,7 +64,7 @@
 export default {
     name: "WaterNumber",
     props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing"],
+    inject: ["sectionChosen", "completeEditing", "setChoose"],
     data() {
         return {
             waterNumberType: "dry",

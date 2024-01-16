@@ -1,4 +1,5 @@
 import json
+from pprint import pprint
 from flask import Flask, request, url_for, render_template, redirect
 from flask_cors import CORS, cross_origin
 from instead_of_db import storages, users_dict, recent
@@ -98,19 +99,34 @@ def users():
 @app.route("/chemical/", methods=("POST", "GET"))
 def chemical_data():
     return {"id": 29,
-            "name_code": "<p>tret-Butyldimethylsilyl chloride</p>",
-            "name_delta": delta,
+            "name_data": {"html": "<p>tret-Butyldimethylsilyl chloride</p>",
+                          "delta": delta},
             "structure_pic": url_for("static", filename="TBDMSCl.png"),
             "structure_mol": mol,
             "structure_aq": 0,
             "location": "root/Лаборатория 1/Холодильник/Нижняя полка",
-            "quantity": "50 g",
+            "quantity": {"number": 50, "unit": "g"},
             "hazard_pictograms": ["flammable", "corrosive", "environmental_hazard"],
             "molar_mass": "150,72",
             "cas": "18162-48-6",
-            "synonyms": ("tret-Butyl(chloro)dimethylsilane, "
-                         "tret-Butyldimethychlorosilane, TBDMSCl"),
-            "comments": "Use parafilm to seal the bottle",
+            "synonyms": [
+                          {
+                          "html": "<p>tret-Butyl(chloro)dimethylsilane</p>", 
+                          "delta": {"ops":[{"insert":"tret-Butyl(chloro)dimethylsilane\n"}]},
+                          },
+                          {
+                          "html": "<p>tret-Butyldimethychlorosilane</p>",
+                          "delta": {"ops":[{"insert":"tret-Butyldimethychlorosilane\n"}]}
+                          },
+                          {
+                          "html": "<p>TBDMSCl</p>",
+                          "delta": {"ops":[{"insert":"TBDMSCl\n"}]}
+                          },
+                         ],
+            "comment":  {
+                          "html": "<p>Use parafilm to seal the bottle</p>",
+                          "delta": {"ops":[{"insert":"Use parafilm to seal the bottle\n"}]}
+                          },
             "tags": ["#protecting_groups",
                      "&silyl_chlorides",
                      "Favorites"],
@@ -119,6 +135,11 @@ def chemical_data():
             "last_change_by": "@janedoe",
             "last_change_date": "23.01.2023"
             }
+
+
+@app.route("/units/", methods=["GET"])
+def units():
+    return ["l", "ml", "g", "kg", "mg"]
 
 
 @app.route("/tags/", methods=("POST", "GET"))
@@ -143,12 +164,15 @@ def root():
 
 @app.route("/children/<id>", methods=("POST", "GET"))
 def children(id):
-    return children_of(int(id))
+    answer = children_of(int(id))
+    pprint(answer)
+    return answer
 
 
 @app.route("/path_to_chemical/<id>", methods=("POST", "GET"))
 def path_to_chemical(id):
-    return path_children(int(id))
+    answer = path_children(int(id))
+    return answer
 
 
 if __name__ == '__main__':
