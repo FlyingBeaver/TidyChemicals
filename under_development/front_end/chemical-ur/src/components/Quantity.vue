@@ -39,17 +39,21 @@ import OneNumeralAndUnit from "./OneNumeralAndUnit.vue";
 export default {
     name: "Quantity",
     props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing", "setChoose"],
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "URLsSettings",
+    ],
     components: {OneNumeralAndUnit},
     data() {
         return {
-            unitsAddress: "http://127.0.0.1:5000/units/",
-            availableUnits: []
+            availableUnits: [],
         }
     },
     methods: {
         async showEditor() {
-            let response = await fetch(this.unitsAddress)
+            let response = await fetch(this.URLsSettings.unitsURL)
             this.availableUnits = await response.json()
             this.sectionChosen("quantity")
         },

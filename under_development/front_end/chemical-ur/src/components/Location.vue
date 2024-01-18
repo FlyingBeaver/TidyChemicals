@@ -47,6 +47,7 @@ export default {
         "completeEditing",
         "updateStorageId",
         "setChoose",
+        "URLsSettings",
     ],
     data() {
         return {
@@ -67,7 +68,7 @@ export default {
         },
         async showEditor() {
             this.sectionChosen(this.$options.name.toLowerCase())
-            let response = await fetch("http://localhost:5000/root/")
+            let response = await fetch(this.URLsSettings.rootStorageURL)
             let root
             if (response.ok) {
                 root = await response.json()
@@ -76,7 +77,7 @@ export default {
             }
             console.log(this.initialData.id)
             let response2 = await fetch(
-                "http://localhost:5000/path_to_chemical/" +
+                this.URLsSettings.pathToChemicalURL +
                 String(this.initialData.id)
             )
             let pathChildren = await response2.json()
@@ -84,7 +85,8 @@ export default {
                 this.$refs.tree_container,
                 "treeOutput",
                 root,
-                pathChildren
+                pathChildren,
+                this.URLsSettings.childrenStoragesURL,
             )
         }
     },

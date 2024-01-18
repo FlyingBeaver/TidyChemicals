@@ -69,7 +69,9 @@
             </span>
         </div>
         <div
-            class="editor-container"
+            v-bind:class="{'editor-container': true,
+                           'editor-height-expandable': allowLineBreak,
+                           'editor-height-fixed': !allowLineBreak}"
             id="editor-container"
             ref="editor"
         ></div>
@@ -232,8 +234,15 @@ export default {
         padding-top: 30px;
     }
     #editor-container {
-        height: 45px;
         border: solid cornflowerblue;
+    }
+
+    .editor-height-fixed {
+        height: 45px;
+    }
+
+    .editor-height-expandable {
+        height: 100%;
     }
 
     #toolbar-container {

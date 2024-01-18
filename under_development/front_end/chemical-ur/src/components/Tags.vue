@@ -101,12 +101,15 @@ export default {
         "status",
         "initialData",
         "editedData",
-        "tagsAddress",
     ],
-    inject: ["sectionChosen", "completeEditing", "setChoose"],
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "URLsSettings",
+    ],
     data() {
         return {
-            startOfTagsUrl: "",
             inputValue: "",
             hashDropdownShown: false,
             ampersandDropdownShown: false,
@@ -236,13 +239,16 @@ export default {
             let result = {}
             for (let tag of tagsList) {
                 if (tag === "Favorites") {
-                    result[tag] = this.startOfTagsUrl + "/favorites/"
+                    result[tag] = this.URLsSettings.favoritesURL
                 } else if (tag.startsWith("#")) {
-                    result[tag] = (this.startOfTagsUrl +
-                        "/hashtags/" + tag.slice(1) + "/")
+                    result[tag] = (
+                        this.URLsSettings.hashtagsURL + tag.slice(1) + "/"
+                    )
                 } else if (tag.startsWith("&")) {
-                    result[tag] = (this.startOfTagsUrl +
-                        "/ampersandtags/" + tag.slice(1) + "/")
+                    result[tag] = (
+                        this.URLsSettings.ampersandtagsURL +
+                        tag.slice(1) + "/"
+                    )
                 } else {
                     throw Error("Unknown format of the tag")
                 }

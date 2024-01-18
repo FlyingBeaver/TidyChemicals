@@ -106,6 +106,11 @@
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></two-numeral-and-unit>
+            <molecular-formula-input
+                v-if="widget === 'molecular_formula_input'"
+                v-bind:disabled="deletionModeOn"
+                v-bind:input-name="rowId + '_value'"
+            ></molecular-formula-input>
         </p>
         <p class="column ketcher-container"
            v-if="widget === 'jsme_input'"
@@ -145,6 +150,7 @@ import UserInput from "@/components/UserInput";
 import CasInput from "@/components/CasInput";
 import TwoNumeralInputs from "@/components/TwoNumeralInputs";
 import TwoNumeralAndUnit from "@/components/TwoNumeralAndUnit";
+import MolecularFormulaInput from "@/components/MolecularFormulaInput";
 
 export default {
 
@@ -161,6 +167,7 @@ export default {
         DateInput,
         DateRangeInput,
         TwoNumeralInputs,
+        MolecularFormulaInput,
     },
     computed: {
         operatorOptions() {
@@ -226,6 +233,7 @@ export default {
                     'cas_input',
                     'two_numeral_inputs',
                     'two_numeral_and_unit',
+                    'molecular_formula_input',
                 ],
             operatorValue: "",
             termValue: "",

@@ -6,7 +6,7 @@ var Chemical, FrameMaker, ListPoint, Receiver, Storage,
 
 export var Tree = (function() {
   class Tree {
-    constructor(tree_container, input_name, root, path_to_node) {
+    constructor(tree_container, input_name, root, path_to_node, children_storages_url) {
       this.update_field = this.update_field.bind(this);
       this.tree_container_mouse = this.tree_container_mouse.bind(this);
       this.highlight = this.highlight.bind(this);
@@ -40,6 +40,7 @@ export var Tree = (function() {
       });
       //there are default (storage_edit) mode, search_form and chemical_edit
       this.mode = "chemical_edit";
+      Tree.children_storages_url = children_storages_url;
       this.highlighted_nodes_ids = [];
       this.tree_container = tree_container;
       this.input_node = document.querySelector(`input[name='${input_name}']`);
@@ -277,6 +278,8 @@ export var Tree = (function() {
 
   Tree.instances = [];
 
+  Tree.children_storages_url = "";
+
   return Tree;
 
 }).call(this);
@@ -440,31 +443,12 @@ Receiver = (function() {
       return result;
     }
 
-    static csrf() {
-      var csrfContainer, csrfInput;
-      if (this.debug) {
-        return "";
-      } else {
-        csrfContainer = document.querySelector("#csrf");
-        csrfInput = csrfContainer.querySelector("input");
-        return csrfInput.getAttribute("value");
-      }
-    }
-
-    static tree_api_address() {
-      return "http://127.0.0.1:5000/children/";
-    }
-
-    //        if @debug
-    //            return "http://127.0.0.1:5000/"
-    //        else
-    //            window.location.href
     static async get_children(parent_id) {
       var answer, response;
       if (indexOf.call(this.content, parent_id) >= 0) {
         return this.content[parent_id];
       }
-      response = (await fetch(this.tree_api_address() + String(parent_id)));
+      response = (await fetch(Tree.children_storages_url + String(parent_id)));
       if (response.ok) {
         answer = (await response.json());
         Object.assign(this.content, answer);

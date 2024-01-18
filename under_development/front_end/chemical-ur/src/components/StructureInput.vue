@@ -2,7 +2,7 @@
     <iframe id="ifKetcher"
             ref="ifKetcher"
             name="ifKetcher"
-            src="http://localhost:5000/"
+            v-bind:src="URLsSettings.ketcherIframeURL"
             width="650"
             height="400"
             v-on:load="$emit('ketcherLoaded')"
@@ -32,7 +32,8 @@ export default {
             ifKetcherWindow.postMessage('{"action": "getMolecule", "pictureNeeded": true}', "*")
         },
     },
-    props: ["inputName", "disabled"]
+    props: ["inputName", "disabled"],
+    inject: ["URLsSettings"],
 }
 </script>
 

@@ -49,11 +49,13 @@
             v-bind:editedData="editedData"
             v-bind:status="status"
         ></comment>
+        <users-dates
+            v-bind:initial-data="initialData"
+        ></users-dates>
         <tags
             v-bind:initialData="initialData"
             v-bind:editedData="editedData"
             v-bind:status="status"
-            v-bind:tags-address="tagsAddress"
             ref="tags"
         ></tags>
     </div>
@@ -88,6 +90,7 @@ import Quantity from "./components/Quantity.vue";
 import CasRn from "./components/CasRn.vue";
 import Synonyms from "./components/Synonyms.vue";
 import Comment from "./components/Comment.vue";
+import UsersDates from "./components/UsersDates.vue";
 export default {
     name: "App",
     components: {
@@ -101,14 +104,17 @@ export default {
         CasRn,
         Synonyms,
         Comment,
+        UsersDates
     },
     data() {
         return {
+            // status can be: "view", "choose", "create"
+            // ("create" not used here)
+            // or equal to component name in lowercase
             status: "view",
             initialData: {},
             editedData: {},
             getContentFromServer: true,
-            tagsAddress: "http://127.0.0.1:5000/tags/",
             availableTags: {}
         }
     },
@@ -137,17 +143,13 @@ export default {
                     formData.append(key, this.editedData[key])
                 }
             }
-            let address = ""
-            if (this.getContentFromServer) {
-                address = "http://127.0.0.1:5000/chemical/"
-            } else {
-                address = window.location.href
-            }
-            console.log(address)
-            let response = await fetch(address, {
+            let response = await fetch(
+                this.URLsSettings.postURL,
+                {
                 method: "POST",
                 body: formData,
-            })
+                }
+            )
             let result = await response.json()
             if (result.error) {
                 alert("Error happened!")
@@ -175,7 +177,25 @@ export default {
     computed: {
         changed() {
             return !(JSON.stringify(this.editedData) === "{}")
-        }
+        },
+        URLsSettings() {
+            let basicUrl = "http://127.0.0.1:5000"
+            return {
+                dataURL: basicUrl + "/chemical/",
+                postURL: basicUrl + "/chemical/",
+                tagsURL: basicUrl + "/tags/",
+                unitsURL: basicUrl + "/units/",
+                rootStorageURL: basicUrl + "/root/",
+                pathToChemicalURL: basicUrl + "/path_to_chemical/",
+                childrenStoragesURL: basicUrl + "/children/",
+                favoritesURL: "/favorites/",
+                hashtagsURL: "/hashtags/",
+                ampersandtagsURL: "/ampersandtags/",
+                usersURL: "/users/",
+                structurePicBaseURL: basicUrl,
+                ketcherIframeURL: basicUrl,
+            }
+        },
     },
     watch: {
         status(newStatus, oldStatus) {
@@ -193,12 +213,13 @@ export default {
             status: this.status,
             updateStorageId: this.updateStorageId,
             setChoose: this.setChoose,
+            URLsSettings: this.URLsSettings,
         }
     },
     async created() {
         if (this.getContentFromServer) {
             let response = await fetch(
-                "http://127.0.0.1:5000/chemical/"
+                this.URLsSettings.dataURL
             )
             this.initialData = await response.json()
         } else {

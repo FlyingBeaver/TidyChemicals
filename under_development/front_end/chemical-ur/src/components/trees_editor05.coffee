@@ -3,7 +3,12 @@
 
 export class Tree
     @instances = []
-    constructor: (tree_container, input_name, root, path_to_node) ->
+    @children_storages_url = ""
+    constructor: (tree_container,
+                  input_name,
+                  root,
+                  path_to_node,
+                  children_storages_url) ->
         if Tree.instances.length >= 2
             throw Error("can't create more than 2 tree instances")
         else if Tree.instances.length == 1
@@ -20,6 +25,7 @@ export class Tree
                     return Tree.instances[0]
         #there are default (storage_edit) mode, search_form and chemical_edit
         @mode = "chemical_edit"
+        Tree.children_storages_url = children_storages_url
         @highlighted_nodes_ids = []
         @tree_container = tree_container
         @input_node = document.querySelector("input[name='#{input_name}']")
@@ -334,25 +340,12 @@ class Receiver
                 result[key] = @content[key].name
         return result
 
-    @csrf: () ->
-        if @debug
-            return ""
-        else
-            csrfContainer = document.querySelector("#csrf")
-            csrfInput = csrfContainer.querySelector("input")
-            return csrfInput.getAttribute("value")
-
-    @tree_api_address: () ->
-        return "http://127.0.0.1:5000/children/"
-#        if @debug
-#            return "http://127.0.0.1:5000/"
-#        else
-#            window.location.href
-
     @get_children: (parent_id) ->
         if parent_id in @content
             return @content[parent_id]
-        response = await fetch(@tree_api_address() + String(parent_id))
+        response = await fetch(
+            Tree.children_storages_url + String(parent_id)
+        )
         if response.ok
             answer = await response.json()
             Object.assign(@content, answer)

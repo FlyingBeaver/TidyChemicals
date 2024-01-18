@@ -19,7 +19,7 @@ export class Tree
                 else if Tree.instances.length == 2 and @number == 1
                     return Tree.instances[0]
         #there are default (storage_edit) mode, search_form and chemical_edit
-        @mode = "chemical_edit"
+        @mode = "search_form"
         @highlighted_nodes_ids = []
         @tree_container = tree_container
         @input_node = document.querySelector("input[name='#{input_name}']")

@@ -38,7 +38,7 @@ export var Tree = (function() {
         }
       });
       //there are default (storage_edit) mode, search_form and chemical_edit
-      this.mode = "chemical_edit";
+      this.mode = "search_form";
       this.highlighted_nodes_ids = [];
       this.tree_container = tree_container;
       this.input_node = document.querySelector(`input[name='${input_name}']`);

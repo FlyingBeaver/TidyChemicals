@@ -6,7 +6,10 @@
         <div class="structure-body"
              v-if="status !== 'structure'"
         >
-            <img v-bind:src="structurePic">
+            <img
+                v-bind:src="structurePic"
+                v-bind:alt="structureName"
+            >
             <span class="water-number" v-if="waterNumberType !== 'dry' && Number(waterNumber) !== 0">
                 <span class="dot">⋅</span>
                 <span class="fraction" v-if="waterNumberType === 'fractional'">
@@ -49,7 +52,12 @@ export default {
     name: "Structure",
     components: {StructureInput},
     props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing", "setChoose"],
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "URLsSettings",
+    ],
     data() {
         return {
             waterNumber: "",
@@ -95,11 +103,30 @@ export default {
         }
     },
     computed: {
+        structureName() {
+            let delta
+            if ('name_data' in this.editedData) {
+                delta = this.editedData.name_data.delta
+            } else if ('name_data' in this.initialData) {
+                delta = this.initialData.name_data.delta
+            } else {
+                return ""
+            }
+            if (delta.ops && delta.ops[0] && delta.ops[0].insert) {
+                return delta.ops[0].insert.slice(0, -1)
+            } else {
+                return ""
+            }
+        },
         structurePic() {
             if ('structure_pic' in this.editedData) {
-                return "http://127.0.0.1:5000/" + this.editedData.structure_pic
+                return (this.URLsSettings.structurePicBaseURL +
+                    this.editedData.structure_pic)
+            } else if ('structure_pic' in this.initialData) {
+                return (this.URLsSettings.structurePicBaseURL +
+                    this.initialData.structure_pic)
             } else {
-                return "http://127.0.0.1:5000/" + this.initialData.structure_pic
+                return ""
             }
         },
         structureAq() {

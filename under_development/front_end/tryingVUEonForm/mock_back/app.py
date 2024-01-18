@@ -1,5 +1,6 @@
 import json
 from pprint import pprint
+from datetime import datetime, date, time
 from flask import Flask, request, url_for, render_template, redirect
 from flask_cors import CORS, cross_origin
 from instead_of_db import storages, users_dict, recent
@@ -16,6 +17,12 @@ for item in storages:
     item2 = dict(item)
     del item2["id"]
     storages_dict[id_] = item2
+
+t = time(11, 45)
+d_created = date(2023, 1, 22)
+d_updated = date(2023, 1, 23)
+datetime_created = datetime.combine(d_created, t)
+datetime_updated = datetime.combine(d_updated, t)
 
 
 app = Flask(__name__)
@@ -131,9 +138,9 @@ def chemical_data():
                      "&silyl_chlorides",
                      "Favorites"],
             "created_by": "@johndoe",
-            "creation_date": "22.01.2023",
+            "creation_date": datetime_created,
             "last_change_by": "@janedoe",
-            "last_change_date": "23.01.2023"
+            "last_change_date": datetime_updated,
             }
 
 
@@ -164,15 +171,12 @@ def root():
 
 @app.route("/children/<id>", methods=("POST", "GET"))
 def children(id):
-    answer = children_of(int(id))
-    pprint(answer)
-    return answer
+    return children_of(int(id))
 
 
 @app.route("/path_to_chemical/<id>", methods=("POST", "GET"))
 def path_to_chemical(id):
-    answer = path_children(int(id))
-    return answer
+    return path_children(int(id))
 
 
 if __name__ == '__main__':

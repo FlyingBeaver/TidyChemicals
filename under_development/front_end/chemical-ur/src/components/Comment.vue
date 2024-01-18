@@ -21,8 +21,8 @@
         <div
             v-if="status === 'comment'"
         >
-            <button v-on:click="localCompleteEditing">Save</button>
-            <button v-on:click="setChoose">Don't save</button>
+            <button v-on:click="localCompleteEditing">Complete editing</button>
+            <button v-on:click="setChoose">Discard changes</button>
         </div>
     </div>
     <div>
