@@ -20,6 +20,9 @@
             <button-box 
                 v-on:add-condition="addCondition"
                 v-on:toggle-deletion-mode="toggleDeletionMode"
+                v-bind:deletion-mode="deletionMode"
+                v-bind:rows-number="rowsNumber"
+                v-bind:submit-form="submitForm"
             ></button-box>
         </form>
     </div>
@@ -113,9 +116,9 @@ export default {
             this.$refs.form.submit();
         }
     },
-    provide() {
-        return {
-            submitForm: this.submitForm,
+    computed: {
+        rowsNumber() {
+            return this.rowsIds.length
         }
     },
     mounted() {
@@ -132,308 +135,214 @@ export default {
 
 
 <style>
-  body {
-      padding: 0;
-      margin: 0;
-      background-color: azure;
-      font-family: Roboto, sans-serif;
-  }
-  /* Header format */
 
-  .header {
-      background-color: CornflowerBlue;
-      color: azure;
-      width: 100%;
-      height: 120px;
-      display: flex;
-      justify-content: space-between;
-  }
+body {
+  padding: 0;
+  margin: 0;
+  background-color: Azure;
+  font-family: Roboto, sans-serif; }
 
-  .logo-container {
-      height: 100%;
-      flex-basis: 50px;
-      margin-left: 30px;
-      display: flex;
-      align-items: center;
-  }
+/* Header format! */
+.header {
+  background-color: CornflowerBlue;
+  color: Azure;
+  width: 100%;
+  height: 120px;
+  display: flex;
+  justify-content: space-between; }
 
-  .buttons-container {
-      height: 100px;
-      margin-right: 30px;
-      padding: 10px 0 10px 0;
-      display: grid;
-      grid-template-columns: minmax(min-content, auto) 1fr;
-      grid-gap: 10px;
-  }
+.logo-container {
+  height: 100%;
+  flex-basis: 50px;
+  margin-left: 30px;
+  display: flex;
+  align-items: center; }
 
-  .show-username{
-      color: azure;
-      grid-row: 1/3;
-  }
+.buttons-container {
+  height: 100px;
+  margin-right: 30px;
+  padding: 10px 0 10px 0;
+  display: grid;
+  grid-template-columns: minmax(min-content, auto) 1fr;
+  grid-gap: 10px; }
 
-  .light-button {
-      display: flex;
-      background-color: azure;
-      color: cornflowerblue;
-      height: 45px;
-      width: 150px;
-      font-size: 24px;
-      align-items: center;
-      justify-content: center;
-  }
+.show-username {
+  color: Azure;
+  grid-row: 1/3; }
 
+.light-button {
+  display: flex;
+  background-color: Azure;
+  color: CornflowerBlue;
+  height: 45px;
+  width: 150px;
+  font-size: 24px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer; }
   .light-button:link {
-      text-decoration: none;
-  }
-
+    text-decoration: none; }
   .light-button:hover {
-      text-decoration: underline;
-  }
+    text-decoration: underline; }
 
-  /* content format */
-  .content-main {
-      display: flex;
-      justify-content: center;
-  }
+/* content format */
+.content-main {
+  display: flex;
+  justify-content: center; }
 
-  form {
-      display: flex;
-      flex-direction: column;
-      flex-basis: 100%;
-  }
-
-  div.row.fired,
-  form.deletion_mode div.row:hover {
-      background-color: darkorange;
-      cursor: url("./assets/Vector.svg"), pointer;
-  }
-
-  form.deletion_mode div.row#buttons_box:hover {
-      cursor: default;
-      background-color: azure;
-  }
-
+form {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%; }
   form:disabled {
-      background-color: azure;
-      opacity: 50%;
-  }
+    background-color: Azure;
+    opacity: 50%; }
 
-  div.row {
-      margin: 0 80px 0 80px;
-      border: none;
-      flex-basis: 100%;
-      /*height: 300px;*/
-      flex-direction: row;
-      display: grid;
-      grid-template-columns: 285px 285px 285px;
-      grid-template-rows: auto auto;
-      grid-column-gap: 20px;
-      justify-content: space-between;
-  }
-
+div.row {
+  margin: 0 80px 0 80px;
+  border: none;
+  flex-basis: 100%;
+  flex-direction: row;
+  display: grid;
+  grid-template-columns: 285px 285px 285px;
+  grid-template-rows: auto auto;
+  grid-column-gap: 20px;
+  justify-content: space-between; }
+  .deletion_mode div.row:hover, div.row.fired {
+    background-color: DarkOrange;
+    cursor: url("./assets/Vector.svg"), pointer; }
+  .deletion_mode div.row#buttons_box:hover {
+    cursor: default;
+    background-color: Azure; }
   div.row:nth-child(1) {
-      margin-top: 80px;
-  }
+    margin-top: 80px; }
 
-  div.row > p {
-      min-height: 65px;
-      height: auto;
-      margin: 0;
-  }
+.column {
+  min-height: 65px;
+  height: auto;
+  margin: 0; }
 
-  p.row.appendix {
-      grid-column: 1/4;
-      background-color: bisque;
-  }
+p.row.appendix {
+  grid-column: 1/4;
+  background-color: Bisque; }
 
+@media (max-width: 863px) {
+  div.row {
+    flex-direction: column;
+    align-items: center;
+    margin: 80px 0 0 0; } }
 
-  form select {
-      font-size: 18px;
-      color: cornflowerblue;
-      background-color: azure;
-      border: solid cornflowerblue 3px;
-      border-radius: 0;
-      width: 285px;
-      height: 45px;
-      padding-left: 8px;
-      appearance: none;
-      -moz-appearance: none;
-      -webkit-appearance: none;
-      background-image: url("./assets/Triangle_in_square.svg");
-      background-position: right;
-      background-repeat: no-repeat;
-      background-size: 45px;
-  }
+div.operator_between_box {
+  grid-column: 2/4;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 30px;
+  padding-top: 30px; }
 
-  form select:hover  {
-      background-color: white;
-  }
+.simple_text_value, .only_num_value, .inactive-field, form select {
+  font-size: 18px;
+  color: CornflowerBlue;
+  background-color: Azure;
+  border: solid CornflowerBlue 3px;
+  width: 285px;
+  height: 45px;
+  padding-left: 8px; }
 
-  form select:focus  {
-      background-color: white;
-  }
+form select {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  background-image: url("./assets/Triangle_in_square.svg");
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: 45px; }
+  form select:hover, form select:focus {
+    background-color: white; }
+  form select:disabled, form select:disabled:hover {
+    background-color: Azure;
+    opacity: 50%;
+    cursor: url("./assets/Vector.svg"), pointer; }
+  form select > option {
+    padding-left: 0; }
 
-  /*form.deletion_mode select:hover:disabled {*/
-  /*    background-color: azure;*/
-  /*}*/
+.inactive-field {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  opacity: 50%; }
 
-  form.deletion_mode:hover input:not(.dark_button),
-  form.deletion_mode:hover select:not(.dark_button),
-  form.deletion_mode:hover button:not(.dark_button),
-  form.deletion_mode select:hover:not(.dark_button),
-  form.deletion_mode select:focus:not(.dark_button),
-  form.deletion_mode button:hover:not(.dark_button),
-  form.deletion_mode button:focus:not(.dark_button),
-  form.deletion_mode input:hover:not(.dark_button),
-  form.deletion_mode input:focus:not(.dark_button) {
-      background-color: azure;
-      opacity: 50%;
-      cursor: url("./assets/Vector.svg"), pointer;
-  }
-
-  .inactive-field {
-      box-sizing: border-box;
-      font-size: 18px;
-      color: cornflowerblue;
-      background-color: azure;
-      border: solid cornflowerblue 3px;
-      border-radius: 0;
-      padding-left: 8px;
-      width: 285px;
-      height: 45px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      opacity: 50%;
-  }
-
-  select > option {
-      padding-left: 0;
-  }
-
-  @media (max-width: 863px) {
-      div.row {
-          flex-direction: column;
-          align-items: center;
-          margin: 80px 0 0 0;
-      }
-  }
-
-  .simple_text_value, .only_num_value {
-      box-sizing: border-box;
-      font-size: 18px;
-      color: cornflowerblue;
-      background-color: azure;
-      border: solid cornflowerblue 3px;
-      border-radius: 0;
-      padding-left: 8px;
-      width: 285px;
-      height: 45px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-  }
-
+.simple_text_value, .only_num_value {
+  box-sizing: border-box; }
   .simple_text_value:focus, .only_num_value:focus {
-      background-color: white;
-  }
+    background-color: white; }
+  .simple_text_value:disabled, .only_num_value:disabled, .simple_text_value:disabled:hover {
+    background-color: Azure;
+    opacity: 50%;
+    cursor: url("./assets/Vector.svg"), pointer; }
 
-  .dark_button {
-      box-sizing: border-box;
-      font-size: 18px;
-      color: azure;
-      background-color: cornflowerblue;
-      border: solid cornflowerblue 3px;
-      border-radius: 0;
-      width: 285px;
-      height: 45px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-  }
+#exit_from_deletion, #search_button, .dark_button {
+  box-sizing: border-box;
+  font-size: 18px;
+  width: 285px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
 
-  .dark_button:disabled {
-      opacity: 65%;
-  }
+.dark_button {
+  color: Azure;
+  background-color: CornflowerBlue;
+  border: solid CornflowerBlue 3px; }
+  .dark_button:hover {
+    color: white;
+    border: solid RoyalBlue 3px;
+    background-color: RoyalBlue; }
+  .dark_button:active {
+    color: white;
+    border: solid MidnightBlue 3px;
+    background-color: MidnightBlue; }
+  .dark_button:disabled, .dark_button:disabled:hover, .dark_button:disabled:active {
+    opacity: 65%;
+    background-color: CornflowerBlue;
+    border: solid CornflowerBlue 3px; }
 
-  #more_conditions:hover, #delete_button:hover {
-      color: white;
-      border: solid royalblue 3px;
-      background-color: royalblue;
-  }
-
-  #more_conditions:active,
-  #delete_button:active {
-      color: white;
-      border: solid midnightblue 3px;
-      background-color: midnightblue;
-  }
-
-  div#buttons_box:nth-child(-n+3) #delete_button {
-      display: none;
-  }
-
-  form.deletion_mode #delete_button,
-  form.deletion_mode #more_conditions {
-      display: none;
-  }
-
-  form:not(.deletion_mode) #exit_from_deletion,
-  form:not(.deletion_mode) #more_conditions_disabled {
-      display: none;
-  }
-
-  #search_button {
-      color: white;
-      font-weight: 700;
-      background-color: dodgerblue;
-      border: solid dodgerblue 3px;
-  }
-
+#search_button {
+  color: white;
+  font-weight: 700;
+  background-color: DodgerBlue;
+  border: solid DodgerBlue 3px; }
   #search_button:hover {
-      color: white;
-      border: solid blue 3px;
-      background-color: blue;
-  }
+    border: solid blue 3px;
+    background-color: blue; }
+  #search_button:active {
+    border: solid Crimson 3px;
+    background-color: Crimson; }
 
-  form #exit_from_deletion,
-  button#search_button:active {
-      color: white;
-      border: solid crimson 3px;
-      background-color: crimson;
-  }
+#exit_from_deletion {
+  color: white;
+  border: solid Crimson 3px;
+  background-color: Crimson; }
+  #exit_from_deletion:hover {
+    border: solid DarkRed 3px;
+    background-color: DarkRed; }
+  #exit_from_deletion:active {
+    border: solid #4d0000 3px;
+    background-color: #4d0000; }
 
-  form button#exit_from_deletion:hover {
-      color: white;
-      border: solid darkred 3px;
-      background-color: darkred;
-  }
+div#buttons_box {
+  margin-top: 10px;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  align-self: end;
+  grid-row-gap: 20px;
+  cursor: default; }
 
-  form button#exit_from_deletion:active {
-      color: white;
-      border: solid rgb(77, 0, 0) 3px;
-      background-color: rgb(77, 0, 0);
-  }
+.warning {
+  background: Peachpuff;
+  margin: 10px 10px 10px 10px;
+  font-family: sans-serif;
+  color: maroon;
+  padding: 10px 10px 10px 10px; }
 
-  div#buttons_box {
-      margin-top: 10px;
-      display: grid;
-      grid-template-rows: 1fr;
-      grid-template-columns: 1fr;
-      align-self: end;
-      grid-row-gap: 20px;
-      cursor: default;
-  }
-
-  div.operator_between_box {
-      grid-column: 2/4;
-      display: flex;
-      justify-content: center;
-      padding-bottom: 30px;
-      padding-top: 30px;
-  }
-
-  div.row.fired {
-      background-color: darkorange;
-  }
 </style>

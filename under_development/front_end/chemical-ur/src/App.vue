@@ -1,63 +1,16 @@
 <template>
     <div class="grid-container">
-        <name v-bind:initialData="initialData"
-              v-bind:editedData="editedData"
-              v-bind:status="status"
-        >
-        </name>
-        <structure
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-        ></structure>
-        <water-number
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-            v-if="status === 'waternumber'"
-        >
-        </water-number>
-        <quantity
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-        ></quantity>
-        <location
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-        ></location>
-        <hazard-pictograms
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-        >
-        </hazard-pictograms>
-        <cas-rn
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-        ></cas-rn>
-        <synonyms
-            ref="synonyms"
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-        ></synonyms>
-        <comment
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-        ></comment>
-        <users-dates
-            v-bind:initial-data="initialData"
-        ></users-dates>
-        <tags
-            v-bind:initialData="initialData"
-            v-bind:editedData="editedData"
-            v-bind:status="status"
-            ref="tags"
-        ></tags>
+        <name></name>
+        <structure></structure>
+        <water-number v-if="status === 'waternumber'"></water-number>
+        <quantity></quantity>
+        <location></location>
+        <hazard-pictograms></hazard-pictograms>
+        <cas-rn></cas-rn>
+        <synonyms ref="synonyms"></synonyms>
+        <comment></comment>
+        <users-dates></users-dates>
+        <tags ref="tags"></tags>
     </div>
     <div v-if="status === 'view'" class="buttons-container">
         <button v-on:click="addTag">Add or remove tag</button>
@@ -80,17 +33,18 @@
 </template>
 
 <script>
-import Name from "./components/Name.vue";
-import HazardPictograms from "./components/HazardPictograms.vue";
-import WaterNumber from "./components/WaterNumber.vue";
-import Structure from "./components/Structure.vue";
-import Tags from "./components/Tags.vue";
-import Location from "./components/Location.vue";
-import Quantity from "./components/Quantity.vue";
-import CasRn from "./components/CasRn.vue";
-import Synonyms from "./components/Synonyms.vue";
-import Comment from "./components/Comment.vue";
-import UsersDates from "./components/UsersDates.vue";
+import {computed} from "vue"
+import Name from "./components/Name.vue"
+import HazardPictograms from "./components/HazardPictograms.vue"
+import WaterNumber from "./components/WaterNumber.vue"
+import Structure from "./components/Structure.vue"
+import Tags from "./components/Tags.vue"
+import Location from "./components/Location.vue"
+import Quantity from "./components/Quantity.vue"
+import CasRn from "./components/CasRn.vue"
+import Synonyms from "./components/Synonyms.vue"
+import Comment from "./components/Comment.vue"
+import UsersDates from "./components/UsersDates.vue"
 export default {
     name: "App",
     components: {
@@ -170,6 +124,8 @@ export default {
                 this.status = "choose"
             }
         },
+        //this.initialData don't contain storageId field,
+        // so setting it with completeEditing() is impossible
         updateStorageId(value) {
             this.editedData.storageId = value
         }
@@ -208,11 +164,12 @@ export default {
         return {
             sectionChosen: this.sectionChosen,
             completeEditing: this.completeEditing,
-            initialData: this.initialData,
-            editedData: this.editedData,
-            status: this.status,
+            initialData: computed(() => this.initialData),
+            editedData: computed(() => this.editedData),
+            status: computed(() => this.status),
             updateStorageId: this.updateStorageId,
             setChoose: this.setChoose,
+            setView: this.setView,
             URLsSettings: this.URLsSettings,
         }
     },
@@ -248,5 +205,9 @@ p {
 p.section-header {
     margin-top: 16px;
     margin-bottom: 8px;
+}
+
+.blank-data {
+    font-style: italic;
 }
 </style>

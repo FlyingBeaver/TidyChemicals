@@ -4,13 +4,18 @@
             Structure:
         </p>
         <div class="structure-body"
-             v-if="status !== 'structure'"
+             v-if="!activateEditors"
         >
             <img
+                v-if="structurePic"
                 v-bind:src="structurePic"
                 v-bind:alt="structureName"
             >
-            <span class="water-number" v-if="waterNumberType !== 'dry' && Number(waterNumber) !== 0">
+            <div
+                v-else
+                class="blank-data"
+            >No structural formula</div>
+            <span class="water-number" v-if="showWaterNumber">
                 <span class="dot">⋅</span>
                 <span class="fraction" v-if="waterNumberType === 'fractional'">
                     <span>{{numerator}}</span>
@@ -22,15 +27,17 @@
                 </span>
             </span>
         </div>
-        <div v-if="status === 'structure'">
+        <div v-if="activateEditors">
             <structure-input
                 ref="structureInput"
                 v-on:ketcher-loaded="ketcherLoadListener">
             </structure-input>
-            <div>
-                <button v-on:click="localCompleteEditing">Complete editing</button>
-                <button v-on:click="setChoose">Discard changes</button>
-            </div>
+            <two-buttons
+                v-bind:parent-name="$options.name"
+                v-on:complete-editing="localCompleteEditing"
+                v-on:discard-changes="discardChanges"
+                v-on:clear-editor="clearEditor"
+            ></two-buttons>
         </div>
     </div>
     <div>
@@ -46,17 +53,20 @@
 </template>
 
 <script>
-import waterNumber from "./WaterNumber.vue";
-import StructureInput from "./StructureInput.vue";
+import TwoButtons from "./TwoButtons.vue"
+import StructureInput from "./StructureInput.vue"
+import {emptyMol} from "./constants.js"
 export default {
     name: "Structure",
-    components: {StructureInput},
-    props: ["status", "initialData", "editedData"],
+    components: {StructureInput, TwoButtons},
     inject: [
         "sectionChosen",
         "completeEditing",
         "setChoose",
         "URLsSettings",
+        "status",
+        "initialData",
+        "editedData",
     ],
     data() {
         return {
@@ -72,6 +82,15 @@ export default {
         window.addEventListener("message", this.acceptMessage)
     },
     methods: {
+        discardChanges() {
+            if ("structure_mol" in this.editedData) {
+                delete this.editedData["structure_mol"]
+            }
+            if ("structure_pic" in this.editedData) {
+                delete this.editedData["structure_pic"]
+            }
+            this.setChoose()
+        },
         editStructure() {
             this.sectionChosen('structure')
             this.listenToKetcherLoad = true
@@ -84,7 +103,6 @@ export default {
         },
         localCompleteEditing() {
             this.$refs.structureInput.getMolecule()
-            //this.status = "view"
         },
         async acceptMessage(event) {
             if (typeof event.data === "string" &&
@@ -100,9 +118,19 @@ export default {
                     molObject.pictureName
                 )
             }
+        },
+        clearEditor() {
+            this.$refs.structureInput.clear()
         }
     },
     computed: {
+        showWaterNumber() {
+            return (
+                this.waterNumberType !== 'dry' &&
+                Number(this.waterNumber) !== 0 &&
+                Boolean(this.structurePic)
+            )
+        },
         structureName() {
             let delta
             if ('name_data' in this.editedData) {
@@ -119,10 +147,14 @@ export default {
             }
         },
         structurePic() {
-            if ('structure_pic' in this.editedData) {
+            if ('structure_pic' in this.editedData &&
+                this.editedData.structure_pic !== null
+            ) {
                 return (this.URLsSettings.structurePicBaseURL +
                     this.editedData.structure_pic)
-            } else if ('structure_pic' in this.initialData) {
+            } else if ('structure_pic' in this.initialData &&
+                this.initialData.structure_pic !== null
+            ) {
                 return (this.URLsSettings.structurePicBaseURL +
                     this.initialData.structure_pic)
             } else {
@@ -135,6 +167,7 @@ export default {
             } else if ("structure_aq" in this.initialData) {
                 return this.initialData.structure_aq
             } else {
+                // only null!
                 return null
             }
         },
@@ -144,7 +177,7 @@ export default {
             } else if ("structure_mol" in this.initialData) {
                 return this.initialData.structure_mol
             } else {
-                return null
+                return emptyMol
             }
         },
         waterNumberType() {
@@ -169,7 +202,13 @@ export default {
             } else {
                 throw Error("Wrong structure_aq format!")
             }
-        }
+        },
+        activateEditors() {
+            return (
+                this.status === this.$options.name.toLowerCase() ||
+                this.status === "create"
+            )
+        },
     },
 }
 </script>

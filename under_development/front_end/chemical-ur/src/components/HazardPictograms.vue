@@ -3,13 +3,16 @@
         <p class="section-header">
             Hazard pictograms:
         </p>
-        <p v-if="status !== 'hazardpictograms'">
+        <p v-if="!activateEditors">
             <img v-for="(value, key) in picUrls"
                  v-bind:src="value"
                  v-bind:alt="key"
                  width="100"
                  height="100">
-            <div v-if="Object.keys(picUrls).length === 0">No hazard pictograms</div>
+            <div
+                v-if="Object.keys(picUrls).length === 0"
+                class="blank-data"
+            >No hazard pictograms</div>
         </p>
         <p v-else>
             <table>
@@ -46,13 +49,12 @@
                     <td colspan="2">{{ descriptionOfHighlighted }}</td>
                 </tr>
             </table>
-            <button
-                v-on:click="completeEditing('hazard_pictograms',
-                                            Object.keys(chosenPictograms))"
-            >Complete Editing</button>
-            <button
-                v-on:click="discardChanges"
-            >Discard changes</button>
+        <two-buttons
+            v-bind:parent-name="$options.name"
+            v-on:complete-editing="localCompleteEditing"
+            v-on:discard-changes="discardChanges"
+            v-on:clear-editor="clearEditor"
+        ></two-buttons>
         </p>
     </div>
     <div>
@@ -63,14 +65,6 @@
             Edit
         </button>
     </div>
-<!--    <div-->
-<!--        v-if="status === 'hazardpictograms'"-->
-<!--    >-->
-<!--        <button-->
-<!--            v-on:click="completeEditing('hazard_pictograms',-->
-<!--                                        Object.keys(chosenPictograms))"-->
-<!--        >Complete Editing</button>-->
-<!--    </div>-->
 </template>
 
 <script>
@@ -84,7 +78,8 @@ import healthHazardUrl from "../assets/hazard_pictograms/health_hazard.svg"
 import ionizingRadiationUrl from "../assets/hazard_pictograms/ionizing_radiation.svg"
 import oxidizingUrl from "../assets/hazard_pictograms/oxidizing.svg"
 import toxicUrl from "../assets/hazard_pictograms/toxic.svg"
-
+import TwoButtons from "./TwoButtons.vue"
+import {toRaw} from "vue"
 export default {
     data() {
         return {
@@ -100,16 +95,39 @@ export default {
                 oxidizing: oxidizingUrl,
                 toxic: toxicUrl
             },
-            chosenPictograms: [],
-            unChosenPictograms: [],
+            chosenPictograms: {},
+            unChosenPictograms: {},
             highlighted: "",
         }
     },
     name: "HazardPictograms",
-    props: ["initialData", "editedData", "status"],
-    inject: ["sectionChosen", "completeEditing", "setChoose"],
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "initialData",
+        "editedData",
+        "status",
+    ],
+    components: {TwoButtons},
     methods: {
+        clearEditor() {
+            this.unChosenPictograms = Object.assign(
+                this.unChosenPictograms,
+                this.chosenPictograms
+            )
+            this.chosenPictograms = {}
+        },
+        localCompleteEditing() {
+            this.completeEditing(
+                'hazard_pictograms',
+                Object.keys(this.chosenPictograms)
+            )
+        },
         discardChanges() {
+            if ("hazard_pictograms" in this.editedData) {
+                delete this.editedData["hazard_pictograms"]
+            }
             this.setup()
             this.setChoose()
         },
@@ -149,11 +167,14 @@ export default {
         picUrls() {
             let actual_list = []
             if ("hazard_pictograms" in this.editedData) {
-                actual_list = this.editedData["hazard_pictograms"]
+                actual_list = toRaw(this.editedData["hazard_pictograms"])
             } else if ("hazard_pictograms" in this.initialData) {
-                actual_list = this.initialData["hazard_pictograms"]
+                actual_list = toRaw(this.initialData["hazard_pictograms"])
             } else {
                 return {}
+            }
+            if (actual_list === null) {
+                actual_list = []
             }
             let result = {}
             for (let hazard of actual_list) {
@@ -168,10 +189,19 @@ export default {
                 let withSpaces = this.highlighted.replace("_", " ")
                 return withSpaces[0].toUpperCase() + withSpaces.slice(1)
             }
-        }
+        },
+        activateEditors() {
+            return (
+                this.status === this.$options.name.toLowerCase() ||
+                this.status === "create"
+            )
+        },
     },
-    mounted() {
-        //console.log(JSON.stringify(this.initialData))
+    created() {
+        if (this.status === "create") {
+            this.unChosenPictograms = Object.assign({}, this.picturesUrls)
+            this.chosenPictograms = {}
+        }
     }
 }
 </script>

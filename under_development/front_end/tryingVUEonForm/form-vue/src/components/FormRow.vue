@@ -7,7 +7,7 @@
         v-on:click="deletionModeOn ? processClick() : null"
         v-bind:class="{ fired: firedId === rowId }"
     >
-        <p class="column" v-if="!rowId.includes('_plus_')">
+        <div class="column" v-if="!rowId.includes('_plus_')">
             <select v-bind:name="rowId + '_term'"
                 required 
                 v-model="termValue" 
@@ -29,9 +29,9 @@
                 <option value='who_created'>Created by</option>
                 <option value='who_updated'>Updated by</option>
             </select>
-        </p>
-        <p class="operator_box column" v-if="!rowId.includes('_plus_')">
-            <span v-if="operatorOptions === ''" class="inactive-field">Operator</span>
+        </div>
+        <div class="operator_box column" v-if="!rowId.includes('_plus_')">
+            <div v-if="operatorOptions === ''" class="inactive-field">Operator</div>
             <select 
                 v-else
                 v-bind:name="rowId + '_operator'"
@@ -47,9 +47,9 @@
                 </option>
                 <option key="null" value="" selected>Choose an operator</option>
             </select>
-        </p>
-        <p class="value_box column" v-if="!rowId.includes('_plus_')">
-            <span class="inactive-field" v-if="widget === 'inactive'">Value</span>
+        </div>
+        <div class="value_box column" v-if="!rowId.includes('_plus_')">
+            <div class="inactive-field" v-if="widget === 'inactive'">Value</div>
             <text-input 
                 v-if="widget === 'text_input'"
                 v-bind:disabled="deletionModeOn"
@@ -61,16 +61,16 @@
                 v-bind:input-name="rowId + '_value'"
             ></text-input-with-format>
             <structure-input-toggle
-                v-if="widget === 'jsme_input'"
+                v-if="widget === 'ketcher_input'"
                 v-bind:disabled="deletionModeOn"
                 v-on:toggle-editor="toggleEditor"
             >
             </structure-input-toggle>
-            <numeral-input
-                v-if="widget === 'numeral_input'"
+            <numerical-input
+                v-if="widget === 'numerical_input'"
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
-            ></numeral-input>
+            ></numerical-input>
             <date-input
                 v-if="widget === 'date_input'"
                 v-bind:disabled="deletionModeOn"
@@ -96,30 +96,30 @@
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></cas-input>
-            <two-numeral-inputs
-                v-if="widget === 'two_numeral_inputs'"
+            <two-numerical-inputs
+                v-if="widget === 'two_numerical_inputs'"
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
-            ></two-numeral-inputs>
-            <two-numeral-and-unit
-                v-if="widget === 'two_numeral_and_unit'"
+            ></two-numerical-inputs>
+            <two-numerical-and-unit
+                v-if="widget === 'two_numerical_and_unit'"
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
-            ></two-numeral-and-unit>
+            ></two-numerical-and-unit>
             <molecular-formula-input
                 v-if="widget === 'molecular_formula_input'"
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'"
             ></molecular-formula-input>
-        </p>
-        <p class="column ketcher-container"
-           v-if="widget === 'jsme_input'"
+        </div>
+        <div class="column ketcher-container"
+           v-if="widget === 'ketcher_input'"
            v-show="editorShown">
             <structure-input
                 v-bind:disabled="deletionModeOn"
                 v-bind:input-name="rowId + '_value'">
             </structure-input>
-        </p>
+        </div>
         <div class="operator_between_box" v-if="rowId.includes('_plus_')">
             <select 
                 v-bind:name="rowId"
@@ -142,31 +142,31 @@ import TextInput from './TextInput.vue';
 import TextInputWithFormat from "@/components/TextInputWithFormat";
 import StructureInput from "@/components/StructureInput";
 import StructureInputToggle from "@/components/StructureInputToggle";
-import NumeralInput from "@/components/NumeralInput";
+import NumericalInput from "@/components/NumericalInput";
 import DateInput from "@/components/DateInput";
 import DateRangeInput from "@/components/DateRangeInput";
 import StoragePlaceInput from "@/components/StoragePlaceInput";
 import UserInput from "@/components/UserInput";
 import CasInput from "@/components/CasInput";
-import TwoNumeralInputs from "@/components/TwoNumeralInputs";
-import TwoNumeralAndUnit from "@/components/TwoNumeralAndUnit";
+import TwoNumericalInputs from "@/components/TwoNumericalInputs";
+import TwoNumericalAndUnit from "@/components/TwoNumericalAndUnit";
 import MolecularFormulaInput from "@/components/MolecularFormulaInput";
 
 export default {
 
     components: {
-        TwoNumeralAndUnit,
+        TwoNumericalAndUnit,
         CasInput,
         UserInput,
         StoragePlaceInput,
-        NumeralInput,
+        NumericalInput,
         StructureInput,
         TextInput,
         TextInputWithFormat,
         StructureInputToggle,
         DateInput,
         DateRangeInput,
-        TwoNumeralInputs,
+        TwoNumericalInputs,
         MolecularFormulaInput,
     },
     computed: {
@@ -224,15 +224,15 @@ export default {
                 [
                     'text_input',
                     'text_input_with_format',
-                    'jsme_input',
-                    'numeral_input',
+                    'ketcher_input',
+                    'numerical_input',
                     'date_input',
                     'date_range_input',
                     'storage_place_input',
                     'user_input',
                     'cas_input',
-                    'two_numeral_inputs',
-                    'two_numeral_and_unit',
+                    'two_numerical_inputs',
+                    'two_numerical_and_unit',
                     'molecular_formula_input',
                 ],
             operatorValue: "",
@@ -245,7 +245,7 @@ export default {
 </script>
 
 <style>
-    p.column.ketcher-container {
+    div.column.ketcher-container {
         grid-column-start: 2;
         grid-column-end: 4;
     }

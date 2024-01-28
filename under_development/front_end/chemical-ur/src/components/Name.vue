@@ -2,12 +2,12 @@
     <div>
         <p class="section-header"
         >
-            <span v-if="status === 'name'">*</span>
+            <span v-if="activateEditors">*</span>
             Name:
         </p>
         <p
             class="name-value"
-            v-if="status !== 'name'"
+            v-if="!activateEditors"
             v-html="nameCode"
         ></p>
         <p v-else>
@@ -20,12 +20,12 @@
             >
             </text-input-with-format>
         </p>
-        <div
-            v-if="status === 'name'"
-        >
-            <button v-on:click="localCompleteEditing">Complete editing</button>
-            <button v-on:click="setChoose">Discard changes</button>
-        </div>
+        <two-buttons
+            v-bind:parent-name="$options.name"
+            v-on:complete-editing="localCompleteEditing"
+            v-on:discard-changes="discardChanges"
+            v-on:clear-editor="clearEditor"
+        ></two-buttons>
     </div>
     <div>
         <button
@@ -39,18 +39,33 @@
 
 <script>
 import TextInputWithFormat from "./TextInputWithFormat.vue";
+import TwoButtons from "./TwoButtons.vue";
 export default {
     name: "Name",
-    components: {TextInputWithFormat},
-    props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing", "setChoose"],
+    components: {TwoButtons, TextInputWithFormat},
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "status",
+        "initialData",
+        "editedData"
+    ],
     methods: {
+        discardChanges() {
+            if ("name_data" in this.editedData) {
+                delete this.editedData["name_data"]
+            }
+            this.setChoose()
+        },
         localCompleteEditing() {
             this.$refs.TextInputWithFormat.localCompleteEditing()
         },
         editingCompleteListener(data) {
-            console.log(data)
             this.completeEditing("name_data", data)
+        },
+        clearEditor() {
+            this.$refs.TextInputWithFormat.clear()
         }
     },
     computed: {
@@ -60,7 +75,7 @@ export default {
             } else if ('name_data' in this.initialData) {
                 return this.initialData.name_data.html
             } else {
-                return null
+                return "<p></p>"
             }
         },
         nameDelta() {
@@ -69,9 +84,15 @@ export default {
             } else if ('name_data' in this.initialData) {
                 return this.initialData.name_data.delta
             } else {
-                return null
+                return {}
             }
-        }
+        },
+        activateEditors() {
+            return (
+                this.status === this.$options.name.toLowerCase() ||
+                this.status === "create"
+            )
+        },
     }
 }
 </script>

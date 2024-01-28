@@ -9,19 +9,34 @@
         v-on:input="inputValidationOnInput"
         v-model="inputValue"
     >
-    <div v-bind:class="{warning: true, 'hide-me': !warningWrongSymbol}">
+    <div
+        class="warning"
+        v-show="warningWrongSymbol"
+    >
         You  are trying to enter a symbol that is not allowed in this field
     </div>
-    <div v-bind:class="{warning: true, 'hide-me': !warningInvalidCas}">
+    <div
+        class="warning"
+        v-show="warningInvalidCas"
+    >
         Invalid value of CAS RN. If you didn't completed input of CAS RN, you can ignore this message
     </div>
-    <div v-bind:class="{warning: true, 'hide-me': !warningTooLongValue}">
+    <div
+        class="warning"
+        v-show="warningTooLongValue"
+    >
         You are trying to input too long value for CAS RN. Valid CAS RN can't contain more than 10 digits.
     </div>
-    <div v-bind:class="{warning: true, 'hide-me': !warningThreeHyphens}">
+    <div
+        class="warning"
+        v-show="warningThreeHyphens"
+    >
         You  are trying to enter third hyphen, but CAS RN can contain only two hyphens
     </div>
-    <div v-bind:class="{warning: true, 'hide-me': !warningHyphensTogether}">
+    <div
+        class="warning"
+        v-show="warningHyphensTogether"
+    >
         You  are trying to enter two hyphens together, but hyphens must separate groups of digits
     </div>
 </template>

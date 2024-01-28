@@ -47,6 +47,7 @@ export class Tree
         @root_object.span = @root_object.li.querySelector("span")
         @root_object.span.addEventListener("dblclick", @root_object.open_close)
         @root_object.span.addEventListener("click", @process_click)
+        @tree_container.addEventListener("unhighlight-storage", @unhighlight_storage)
 
         Tree.instances.push(@)
         @frame_maker = new FrameMaker(@)
@@ -58,6 +59,13 @@ export class Tree
 
         if path_to_node != undefined
             Storage.open_with_path(path_to_node)
+
+    unhighlight_storage: () =>
+        copy_of_highlighted = []
+        Object.assign(copy_of_highlighted, @highlighted_nodes_ids)
+        for processed_id of copy_of_highlighted
+            @unhighlight(processed_id)
+        @update_field()
 
     update_field: () =>
         highlighted_nodes_json = JSON.stringify(@highlighted_nodes_ids)

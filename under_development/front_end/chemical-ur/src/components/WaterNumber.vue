@@ -17,7 +17,7 @@
                 <input type="text"
                        v-model="waterNumber"
                        v-on:input="hideWarnings"
-                >
+                />
             </p>
             <p v-if="waterNumberType === 'fractional'"
                class="water-number-container"
@@ -26,12 +26,12 @@
                 <input type="text"
                        v-model="numerator"
                        v-on:input="hideWarnings"
-                >
+                />
                 <span>Denominator:</span>
                 <input type="text"
                        v-model="denominator"
                        v-on:input="hideWarnings"
-                >
+                />
             </p>
             <p class="warning" v-show="leadingZeroWarning">
                 This number can't start with zero
@@ -45,26 +45,32 @@
                 must be filled
             </p>
         </div>
-        <div>
-            <button
-                v-on:click="localCompleteEditing"
-                class="bottom"
-            >Complete editing</button>
-            <button
-                v-on:click="setChoose"
-                class="bottom"
-            >Discard changes</button>
-        </div>
+        <two-buttons
+            class="bottom"
+            v-bind:parent-name="$options.name"
+            v-on:complete-editing="localCompleteEditing"
+            v-on:discard-changes="discardChanges"
+            v-on:clear-editor="clearEditor"
+        ></two-buttons>
     </div>
     <div>
     </div>
 </template>
 
 <script>
+import {difference} from "./constants.js"
+import TwoButtons from "./TwoButtons.vue"
 export default {
     name: "WaterNumber",
-    props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing", "setChoose"],
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "status",
+        "initialData",
+        "editedData",
+    ],
+    components: {TwoButtons},
     data() {
         return {
             waterNumberType: "dry",
@@ -78,6 +84,12 @@ export default {
         }
     },
     methods: {
+        discardChanges() {
+            if ("structure_aq" in this.editedData) {
+                delete this.editedData["structure_aq"]
+            }
+            this.setChoose()
+        },
         localCompleteEditing() {
             if (!this.allFieldsFilled()) {
                 return null
@@ -97,19 +109,15 @@ export default {
                 if (isNaN(numeratorInt) || isNaN(denominatorInt)) {
                     throw Error("numerator or denominator is NaN")
                 }
-                this.completeEditing("structure_aq", [numeratorInt, denominatorInt])
+                this.completeEditing(
+                    "structure_aq",
+                    [numeratorInt, denominatorInt]
+                )
             }
-        },
-        difference(setA, setB) {
-            const _difference = new Set(setA);
-            for (const elem of setB) {
-                _difference.delete(elem);
-            }
-            return _difference;
         },
         containsOnlyDigits(text) {
             let textSet = new Set(text)
-            return this.difference(textSet, this.digits).size === 0
+            return difference(textSet, this.digits).size === 0
         },
         hideWarnings() {
             this.oddCharsWarning = false
@@ -138,7 +146,13 @@ export default {
             } else {
                 return true
             }
-        }
+        },
+        clearEditor() {
+            this.waterNumberType = "dry"
+            this.waterNumber = ""
+            this.numerator = ""
+            this.denominator = ""
+        },
     },
     watch: {
         waterNumber(newValue, oldValue) {
@@ -157,8 +171,6 @@ export default {
             structureAq = this.editedData.structure_aq
         } else if ("structure_aq" in this.initialData) {
             structureAq = this.initialData.structure_aq
-        } else {
-            throw Error("No structure_aq data!")
         }
         if (structureAq === null) {
             this.waterNumberType = "dry"

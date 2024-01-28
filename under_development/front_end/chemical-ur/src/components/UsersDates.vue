@@ -31,8 +31,7 @@
 <script>
 export default {
     name: "UsersDates",
-    props: ["initialData"],
-    inject: ["URLsSettings"],
+    inject: ["URLsSettings", "initialData",],
     methods: {
         formatDate(date) {
             let day = String(date.getDate())
@@ -45,8 +44,12 @@ export default {
     },
     computed: {
         dateCreated() {
-            let date = new Date(this.initialData.creation_date)
-            return this.formatDate(date)
+            if ("creation_date" in this.initialData) {
+                let date = new Date(this.initialData.creation_date)
+                return this.formatDate(date)
+            } else {
+                return "No data"
+            }
         },
         dateUpdated() {
             let date = new Date(this.initialData.last_change_date)

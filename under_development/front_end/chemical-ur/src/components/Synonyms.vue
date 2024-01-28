@@ -8,19 +8,24 @@
             ref="listContainer"
         >
             <div>
+                <div v-if="synonyms.length === 0"
+                     class="blank-data"
+                >No synonyms</div>
                 <table>
-                    <tr v-for="(syn, index) in synonyms">
+                    <tr v-for="(syn, index) in synonyms"
+                        v-bind:key="index"
+                    >
                         <td class="bullet">•</td>
                         <td v-html="syn.html"></td>
                         <td>
                             <button
                                 v-on:click="deleteSynonym(index)"
-                                v-if="mode === 'delete' && status === 'synonyms'"
+                                v-if="mode === 'delete' && activateEditors"
                                 class="small-button"
                             >Delete</button>
                             <button
                                 v-on:click="updateSynonym(index)"
-                                v-if="mode === 'update' && status === 'synonyms'"
+                                v-if="mode === 'update' && activateEditors"
                                 class="small-button"
                             >Update</button>
                         </td>
@@ -28,7 +33,7 @@
                 </table>
             </div>
         </p>
-        <p v-if="status === 'synonyms' && mode === 'show'">
+        <p v-if="activateEditors && mode === 'show'">
             <button
                 v-on:click="startCreationOfSynonym"
             >Create a synonym</button>
@@ -39,7 +44,7 @@
                 v-on:click="startDeletionOfSynonym"
             >Delete a synonym</button>
         </p>
-        <p v-if="status === 'synonyms' && (mode === 'updateInProcess' || mode === 'create')">
+        <p v-if="activateEditors && (mode === 'updateInProcess' || mode === 'create')">
             <text-input-with-format
                 ref="TextInputWithFormat"
                 v-bind:content="nameCode"
@@ -48,16 +53,24 @@
                 v-bind:char-restriction="false"
             >
             </text-input-with-format>
-            <button v-on:click="saveEditingResult"
-            >{{ mode === "create" ? "Add the synonym" : "Save changes" }}</button>
-            <button v-on:click="mode = 'show'">Discard changes</button>
+            <button
+                v-on:click="saveEditingResult"
+            >{{ mode === "create" ? "Add the synonym" : "Save changes" }}
+            </button>
+            <button v-on:click="mode = 'show'">Close editor</button>
         </p>
-        <div
-            v-if="status === 'synonyms' && mode !== 'updateInProcess' && mode !== 'create'"
+        <!--<div
+            v-if="activateEditors && mode !== 'updateInProcess' && mode !== 'create'"
         >
             <button v-on:click="localCompleteEditing">Complete Editing</button>
             <button v-on:click="exitWithoutSaving">Discard changes</button>
-        </div>
+        </div>-->
+        <two-buttons
+            v-bind:parent-name="$options.name"
+            v-on:complete-editing="localCompleteEditing"
+            v-on:discard-changes="discardChanges"
+            v-on:clear-editor="clearEditor"
+        ></two-buttons>
     </div>
     <div>
         <button
@@ -71,12 +84,19 @@
 
 <script>
 import TextInputWithFormat from "./TextInputWithFormat.vue"
-import {toRaw} from "vue";
+import TwoButtons from "./TwoButtons.vue"
+import {toRaw} from "vue"
 export default {
     name: "Synonyms",
-    components: {TextInputWithFormat},
-    props: ["status", "initialData", "editedData"],
-    inject: ["sectionChosen", "completeEditing", "setChoose"],
+    components: {TextInputWithFormat, TwoButtons},
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "status",
+        "initialData",
+        "editedData",
+    ],
     data() {
         return {
             mode: 'show',
@@ -86,6 +106,17 @@ export default {
         }
     },
     methods: {
+        discardChanges () {
+            if ("synonyms" in this.editedData) {
+                delete this.editedData["synonyms"]
+            }
+            this.setChoose()
+        },
+        clearEditor() {
+            this.localCopyOfSynonyms = []
+            this.$refs.TextInputWithFormat.clear()
+            this.mode = "show"
+        },
         startCreationOfSynonym() {
             this.mode = 'create'
             this.nameCode = ''
@@ -155,13 +186,23 @@ export default {
             }
         },
         globalCopyOfSynonyms() {
-            if ('synonyms' in this.editedData) {
+            if ('synonyms' in this.editedData &&
+                this.editedData.synonyms !== null
+            ) {
                 return this.editedData.synonyms
-            } else if ('synonyms' in this.initialData) {
+            } else if ('synonyms' in this.initialData &&
+                this.initialData.synonyms !== null
+            ) {
                 return this.initialData.synonyms
             } else {
-                return null
+                return []
             }
+        },
+        activateEditors() {
+            return (
+                this.status === this.$options.name.toLowerCase() ||
+                this.status === "create"
+            )
         },
     },
 }
@@ -177,6 +218,7 @@ button.small-button {
 
 table, td {
     border: 0;
+    margin-bottom: 0;
 }
 td > p {
     margin-top: 0;

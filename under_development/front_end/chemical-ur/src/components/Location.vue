@@ -3,7 +3,9 @@
         <p class="section-header">
             Location:
         </p>
-        <p v-if="status !== 'location'">
+        <p v-if="!activateEditors"
+           v-bind:class="{'blank-data': location === 'No location data!'}"
+        >
             {{location}}
         </p>
         <div class="tree" v-else>
@@ -17,14 +19,12 @@
             </div>
         </div>
         <input type="hidden" name="treeOutput" ref="treeOutput">
-        <div v-if="status === 'location'">
-            <button
-                v-on:click="localCompleteEditing"
-            >Complete editing</button>
-            <button
-                v-on:click="setChoose"
-            >Discard changes</button>
-        </div>
+        <two-buttons
+            v-bind:parent-name="$options.name"
+            v-on:complete-editing="localCompleteEditing"
+            v-on:discard-changes="discardChanges"
+            v-on:clear-editor="unhighlightStorage"
+        ></two-buttons>
     </div>
     <div>
         <button
@@ -37,18 +37,21 @@
 </template>
 
 <script>
-import {Tree} from "./trees_editor05.js";
-
+import {Tree} from "./trees_editor05.js"
+import TwoButtons from "./TwoButtons.vue"
 export default {
     name: "Location",
-    props: ["status", "initialData", "editedData"],
     inject: [
         "sectionChosen",
         "completeEditing",
         "updateStorageId",
         "setChoose",
         "URLsSettings",
+        "status",
+        "initialData",
+        "editedData",
     ],
+    components: {TwoButtons},
     data() {
         return {
             editorIsOn: false,
@@ -57,6 +60,19 @@ export default {
         }
     },
     methods: {
+        discardChanges() {
+            if ("location" in this.editedData) {
+                delete this.editedData["location"]
+            }
+            if ("storageId" in this.editedData) {
+                delete this.editedData["storageId"]
+            }
+            this.setChoose()
+        },
+        unhighlightStorage () {
+            let event = new Event("unhighlight-storage")
+            this.$refs.tree_container.dispatchEvent(event)
+        },
         localCompleteEditing() {
             let treeOutputContent = this.$refs.treeOutput.value
             let treeOutputObj = JSON.parse(treeOutputContent)
@@ -91,13 +107,23 @@ export default {
         }
     },
     computed: {
+        activateEditors() {
+            return (
+                this.status === this.$options.name.toLowerCase() ||
+                this.status === "create"
+            )
+        },
         location() {
-            if ("location" in this.editedData) {
+            if ("location" in this.editedData &&
+                this.editedData.location !== null
+            ) {
                 return this.editedData.location
-            } else if ("location" in this.initialData) {
+            } else if ("location" in this.initialData &&
+                this.initialData.location !== null
+            ) {
                 return this.initialData.location
             } else {
-                return null
+                return "No location data!"
             }
         }
     },

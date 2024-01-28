@@ -3,7 +3,7 @@
         <p class="section-header">
             Tags
         </p>
-        <div v-if="status === 'tags'">
+        <div v-if="activateEditors">
             <div v-for="(tag, index) in editableTagsList"
                  class="tag"
                  v-bind:data-key="index">
@@ -13,7 +13,7 @@
                 >X</span>
             </div>
         </div>
-        <div v-if="status === 'tags'"
+        <div v-if="activateEditors"
              class="tags-grid"
         >
             <input class="tag-input"
@@ -24,7 +24,7 @@
                    v-on:keyup.esc="inputEscKey"
                    v-on:focus="inputFocus"
                    v-model="inputValue"
-            >
+            />
             <div v-if="hints.length > 0"
                  class="tags-hints-box"
             >
@@ -73,40 +73,43 @@
                 "#" or "&" must be first character of the tag
             </p>
         </div>
-        <p v-else
-           v-for="(value, key) in currentTags">
-            <a v-bind:href="value">{{ key }}</a>
-        </p>
-        <div v-if="status === 'tags'"
-             class="bottom"
-        >
-            <button
-                v-on:click="localCompleteEditing"
-            >Complete Editing</button>
-            <button
-                v-on:click="setChoose"
-            >Discard changes</button>
-
+        <div v-else>
+            <p
+                v-for="(value, key) in currentTags">
+                <a v-bind:href="value">{{ key }}</a>
+            </p>
+            <p v-if="Object.keys(currentTags).length === 0"
+               class="blank-data"
+            >
+                No tags
+            </p>
         </div>
+        <two-buttons
+            v-bind:parent-name="$options.name"
+            v-on:complete-editing="localCompleteEditing"
+            v-on:discard-changes="discardChanges"
+            v-on:clear-editor="clearEditor"
+        ></two-buttons>
     </div>
     <div>
     </div>
 </template>
 
 <script>
-import {difference, charactersForTags} from "./constants.js";
+import {difference, charactersForTags} from "./constants.js"
+import TwoButtons from "./TwoButtons.vue"
+import {toRaw} from "vue"
 export default {
     name: "Tags",
-    props: [
-        "status",
-        "initialData",
-        "editedData",
-    ],
+    components: {TwoButtons},
     inject: [
         "sectionChosen",
         "completeEditing",
-        "setChoose",
+        "setView",
         "URLsSettings",
+        "status",
+        "initialData",
+        "editedData",
     ],
     data() {
         return {
@@ -126,6 +129,17 @@ export default {
         }
     },
     methods: {
+        discardChanges() {
+            if ("tags" in this.editedData) {
+                delete this.editedData["tags"]
+            }
+            //
+            this.setView()
+        },
+        clearEditor() {
+            this.inputValue = ""
+            this.editableTagsList = []
+        },
         toggleHashDropdown() {
             this.hashDropdownShown = !this.hashDropdownShown
             this.ampersandDropdownShown = false
@@ -136,9 +150,9 @@ export default {
         },
         fillTagsList() {
             if ("tags" in this.editedData) {
-                this.editableTagsList = [...this.editedData.tags]
+                this.editableTagsList = toRaw(this.editedData.tags)
             } else if ("tags" in this.initialData) {
-                this.editableTagsList = [...this.initialData.tags]
+                this.editableTagsList = toRaw(this.initialData.tags)
             }
         },
         deleteTag(event) {
@@ -227,6 +241,12 @@ export default {
         }
     },
     computed: {
+        activateEditors() {
+            return (
+                this.status === this.$options.name.toLowerCase() ||
+                this.status === "create"
+            )
+        },
         currentTags() {
             let tagsList = []
             if ("tags" in this.editedData) {
@@ -235,6 +255,9 @@ export default {
                 tagsList = this.initialData.tags
             } else {
                 return {}
+            }
+            if (tagsList === null) {
+                tagsList = []
             }
             let result = {}
             for (let tag of tagsList) {
@@ -312,6 +335,9 @@ export default {
                 this.fillTagsList()
             }
         },
+		/**
+		* Input validator
+		*/
         inputValue(newValue, oldValue) {
             this.highlightedTagIndex = null
             //Check for odd chars

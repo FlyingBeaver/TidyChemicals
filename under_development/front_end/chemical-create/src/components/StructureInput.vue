@@ -1,0 +1,47 @@
+<template>
+    <iframe
+        id="ifKetcher"
+        ref="ifKetcher"
+        name="ifKetcher"
+        v-bind:src="URLsSettings.ketcherIframeURL"
+        width="650"
+        height="400"
+        v-on:load="$emit('ketcherLoaded')"
+    >
+    </iframe>
+</template>
+
+<script>
+import {emptyMol} from "./constants.js"
+export default {
+    name: "StructureInput",
+    emits: ["ketcherLoaded"],
+    data() {
+        return {
+            ketcherInstance: null
+        }
+    },
+    methods: {
+        setMolecule(molBlock) {
+            let message = {action: "setMolecule", molBlock: molBlock}
+            let messageStr = JSON.stringify(message)
+            let ifKetcherWindow = window.frames.ifKetcher
+            ifKetcherWindow.postMessage(messageStr, "*")
+            console.log("sending message...")
+        },
+        getMolecule() {
+            let ifKetcherWindow = window.frames.ifKetcher
+            ifKetcherWindow.postMessage('{"action": "getMolecule", "pictureNeeded": true}', "*")
+        },
+        clear() {
+            this.setMolecule(emptyMol)
+        },
+    },
+    props: ["inputName", "disabled"],
+    inject: ["URLsSettings"],
+}
+</script>
+
+<style>
+
+</style>

@@ -28,23 +28,19 @@ export const tree = {
     molar_mass: {
         equals: {
             verbose: 'equals',
-                widget: 'numeral_input'
-        },
-        equals_with_epsilon: {
-            verbose: 'equals with epsilon',
-                widget: 'special_numeral_input'
+                widget: 'numerical_input'
         },
         in_interval_between: {
             verbose: 'in interval between',
-                widget: 'two_numeral_inputs'
+                widget: 'two_numerical_inputs'
         },
         less_than: {
             verbose: 'less than',
-                widget: 'numeral_input'
+                widget: 'numerical_input'
         },
         more_than: {
             verbose: 'more than',
-                widget: 'numeral_input'
+                widget: 'numerical_input'
         },
         verbose: 'Molar mass'
     },
@@ -81,23 +77,19 @@ export const tree = {
     quantity_with_unit: {
         equals: {
             verbose: 'equals',
-                widget: 'numeral_and_unit'
-        },
-        equals_with_epsilon: {
-            verbose: 'in interval around',
-                widget: 'numeral_epsilon_unit'
+                widget: 'numerical_and_unit'
         },
         in_interval_between: {
             verbose: 'in interval between',
-                widget: 'two_numeral_and_unit'
+                widget: 'two_numerical_and_unit'
         },
         less_than: {
             verbose: 'less than',
-                widget: 'numeral_and_unit'
+                widget: 'numerical_and_unit'
         },
         more_than: {
             verbose: 'more than',
-                widget: 'numeral_and_unit'
+                widget: 'numerical_and_unit'
         },
         verbose: 'Quantity'
     },
@@ -111,15 +103,15 @@ export const tree = {
     structure: {
         exact_match: {
             verbose: 'exact match',
-                widget: 'jsme_input'
+                widget: 'ketcher_input'
         },
         substructure: {
             verbose: 'substructure',
-                widget: 'jsme_input'
+                widget: 'ketcher_input'
         },
         substructure_greedy: {
             verbose: 'substructure (greedy)',
-                widget: 'jsme_input'
+                widget: 'ketcher_input'
         },
         verbose: 'Structure'
     },
@@ -269,6 +261,35 @@ export const difference = function (setA, setB) {
     }
     return _difference;
 }
+
+export const charactersForTags = ("#&0123456789abcdefghijklmnopqrstu" +
+    "vwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")
+
+export const emptyMol = `
+  Ketcher  1182418572D 1   1.00000     0.00000     0
+
+  0  0  0  0  0  0  0  0  0  0999 V2000
+M  END`
+
+export const dataKeys = [
+    'id',
+    'name_data',
+    'structure_pic',
+    'structure_mol',
+    'structure_aq',
+    'location',
+    'quantity',
+    'hazard_pictograms',
+    'molar_mass',
+    'cas',
+    'synonyms',
+    'comment',
+    'tags',
+    'created_by',
+    'creation_date',
+    'last_change_by',
+    'last_change_date'
+]
 
 export const elementSymbols = [
     'H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne',

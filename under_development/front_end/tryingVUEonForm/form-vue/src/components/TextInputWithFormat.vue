@@ -15,8 +15,11 @@
                 <button class="input-button" data-character="em_dash"
                         v-on:click.prevent="enterSymbol">—</button>
                 <button class="input-button" v-on:click.prevent="toggleGreek">ΑΩ</button>
-                <div v-bind:class="{'greek-palette': true, 'hide-me': greekAlphabetHidden}"
-                     v-on:click.prevent="enterSymbol">
+                <div
+                    class="greek-palette"
+                    v-show="!greekAlphabetHidden"
+                    v-on:click.prevent="enterSymbol"
+                >
                     <button class="input-button" data-character="capital_alpha">Α</button>
                     <button class="input-button" data-character="alpha">α</button>
                     <button class="input-button" data-character="capital_beta">Β</button>
@@ -74,7 +77,14 @@
             ref="editor"
         ></div>
         <!-- здесь будет всплывать предупреждение при вводе недопустимых символов -->
-        <div v-bind:class="{warning: true, 'hide-me': warningHidden}">You are trying to enter a character that is not allowed in this field. Only digits, latin and greek letters with no diacritics, space, full stop (period), comma, (), [], {}, +, -, /, :, ;, ±, — and ′ are allowed.</div>
+        <div
+            class="warning"
+            v-show="!warningHidden"
+        >You are trying to enter a character that is not allowed in
+            this field. Only digits, latin and greek letters with no
+            diacritics, space, full stop (period), comma, (), [], {},
+            +, -, /, :, ;, ±, — and ′ are allowed.
+        </div>
     </div>
     <input
         type="hidden"
@@ -89,7 +99,7 @@
 </template>
 
 <script>
-import {characters, characters_in_string, difference} from "@/components/constants";
+import {characters, characters_in_string, difference} from "@/components/constants"
 import Quill from "quill"
 export default {
     name: "TextInputWithFormat",
@@ -238,18 +248,6 @@ export default {
 
     span.ql-formats {
         position: relative;
-    }
-
-    .hide-me {
-        display: none;
-    }
-
-    div.warning {
-        background: peachpuff;
-        margin: 10px 10px 10px 10px;
-        font-family: sans-serif;
-        color: maroon;
-        padding: 10px 10px 10px 10px;
     }
 
     div.disabled {

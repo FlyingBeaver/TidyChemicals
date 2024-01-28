@@ -6,18 +6,30 @@
         v-bind:disabled="disabled"
         v-model="inputValue"
     >
-    <div v-bind:class="{warning: true, 'hide-me': !warningWrongChar}">
+    <div
+        class="warning"
+        v-show="warningWrongChar"
+    >
         You  are trying to enter a symbol that is not allowed in this field
     </div>
-    <div v-bind:class="{warning: true, 'hide-me': !warningUnrecognizedElement}">
+    <div
+        class="warning"
+        v-show="warningUnrecognizedElement"
+    >
         Element {{ plural ? "symbols were" : "symbol was" }}
         not recognized: {{unrecognizedSymbols}}
     </div>
-    <div v-bind:class="{warning: true, 'hide-me': !warningFirstChar}">
+    <div
+        class="warning"
+        v-show="warningFirstChar"
+    >
         First character of the molecular formula must be an uppercase latin letter
     </div>
-    <div v-bind:class="{warning: true, 'hide-me': !warningDigitLowercase}" >
-        After a digits must be an uppercase letter
+    <div
+        class="warning"
+        v-show="warningDigitLowercase"
+    >
+        After a digit must be an uppercase letter
     </div>
     <input type="hidden" v-model="molecularFormulaJSON">
 </template>

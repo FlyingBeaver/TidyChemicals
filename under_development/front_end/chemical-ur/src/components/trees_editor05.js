@@ -7,6 +7,7 @@ var Chemical, FrameMaker, ListPoint, Receiver, Storage,
 export var Tree = (function() {
   class Tree {
     constructor(tree_container, input_name, root, path_to_node, children_storages_url) {
+      this.unhighlight_storage = this.unhighlight_storage.bind(this);
       this.update_field = this.update_field.bind(this);
       this.tree_container_mouse = this.tree_container_mouse.bind(this);
       this.highlight = this.highlight.bind(this);
@@ -55,6 +56,7 @@ export var Tree = (function() {
       this.root_object.span = this.root_object.li.querySelector("span");
       this.root_object.span.addEventListener("dblclick", this.root_object.open_close);
       this.root_object.span.addEventListener("click", this.process_click);
+      this.tree_container.addEventListener("unhighlight-storage", this.unhighlight_storage);
       Tree.instances.push(this);
       this.frame_maker = new FrameMaker(this);
       if (this.mode !== "chemical_edit") {
@@ -66,6 +68,16 @@ export var Tree = (function() {
       if (path_to_node !== void 0) {
         Storage.open_with_path(path_to_node);
       }
+    }
+
+    unhighlight_storage() {
+      var copy_of_highlighted, processed_id;
+      copy_of_highlighted = [];
+      Object.assign(copy_of_highlighted, this.highlighted_nodes_ids);
+      for (processed_id in copy_of_highlighted) {
+        this.unhighlight(processed_id);
+      }
+      return this.update_field();
     }
 
     update_field() {
