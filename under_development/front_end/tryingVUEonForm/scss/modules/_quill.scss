@@ -1,0 +1,40 @@
+#standalone-container {
+    margin: auto;
+    max-width: 720px;
+}
+#editor-container {
+    height: 45px;
+    border: solid Cornflowerblue;
+}
+
+#toolbar-container {
+    margin: -25px 0 0 0;
+}
+
+.ql-toolbar.ql-snow {
+    padding: 0;
+}
+
+.ql-editor.ql-blank {
+    overflow-y: hidden;
+}
+
+.greek-palette {
+    bottom:25px;
+    right: 0;
+    border: 1px Grey solid;
+    background: white;
+    position: absolute;
+    width: 432px;
+    height: 81px;
+    display: grid;
+    grid-template: repeat(3, 1fr) / repeat(16, 1fr);
+    .input-button {
+        width: 27px;
+        height: 27px;
+    }
+}
+
+.ql-formats {
+    position: relative;
+}

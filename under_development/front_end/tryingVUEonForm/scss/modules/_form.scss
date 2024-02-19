@@ -1,0 +1,61 @@
+.search-form {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    &:disabled {
+        background-color: Azure;
+        opacity: 50%;
+    }
+}
+
+.row {
+    margin: 0 60px 0 60px;
+    padding: 20px;
+    border: none;
+    flex-basis: 100%;
+    display: grid;
+    grid-template-columns: 285px 285px 285px;
+    grid-template-rows: auto auto;
+    grid-column-gap: 20px;
+    justify-content: space-between;
+    .deletion_mode &:hover, &.fired {
+        background-color: DarkOrange;
+        cursor: url("./assets/trash.svg"), pointer;
+    }
+}
+
+.column {
+    height: auto;
+}
+
+@media (max-width: 863px) {
+    .row {
+        grid-template-columns: 285px;
+        align-items: center;
+        justify-content:center;
+    }
+    .column {
+        margin: 10px;
+    }
+}
+
+.operator-between {
+    grid-column: 2/4;
+    display: flex;
+    justify-content: center;
+}
+
+.buttons-box {
+    @extend .row;
+    margin-top: 10px;
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    align-self: end;
+    grid-row-gap: 20px;
+    cursor: default;
+    .deletion_mode &:hover {
+        cursor: default;
+        background-color: Azure;
+    }
+}

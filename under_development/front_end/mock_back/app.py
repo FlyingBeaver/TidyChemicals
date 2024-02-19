@@ -168,10 +168,8 @@ def users():
 
 @app.route("/chemical/", methods=("POST", "GET"))
 def chemical_data():
-    branch_no = 1
+    branch_no = 2
     if branch_no == 1:
-        print("!!!!!!!!!!!")
-        print(none_where_possible_dict["creation_date"])
         return none_where_possible_dict
     elif branch_no == 2:
         return make_dict(url_for("static", filename="TBDMSCl.png"))

@@ -1,0 +1,75 @@
+%abstract-rectangle {
+    font-size: 18px;
+    color: CornflowerBlue;
+    background-color: Azure;
+    border: solid CornflowerBlue 3px;
+    width: 285px;
+    height: 45px;
+    padding-left: 8px;
+}
+
+.wide-select {
+    @extend %abstract-rectangle;
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background-image: url("./assets/Triangle_in_square.svg");
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: 45px;
+    &:hover, &:focus {
+        background-color: white;
+    }
+    &:disabled, &:disabled:hover {
+        background-color: Azure;
+        opacity: 50%;
+        cursor: url("./assets/trash.svg"), pointer;
+    }
+    > option {
+        padding-left: 0;
+    }
+}
+
+.narrow-select {
+    @extend .wide-select;
+    width: auto;
+}
+
+.inactive-field {
+    @extend %abstract-rectangle;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    opacity: 50%;
+}
+
+.simple-text-input, {
+    @extend %abstract-rectangle;
+    box-sizing: border-box;
+    &:focus {
+        background-color: white;
+    }
+    &:disabled, &:disabled:hover {
+        background-color: Azure;
+        opacity: 50%;
+        cursor: url("./assets/trash.svg"), pointer;
+    }
+}
+
+.narrow-date-input {
+    @extend %abstract-rectangle;
+    width: auto;
+    box-sizing: border-box;
+}
+
+.narrow-text-input {
+    @extend .simple-text-input;
+    grid-column: span 1;
+    width: auto;
+}
+
+.wide-text-input {
+    @extend .simple-text-input;
+    grid-column: span 3;
+    width: auto;
+}

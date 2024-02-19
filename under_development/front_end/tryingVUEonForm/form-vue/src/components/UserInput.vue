@@ -1,40 +1,44 @@
 <template>
     <button
-        class="dark_button"
+        class="dark-button"
         v-on:click.prevent="toggleEditor"
     >{{ editorIsOn ? "Hide widget" : "Show widget" }}
     </button>
     <div class="user-input-container" v-show="editorIsOn">
+        <p class="prompt-width-3"
+        >Start typing below name of a user you want to select</p>
         <input
             type="text"
-            class="simple_text_value wide"
+            class="wide-text-input"
             v-bind:name="inputName"
             v-bind:disabled="disabled"
             v-model="inputContent"
+            v-on:keyup.down="reactOnKeyDown"
+            v-on:keydown.down.prevent=""
+            v-on:keyup.up="reactOnKeyUp"
+            v-on:keydown.up.prevent=""
+            v-on:keyup.enter="reactOnKeyEnter"
+            v-on:keydown.enter.prevent=""
         >
-        <p
-            class="wide hint"
-        >Start typing above name of user you want to select</p>
-        <div class="narrow left-label">Full name</div>
-        <label class="pretty-toggle narrow">
-            <input type="checkbox" v-model="usernameIsOn">
-            <div class="toggle-inside"></div>
-        </label>
-        <div class="narrow right-label">Username</div>
-        <div class="users wide">
+        <div class="selected-users">
             <p
-                v-for="id in chosenUsers"
+                v-for="(id, index) in chosenUsers"
                 v-bind:key="id"
+                v-bind:class="{'one-user': true, 'highlighted-username': index === highlightedUserIndex && highlightInChosen}"
                 v-on:click="unselectUser(id)"
             >{{ showName(id) }}
             </p>
-            <p v-if="chosenUsersEmpty">No one chosen!</p>
+            <p
+                v-if="chosenUsersEmpty"
+                class="nobody"
+            >No one chosen!</p>
         </div>
-        <div v-bind:class="{users:true, wide:true, 'small-grid':recentShown}">
+        <div v-bind:class="{'users-to-select': true, 'small-grid': recentShown}">
             <div>
                 <p
-                    v-for="id in usersToChoose"
+                    v-for="(id, index) in usersToChoose"
                     v-bind:key="id"
+                    v-bind:class="{'one-user': true, 'highlighted-username': index === highlightedUserIndex && !highlightInChosen}"
                     v-on:click="selectUser(id)"
                 >{{ showName(id) }}
                 </p>
@@ -44,9 +48,20 @@
                     v-for="id in usersToChoose"
                     v-bind:key="id"
                     v-on:click="deleteUserFromRecent(id)"
+                    class="cross"
                 >X</p>
             </div>
         </div>
+        <div class="left-label">Full name</div>
+        <label class="pretty-toggle">
+            <input
+                type="checkbox"
+                class="pretty-toggle-checkbox"
+                v-model="usernameIsOn"
+            >
+            <span class="toggle-indicator"></span>
+        </label>
+        <div class="right-label">Username</div>
     </div>
 
     <input
@@ -78,9 +93,100 @@ export default {
             recent: [],
             deletedFromRecent: [],
             inputContent: "",
+            highlightedUserIndex: null,
+            highlightInChosen: false,
         }
     },
     methods: {
+        reactOnKeyEnter() {
+            if (this.highlightInChosen) {
+                this.unselectUser(this.chosenUsers[this.highlightedUserIndex])
+            } else {
+                this.selectUser(this.usersToChoose[this.highlightedUserIndex])
+            }
+            this.highlightedUserIndex = null
+            this.highlightInChosen = false
+        },
+        nullGuardUp() {
+            if (this.highlightedUserIndex === null) {
+                if (this.usersToChoose.length > 0) {
+                    this.highlightedUserIndex = this.usersToChoose.length - 1
+                    return
+                }
+                if (this.chosenUsers.length > 0) {
+                    this.highlightedUserIndex = this.chosenUsers.length - 1
+                    this.highlightInChosen = true
+                    return
+                }
+            }
+        },
+        reactOnKeyUp() {
+            this.nullGuardUp()
+
+            if (this.highlightedUserIndex > 0) {
+                this.highlightedUserIndex--
+            } else if (
+                this.highlightedUserIndex === 0 &&
+                !this.highlightInChosen
+            ) {
+                if (this.chosenUsers.length > 0) {
+                    this.highlightInChosen = true
+                    this.highlightedUserIndex = this.chosenUsers.length - 1
+                } else {
+                    this.highlightedUserIndex = this.usersToChoose.length - 1
+                }
+            } else if (
+                this.highlightedUserIndex === 0 &&
+                this.highlightInChosen
+            ) {
+                if (this.usersToChoose.length > 0) {
+                    this.highlightInChosen = false
+                    this.highlightedUserIndex = this.usersToChoose.length - 1
+                } else if (this.chosenUsers.length > 0) {
+                    this.highlightedUserIndex = this.chosenUsers.length - 1
+                }
+            }
+        },
+        nullGuardDown() {
+            if (this.highlightedUserIndex === null) {
+                if (this.usersToChoose.length > 0) {
+                    this.highlightedUserIndex = 0
+                    return
+                }
+                if (this.chosenUsers.length > 0) {
+                    this.highlightedUserIndex = 0
+                    this.highlightInChosen = true
+                    return
+                }
+            }
+        },
+        reactOnKeyDown() {
+            this.nullGuardDown()
+
+            if (this.highlightInChosen) {
+                if (this.highlightedUserIndex <
+                    this.chosenUsers.length - 1
+                ) {
+                    this.highlightedUserIndex++
+                } else if (this.usersToChoose.length > 0) {
+                    this.highlightInChosen = false
+                    this.highlightedUserIndex = 0
+                } else {
+                    this.highlightedUserIndex = 0
+                }
+            } else {
+                if (this.highlightedUserIndex <
+                    this.usersToChoose.length - 1
+                ) {
+                    this.highlightedUserIndex++
+                } else if (this.chosenUsers.length > 0) {
+                    this.highlightInChosen = true
+                    this.highlightedUserIndex = 0
+                } else {
+                    this.highlightedUserIndex = 0
+                }
+            }
+        },
         toggleEditor() {
             this.editorIsOn = !this.editorIsOn
         },
@@ -117,7 +223,7 @@ export default {
     },
     computed: {
         chosenUsersEmpty() {
-            return (JSON.stringify(this.chosenUsers) === '[]')
+            return (this.chosenUsers.length === 0)
         },
         chosenUsersStr() {
             return JSON.stringify(this.chosenUsers)
@@ -135,6 +241,9 @@ export default {
                 let usersToShow = []
                 if (this.usernameIsOn) {
                     for (let username in this.usersObject) {
+                        if (this.chosenUsers.indexOf(username) !== -1) {
+                            continue
+                        }
                         if (username.toLowerCase()
                                 .indexOf(value.toLowerCase()) !== -1) {
                             usersToShow.push(username)
@@ -142,6 +251,9 @@ export default {
                     }
                 } else {
                     for (let username in this.usersObject) {
+                        if (this.chosenUsers.indexOf(username) !== -1) {
+                            continue
+                        }
                         if (this.usersObject[username].toLowerCase()
                                 .indexOf(value.toLowerCase()) !== -1) {
                             usersToShow.push(username)
@@ -151,6 +263,8 @@ export default {
                 this.usersToChoose = usersToShow
                 this.recentShown = false
             }
+            this.highlightedUserIndex = null
+            this.highlightInChosen = false
         },
     },
     beforeMount() {
@@ -160,90 +274,5 @@ export default {
 }
 </script>
 
-<style scoped>
-p {
-    margin: 0;
-}
-
-input[type=checkbox] {
-    height: 0;
-    width: 0;
-    opacity: 0;
-}
-label.pretty-toggle {
-    width: 100%;
-    background-color: cornflowerblue;
-    height: 25px;
-    cursor: pointer;
-    position: relative;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-/*unchecked*/
-div.toggle-inside {
-    background-color: white;
-    margin-top: 3px;
-    margin-left: 3px;
-    margin-bottom: 3px;
-    height: 19px;
-    width: 19px;
-}
-input:checked ~ div.toggle-inside {
-    right: 0;
-    position: absolute;
-    background-color: white;
-    margin-top: 3px;
-    /*margin-left: 35px;*/
-    margin-right: 3px;
-    margin-bottom: 3px;
-    height: 19px;
-    width: 19px;
-}
-div.users {
-    border: solid cornflowerblue 3px;
-}
-div.users:last-child {
-    border-top: solid cornflowerblue 1px;
-}
-div.users p {
-    color: cornflowerblue;
-    padding-left: 5px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-div.users p:hover {
-    background-color: white;
-}
-div.small-grid {
-    display: grid;
-    grid-template-columns: 1fr 20px;
-}
-div.user-input-container {
-    display: grid;
-    grid-template-columns: 40% 20% 40%;
-    grid-template-rows: auto;
-    margin-top: 5px;
-}
-.wide {
-    grid-column-start: span 3;
-}
-.narrow {
-    grid-column-start: span 1;
-}
-.left-label {
-    justify-self: end;
-    align-self: center;
-    margin-right: 10px;
-    color: cornflowerblue;
-}
-.right-label {
-    justify-self: start;
-    align-self: center;
-    margin-left: 10px;
-    color: cornflowerblue;
-}
-.hint {
-    color: cornflowerblue;
-    font-style: italic;
-}
+<style>
 </style>

@@ -44,12 +44,4 @@ export default {
 <style>
 @import "./static/static/css/main.8e693d51.css";
 
-div#ifKetcher {
-    height: 400px;
-}
-
-div.disabled {
-    opacity: 50%;
-    background-color: azure;
-}
 </style>

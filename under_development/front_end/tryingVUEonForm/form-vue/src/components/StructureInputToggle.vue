@@ -1,6 +1,6 @@
 <template>
     <button
-        class="dark_button"
+        class="dark-button"
         v-on:click.prevent="toggleEditor"
     >{{ editorIsOn ? "Hide editor" : "Show editor" }}</button>
 </template>

@@ -1,9 +1,9 @@
 <template>
     <input
         type="text"
+        class="simple-text-input"
         v-bind:name="inputName"
         v-bind:disabled="disabled"
-        class="simple_text_value"
         v-on:input="inputValidation"
         v-model="inputValue"
     >

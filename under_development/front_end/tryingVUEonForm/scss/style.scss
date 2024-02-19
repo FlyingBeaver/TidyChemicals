@@ -1,261 +1,51 @@
-body {
-    padding: 0;
-    margin: 0;
-    background-color: Azure;
-    font-family: Roboto, sans-serif;
-}
-/* Header format! */
+@import "_base.scss";
+@import "_layout.scss";
+@import "modules/_inputs.scss";
+@import "modules/_buttons.scss";
+@import "modules/_form.scss";
+@import "modules/_single-checkbox.scss";
+@import "modules/_tree.scss";
+@import "modules/_quill.scss";
+@import "modules/_pretty-toggle.scss";
+@import "modules/_messages.scss";
+@import "modules/_user-input.scss";
 
-.header {
-    background-color: CornflowerBlue;
-    color: Azure;
-    width: 100%;
-    height: 120px;
-    display: flex;
-    justify-content: space-between;
-}
 
-.logo-container {
-    height: 100%;
-    flex-basis: 50px;
-    margin-left: 30px;
-    display: flex;
-    align-items: center;
-}
-
-.buttons-container {
-    height: 100px;
-    margin-right: 30px;
-    padding: 10px 0 10px 0;
+.date-range-wrapper {
     display: grid;
-    grid-template-columns: minmax(min-content, auto) 1fr;
-    grid-gap: 10px;
-}
-
-.show-username{
-    color: Azure;
-    grid-row: 1/3;
-}
-
-.light-button {
-    display: flex;
-    background-color: Azure;
-    color: CornflowerBlue;
-    height: 45px;
-    width: 150px;
-    font-size: 24px;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    &:link {
-        text-decoration: none;
-    }
-    &:hover {
-        text-decoration: underline;
-    }
-}
-
-/* content format */
-.content-main {
-    display: flex;
-    justify-content: center;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    flex-basis: 100%;
-    &:disabled {
-        background-color: Azure;
-        opacity: 50%;
-    }
-}
-
-div.row {
-    margin: 0 80px 0 80px;
-    border: none;
-    flex-basis: 100%;
-    flex-direction: row;
-    display: grid;
-    grid-template-columns: 285px 285px 285px;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
-    grid-column-gap: 20px;
-    justify-content: space-between;
-    .deletion_mode &:hover, &.fired {
-        background-color: DarkOrange;
-        cursor: url("./assets/Vector.svg"), pointer;
-    }
-    .deletion_mode &#buttons_box:hover {
-        cursor: default;
-        background-color: Azure;
-    }
-    &:nth-child(1) {
-        margin-top: 80px;
-    }
+    gap: 10px;
 }
 
-.column {
-    min-height: 65px;
-    height: auto;
-    margin: 0;
+.column.ketcher-container {
+    grid-column-start: 2;
+    grid-column-end: 4;
 }
 
-p.row.appendix {
-    grid-column: 1/4;
-    background-color: Bisque;
+/*Needed for non-iframe ketcher*/
+textarea.cliparea {
+    display: none;
 }
 
-@media (max-width: 863px) {
-    div.row {
-        flex-direction: column;
-        align-items: center;
-        margin: 80px 0 0 0;
-    }
+/*These two rules for StructureInput*/
+div#ifKetcher {
+    height: 400px;
 }
 
-div.operator_between_box {
-    grid-column: 2/4;
-    display: flex;
-    justify-content: center;
-    padding-bottom: 30px;
-    padding-top: 30px;
-}
-
-%abstract-rectangle {
-    font-size: 18px;
-    color: CornflowerBlue;
-    background-color: Azure;
-    border: solid CornflowerBlue 3px;
-    width: 285px;
-    height: 45px;
-    padding-left: 8px;
-}
-
-form select {
-    @extend %abstract-rectangle;
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    background-image: url("./assets/Triangle_in_square.svg");
-    background-position: right;
-    background-repeat: no-repeat;
-    background-size: 45px;
-    &:hover, &:focus {
-        background-color: white;
-    }
-    &:disabled, &:disabled:hover {
-        background-color: Azure;
-        opacity: 50%;
-        cursor: url("./assets/Vector.svg"), pointer;
-    }
-    > option {
-        padding-left: 0;
-    }
-}
-
-.inactive-field {
-    @extend %abstract-rectangle;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
+div.disabled {
     opacity: 50%;
+    background-color: Azure;
 }
 
-.simple_text_value, {
-    @extend %abstract-rectangle;
-    box-sizing: border-box;
-    &:focus {
-        background-color: white;
-    }
-    &:disabled, &:disabled:hover {
-        background-color: Azure;
-        opacity: 50%;
-        cursor: url("./assets/Vector.svg"), pointer;
-    }
-}
-
-.only_num_value {
-    @extend .simple_text_value;
-}
-
-%abstract-button {
-    box-sizing: border-box;
-    font-size: 18px;
-    width: 285px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dark_button {
-    @extend %abstract-button;
-    color: Azure;
-    background-color: CornflowerBlue;
-    border: solid CornflowerBlue 3px;
-
-    &:hover {
-        color: white;
-        border: solid RoyalBlue 3px;
-        background-color: RoyalBlue;
-    }
-    &:active {
-        color: white;
-        border: solid MidnightBlue 3px;
-        background-color: MidnightBlue;
-    }
-    &:disabled, &:disabled:hover, &:disabled:active {
-        opacity: 65%;
-        background-color: CornflowerBlue;
-        border: solid CornflowerBlue 3px;
-    }
-}
-
-#search_button {
-    @extend %abstract-button;
-    color: white;
-    font-weight: 700;
-    background-color: DodgerBlue;
-    border: solid DodgerBlue 3px;
-    &:hover {
-        border: solid blue 3px;
-        background-color: blue;
-    }
-    &:active {
-        border: solid Crimson 3px;
-        background-color: Crimson;
-    }
-}
-
-#exit_from_deletion {
-    @extend %abstract-button;
-    color: white;
-    border: solid Crimson 3px;
-    background-color: Crimson;
-    &:hover {
-        border: solid DarkRed 3px;
-        background-color: DarkRed;
-    }
-    &:active {
-        border: solid rgb(77, 0, 0) 3px;
-        background-color: rgb(77, 0, 0);
-    }
-}
-
-div#buttons_box {
-    margin-top: 10px;
+.three-columns-container {
     display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: 1fr;
-    align-self: end;
-    grid-row-gap: 20px;
-    cursor: default;
+    grid-template-columns: 31% 31% 31%;
+    column-gap: 3.5%;
 }
 
-.warning {
-    background: Peachpuff;
-    margin: 10px 10px 10px 10px;
-    font-family: sans-serif;
-    color: maroon;
-    padding: 10px 10px 10px 10px;
+.two-columns-container {
+    display: grid;
+    grid-template-columns: 48% 48%;
+    column-gap: 4%;
 }

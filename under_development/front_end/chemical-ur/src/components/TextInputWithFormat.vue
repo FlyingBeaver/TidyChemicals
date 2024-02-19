@@ -8,17 +8,33 @@
                 <button class="ql-script" value="super"></button>
             </span>
                 <span class="ql-formats">
-                <button class="input-button" data-character="prime"
-                        v-on:click.prevent="enterSymbol">′</button>
-                <button class="input-button" data-character="plus_minus"
-                        v-on:click.prevent="enterSymbol">±</button>
-                <button class="input-button" data-character="em_dash"
-                        v-on:click.prevent="enterSymbol">—</button>
-                <button class="input-button" v-on:click.prevent="toggleGreek">ΑΩ</button>
+                <button
+                    v-on:click.prevent="enterSymbol"
+                    class="input-button"
+                    data-character="prime"
+                >′
+                </button>
+                <button
+                    v-on:click.prevent="enterSymbol"
+                    class="input-button"
+                    data-character="plus_minus"
+                >±
+                </button>
+                <button
+                    v-on:click.prevent="enterSymbol"
+                    class="input-button"
+                    data-character="em_dash"
+                >—
+                </button>
+                <button
+                    v-on:click.prevent="toggleGreek"
+                    class="input-button"
+                >ΑΩ
+                </button>
                 <div
-                    class="greek-palette"
                     v-show="!greekAlphabetHidden"
                     v-on:click.prevent="enterSymbol"
+                    class="greek-palette"
                 >
                     <button class="input-button" data-character="capital_alpha">Α</button>
                     <button class="input-button" data-character="alpha">α</button>
@@ -77,11 +93,11 @@
                            'editor-height-fixed': !allowLineBreak}"
             id="editor-container"
             ref="editor"
-        ></div>
-        <!-- здесь будет всплывать предупреждение при вводе недопустимых символов -->
+        >
+        </div>
         <div
-            class="warning"
             v-show="!warningHidden"
+            class="warning"
         >
             You are trying to enter a character that is not allowed
             in this field. Only digits, latin and greek letters
@@ -92,10 +108,18 @@
 </template>
 
 <script>
-import {characters, characters_in_string, difference} from "./constants.js";
+import {characters, characters_in_string, difference} from "../utils/constants.js";
 import Quill from "quill"
+
 export default {
     name: "TextInputWithFormat",
+    inject: ["completeEditing"],
+    props: {
+        "content": String,
+        "allowLineBreak": Boolean,
+        "charRestriction": Boolean
+    },
+    emits: ["editing-complete"],
     data() {
         return {
             editor: null,
@@ -109,10 +133,32 @@ export default {
             formattingInputContent: "",
         }
     },
-    props:
-        {"content": String, "allowLineBreak": Boolean, "charRestriction": Boolean},
-    emits: ["editing-complete"],
-    inject: ["completeEditing"],
+    mounted() {
+        this.editor = new Quill(
+            this.$refs.editor,
+            {
+                modules: {
+                    formula: false,
+                    syntax: false,
+                    toolbar: this.$refs.toolbar
+                },
+                placeholder: '',
+                theme: "snow"
+            }
+        )
+        this.editor.root.setAttribute('spellcheck', false)
+        this.editor.on("text-change", this.checkInserted)
+        this.qlEditor = this.$refs.editor.querySelector(".ql-editor")
+        this.editor.on("text-change", this.updateInputs)
+        this.insertInitialText()
+        if (this.allowLineBreak) {
+            this.charactersSet = new Set(characters_in_string + "\n")
+            this.charactersString = characters_in_string + "\n"
+        } else {
+            this.charactersSet = new Set(characters_in_string)
+            this.charactersString = characters_in_string
+        }
+    },
     methods: {
         showWarning() {
             this.warningHidden = false
@@ -212,37 +258,11 @@ export default {
             this.editor.deleteText(0, finalPosition, "user")
         }
     },
-    mounted() {
-        this.editor = new Quill(
-            this.$refs.editor,
-            {
-                modules: {
-                    formula: false,
-                    syntax: false,
-                    toolbar: this.$refs.toolbar
-                },
-                placeholder: '',
-                theme: "snow"
-            }
-        )
-        this.editor.root.setAttribute('spellcheck', false)
-        this.editor.on("text-change", this.checkInserted)
-        this.qlEditor = this.$refs.editor.querySelector(".ql-editor")
-        this.editor.on("text-change", this.updateInputs)
-        this.insertInitialText()
-        if (this.allowLineBreak) {
-            this.charactersSet = new Set(characters_in_string + "\n")
-            this.charactersString = characters_in_string + "\n"
-        } else {
-            this.charactersSet = new Set(characters_in_string)
-            this.charactersString = characters_in_string
-        }
-    },
 }
 </script>
 
 <style>
-    @import "quill.snow.css";
+    @import "../assets/quill.snow.css";
     #standalone-container {
         margin: auto;
         max-width: 720px;

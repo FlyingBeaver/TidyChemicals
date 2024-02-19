@@ -3,7 +3,7 @@
         type="text"
         v-bind:name="inputName"
         v-bind:disabled="disabled"
-        class="simple_text_value"
+        class="simple-text-input"
         v-on:blur="inputValidationOnBlur"
         v-on:focus="hideInvalidCasWarning"
         v-on:input="inputValidationOnInput"

@@ -1,0 +1,68 @@
+.tree {
+    background: Snow;
+    min-height: 100px;
+    min-width: 95%;
+    margin: 10px;
+    resize: horizontal;
+    overflow: auto;
+    float: left;
+
+    .tree_container {
+        position: relative;
+    }
+    .background {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+    .foreground {
+        position: relative;
+        height: 100%;
+        width: 100%;
+    }
+    .highlighted {
+        background: red;
+    }
+    .figure {
+        margin-top: 50px;
+        margin-left: 40px;
+        height: 50px;
+        width: 50px;
+        background: Bisque;
+        position: relative;
+    }
+    ul {
+        user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        .foreground > & {
+            padding-bottom: 40px;
+        }
+    }
+    li {
+        &.open {
+            list-style-image: url(./assets/door-open.svg);
+        }
+        &.closed {
+            list-style-image: url(./assets/door-closed.svg);
+        }
+        &.chemical {
+            list-style-image: url(./assets/jar.svg);
+            // list-style-type: disc;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,42 +1,43 @@
 <template>
     <input
-        type="text"
-        class="simple_text_value"
+        v-model="inputValue"
         v-on:blur="inputValidationOnBlur"
         v-on:focus="hideInvalidCasWarning"
         v-on:input="inputValidationOnInput"
-        v-model="inputValue"
+        type="text"
+        class="simple_text_value"
     >
     <div
-        class="warning"
         v-show="warningWrongSymbol"
+        class="warning"
     >
         You  are trying to enter a symbol that is not allowed in
         this field
     </div>
     <div
-        class="warning"
         v-show="warningInvalidCas"
+        class="warning"
     >
         Invalid value of CAS RN. If you didn't completed input of CAS RN,
         you can ignore this message
     </div>
     <div
-        class="warning"
         v-show="warningTooLongValue"
+        class="warning"
     >
         You are trying to input too long value for CAS RN. Valid CAS RN
         can't contain more than 10 digits.
     </div>
     <div
-        class="warning"
         v-show="warningThreeHyphens"
+        class="warning"
     >
         You  are trying to enter third hyphen, but CAS RN can contain
         only two hyphens
     </div>
-    <div class="warning"
+    <div
          v-show="warningHyphensTogether"
+         class="warning"
     >
         You  are trying to enter two hyphens together, but hyphens must
         separate groups of digits
@@ -46,8 +47,8 @@
 <script>
 export default {
     name: "CasInput",
-    props: ["cas"],
     inject: ["completeEditing"],
+    props: ["cas"],
     data() {
         return {
             expectedSymbols: new Set("0123456789-"),
@@ -147,11 +148,10 @@ export default {
         },
         hideInvalidCasWarning() {
             this.warningInvalidCas = false
-        }
-    }
+        },
+    },
 }
 </script>
 
-<style scoped>
-
+<style>
 </style>

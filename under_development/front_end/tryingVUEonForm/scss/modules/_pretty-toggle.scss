@@ -1,0 +1,52 @@
+
+.pretty-toggle {
+    grid-column: span 1;
+    width: 100%;
+    background-color: CornflowerBlue;
+    height: 25px;
+    cursor: pointer;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    .pretty-toggle-checkbox {
+        height: 0;
+        width: 0;
+        opacity: 0;
+        &:checked ~ .toggle-indicator {
+            right: 0;
+            position: absolute;
+            background-color: white;
+            margin-top: 3px;
+            margin-right: 3px;
+            margin-bottom: 3px;
+            height: 19px;
+            width: 19px;
+        }
+    }
+    .toggle-indicator {
+        display: inline-block;
+        background-color: white;
+        margin-top: 3px;
+        margin-left: 3px;
+        margin-bottom: 3px;
+        height: 19px;
+        width: 19px;
+    }
+}
+
+
+.left-label {
+    grid-column: span 1;
+    justify-self: end;
+    align-self: center;
+    margin-right: 10px;
+    color: CornflowerBlue;
+}
+
+.right-label {
+    grid-column: span 1;
+    justify-self: start;
+    align-self: center;
+    margin-left: 10px;
+    color: CornflowerBlue;
+}

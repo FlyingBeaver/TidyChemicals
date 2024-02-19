@@ -1,15 +1,15 @@
 <template>
     <div class="container">
         <input
+            v-model="inputValue"
+            v-on:input="inputValidation"
             type="text"
             name="numerical_input"
             class="simple_text_value"
-            v-on:input="inputValidation"
-            v-model="inputValue"
         >
         <select
-            name="unit_input"
             v-model="unitValue"
+            name="unit_input"
             class="narrow-select"
         >
             <option
@@ -19,21 +19,21 @@
             <option value="" selected>—</option>
         </select>
         <div
-            class="warning"
             v-show="warningWrongSymbol"
+            class="warning"
         >
             You  are trying to enter a symbol that is not allowed
             in numeric field
         </div>
         <div
-            class="warning"
             v-show="warningOddDelimiter"
+            class="warning"
         >
             You  are trying to enter second decimal separator
         </div>
         <div
-            class="warning"
             v-show="warningEmptyField"
+            class="warning"
         >
             You  are trying to commit empty field. Some value
             needed for commit.
@@ -42,11 +42,12 @@
 </template>
 
 <script>
-import {difference} from "./constants.js"
+import {difference} from "../utils/constants.js"
+
 export default {
     name: "OneNumericalAndUnit",
-    props: ["unit", "number", "units"],
     inject: ["completeEditing"],
+    props: ["unit", "number", "units"],
     data() {
         return {
             numericSymbols: new Set("0123456789.,"),
@@ -94,8 +95,8 @@ export default {
         clear() {
             this.inputValue = ""
             this.unitValue = ""
-        }
-    }
+        },
+    },
 }
 </script>
 

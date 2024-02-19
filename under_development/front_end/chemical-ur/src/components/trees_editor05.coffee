@@ -4,11 +4,12 @@
 export class Tree
     @instances = []
     @children_storages_url = ""
-    constructor: (tree_container,
-                  input_name,
-                  root,
-                  path_to_node,
-                  children_storages_url) ->
+    constructor: ({tree_container,
+                   input_name,
+                   root,
+                   path_to_node,
+                   children_storages_url,
+                   mode,}) ->
         if Tree.instances.length >= 2
             throw Error("can't create more than 2 tree instances")
         else if Tree.instances.length == 1
@@ -23,8 +24,8 @@ export class Tree
                     return Tree.instances[1]
                 else if Tree.instances.length == 2 and @number == 1
                     return Tree.instances[0]
-        #there are default (storage_edit) mode, search_form and chemical_edit
-        @mode = "chemical_edit"
+        @mode = mode
+        @set_mode()
         Tree.children_storages_url = children_storages_url
         @highlighted_nodes_ids = []
         @tree_container = tree_container
@@ -50,26 +51,51 @@ export class Tree
         @tree_container.addEventListener("unhighlight-storage", @unhighlight_storage)
 
         Tree.instances.push(@)
-        @frame_maker = new FrameMaker(@)
-        if @mode != "chemical_edit"
-            @tree_container.addEventListener("mousedown", @tree_container_mouse)
-            @tree_container.addEventListener("mouseup", @tree_container_mouse)
-            @tree_container.addEventListener("mousemove", @tree_container_mouse)
+        if @frame_selection
+            @frame_maker = new FrameMaker(@)
+        @tree_container.addEventListener("mousedown", @tree_container_mouse)
+        @tree_container.addEventListener("mouseup", @tree_container_mouse)
+        @tree_container.addEventListener("mousemove", @tree_container_mouse)
         @there_was_mousedown = false
 
-        if path_to_node != undefined
+        if path_to_node
             Storage.open_with_path(path_to_node)
 
+    set_mode: () =>
+        if @mode == "storage_editing"
+            @frame_selection = true
+            @multiple_selection = true
+            @terminal_selection = true
+            @non_terminal_selection = true
+            @chemical_selection = true
+            @tree_editing = true
+        else if @mode == "search_form"
+            @frame_selection = true
+            @multiple_selection = true
+            @terminal_selection = true
+            @non_termical_selection = true
+            @chemical_selection = false
+            @tree_editing = false
+        else if @mode == "chemical_editing"
+            @frame_selection = false
+            @multiple_selection = false
+            @terminal_selection = true
+            @non_terminal_selection = false
+            @chemical_selection = false
+            @tree_editing = false
+        else
+            throw Error("Wrong mode value")
+    
     unhighlight_storage: () =>
         copy_of_highlighted = []
         Object.assign(copy_of_highlighted, @highlighted_nodes_ids)
-        for processed_id of copy_of_highlighted
+        for processed_id in copy_of_highlighted
             @unhighlight(processed_id)
         @update_field()
 
     update_field: () =>
         highlighted_nodes_json = JSON.stringify(@highlighted_nodes_ids)
-        if @mode == "chemical_edit"
+        if @mode == "chemical_editing"
             if highlighted_nodes_json == "[]"
                 highlighted_node = null
             else
@@ -103,6 +129,18 @@ export class Tree
                 @there_was_mousedown = false
 
     highlight: (node_id) =>
+        node = Chemical.chemicals_and_storages[node_id]
+        if node == null or node == undefined
+            return
+        if not @terminal_selection
+            if node instanceof Storage and node.is_terminal
+                return
+        if not @non_terminal_storage
+            if node instanceof Storage and not node.is_terminal
+                return
+        if not @chemical_selection
+            if not (node instanceof Storage)
+                return
         if @highlighted_nodes_ids.indexOf(node_id) == -1
             @highlighted_nodes_ids.push(node_id)
             @update_field()
@@ -138,7 +176,7 @@ export class Tree
             else
                 @highlighted_no_key(event)
         else
-            if @mode == "chemical_edit"
+            if @multiple_selection
                 node_id = event.target.dataset.storage_node_id
                 node_object = Chemical.chemicals_and_storages[node_id]
                 if (node_object instanceof Storage and
@@ -278,8 +316,9 @@ class Storage extends Chemical
         else
             if event.target == @span
                 @open()
-        @tree.frame_maker.destructor()
-        @tree.frame_maker = new FrameMaker(@tree)
+        if @tree.frame_selection
+            @tree.frame_maker.destructor()
+            @tree.frame_maker = new FrameMaker(@tree)
 
     close: () =>
         ul = @li.querySelector("ul")

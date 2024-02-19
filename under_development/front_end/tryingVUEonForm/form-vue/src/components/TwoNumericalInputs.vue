@@ -1,10 +1,10 @@
 <template>
-    <div class="container">
+    <div class="two-columns-container">
         <input
             type="text"
             v-bind:name="inputName + '_left'"
             v-bind:disabled="disabled"
-            class="simple_text_value"
+            class="narrow-text-input"
             v-on:input="inputValidationLeft"
             v-model="inputValueLeft"
         >
@@ -12,18 +12,18 @@
             type="text"
             v-bind:name="inputName + '_right'"
             v-bind:disabled="disabled"
-            class="simple_text_value"
+            class="narrow-text-input"
             v-on:input="inputValidationRight"
             v-model="inputValueRight"
         >
         <div
-            class="warning"
+            class="warning-width-2"
             v-show="warningWrongSymbol"
         >
-            You  are trying to enter a symbol that is not allowed in numerical field
+            You  are trying to enter a character that is not allowed in numerical field
         </div>
         <div
-            class="warning"
+            class="warning-width-2"
             v-show="warningOddDelimiter"
         >
             You  are trying to enter second decimal separator
@@ -103,17 +103,5 @@ export default {
 }
 </script>
 
-<style scoped>
-div.container {
-    display: grid;
-    grid-template-columns: 48% 48%;
-    column-gap: 4%;
-}
-div.warning {
-    grid-column: span 2;
-}
-input.simple_text_value {
-    grid-column: span 1;
-    width: auto;
-}
+<style>
 </style>

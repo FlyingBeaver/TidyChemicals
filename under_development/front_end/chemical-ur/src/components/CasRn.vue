@@ -10,19 +10,19 @@
         </p>
         <cas-input
             v-else
-            v-bind:cas="casRn"
             ref="casInput"
+            v-bind:cas="casRn"
         ></cas-input>
         <two-buttons
-            v-bind:parent-name="$options.name"
             v-on:complete-editing="localCompleteEditing"
             v-on:discard-changes="discardChanges"
             v-on:clear-editor="clearEditor"
+            v-bind:parent-name="$options.name"
         ></two-buttons>
     </div>
     <div>
         <button
-            v-if="activateEditors"
+            v-if="status === 'choose'"
             v-on:click="sectionChosen('casrn')"
         >
             Edit
@@ -32,10 +32,23 @@
 
 <script>
 import CasInput from "./CasInput.vue"
-import TwoButtons from "./TwoButtons.vue";
+import TwoButtons from "./TwoButtons.vue"
+import activateEditors from "../mixins/activateEditors.js"
+import getParentData from "../mixins/getParentData.js"
+import discardChanges from "../mixins/discardChanges.js"
+import clearEditor from "../mixins/clearEditor.js"
+import localCompleteEditing from "../mixins/localCompleteEditing.js"
+
 export default {
     name: "CasRn",
     components: {CasInput, TwoButtons},
+    mixins: [
+        activateEditors,
+        discardChanges,
+        getParentData,
+        clearEditor,
+        localCompleteEditing,
+    ],
     inject: [
         "sectionChosen",
         "completeEditing",
@@ -44,39 +57,13 @@ export default {
         "initialData",
         "editedData",
     ],
-    methods: {
-        discardChanges() {
-            if ("cas" in this.editedData) {
-                delete this.editedData["cas"]
-            }
-        },
-        clearEditor() {
-            this.$refs.casInput.clear()
-        },
-        localCompleteEditing() {
-            this.$refs.casInput.localCompleteEditing()
-        },
-    },
     computed: {
         casRn() {
-            if ("cas" in this.editedData && this.editedData.cas !== null) {
-                return this.editedData.cas
-            } else if ("cas" in this.initialData && this.initialData.cas !== null) {
-                return this.initialData.cas
-            } else {
-                return ""
-            }
-        },
-        activateEditors() {
-            return (
-                this.status === this.$options.name.toLowerCase() ||
-                this.status === "create"
-            )
+            return this.parentData(["cas"], "")
         },
     },
 }
 </script>
 
-<style scoped>
-
+<style>
 </style>

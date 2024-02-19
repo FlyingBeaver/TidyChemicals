@@ -24,22 +24,24 @@
                     <td>
                         <img
                             v-for="(value, key) in chosenPictograms"
+                            v-bind:key="key"
+                            v-on:click="highlightPictogram"
+                            v-on:dblclick="unChoose"
                             v-bind:src="value"
                             v-bind:alt="key"
                             v-bind:class="{frame: key === this.highlighted}"
-                            v-on:click="highlightPictogram"
-                            v-on:dblclick="unChoose"
                             width="100"
                             height="100">
                     </td>
                     <td>
                         <img
                             v-for="(value, key) in unChosenPictograms"
+                            v-bind:key="key"
+                            v-on:click="highlightPictogram"
+                            v-on:dblclick="choose"
                             v-bind:src="value"
                             v-bind:alt="key"
                             v-bind:class="{frame: key === this.highlighted}"
-                            v-on:click="highlightPictogram"
-                            v-on:dblclick="choose"
                             width="100"
                             height="100"
                         >
@@ -50,10 +52,10 @@
                 </tr>
             </table>
         <two-buttons
-            v-bind:parent-name="$options.name"
             v-on:complete-editing="localCompleteEditing"
             v-on:discard-changes="discardChanges"
             v-on:clear-editor="clearEditor"
+            v-bind:parent-name="$options.name"
         ></two-buttons>
         </p>
     </div>
@@ -79,8 +81,26 @@ import ionizingRadiationUrl from "../assets/hazard_pictograms/ionizing_radiation
 import oxidizingUrl from "../assets/hazard_pictograms/oxidizing.svg"
 import toxicUrl from "../assets/hazard_pictograms/toxic.svg"
 import TwoButtons from "./TwoButtons.vue"
-import {toRaw} from "vue"
+import activateEditors from "../mixins/activateEditors.js"
+import discardChanges from "../mixins/discardChanges.js"
+import getParentData from "../mixins/getParentData.js"
+
 export default {
+    name: "HazardPictograms",
+    components: {TwoButtons},
+    mixins: [
+        activateEditors,
+        discardChanges,
+        getParentData,
+    ],
+    inject: [
+        "sectionChosen",
+        "completeEditing",
+        "setChoose",
+        "initialData",
+        "editedData",
+        "status",
+    ],
     data() {
         return {
             picturesUrls: {
@@ -100,16 +120,33 @@ export default {
             highlighted: "",
         }
     },
-    name: "HazardPictograms",
-    inject: [
-        "sectionChosen",
-        "completeEditing",
-        "setChoose",
-        "initialData",
-        "editedData",
-        "status",
-    ],
-    components: {TwoButtons},
+    computed: {
+        picUrls() {
+            let actual_list = []
+            actual_list.push(
+                ...this.parentData(["hazard_pictograms"], [])
+            )
+            let result = {}
+            for (let hazard of actual_list) {
+                result[hazard] = this.picturesUrls[hazard]
+            }
+            return result
+        },
+        descriptionOfHighlighted() {
+            if (this.highlighted === "") {
+                return "Double-click on pictogram to choose it"
+            } else {
+                let withSpaces = this.highlighted.replace("_", " ")
+                return withSpaces[0].toUpperCase() + withSpaces.slice(1)
+            }
+        },
+    },
+    created() {
+        if (this.status === "create") {
+            this.unChosenPictograms = Object.assign({}, this.picturesUrls)
+            this.chosenPictograms = {}
+        }
+    },
     methods: {
         clearEditor() {
             this.unChosenPictograms = Object.assign(
@@ -125,11 +162,8 @@ export default {
             )
         },
         discardChanges() {
-            if ("hazard_pictograms" in this.editedData) {
-                delete this.editedData["hazard_pictograms"]
-            }
+            this.discardChangesCommon("hazard_pictograms")
             this.setup()
-            this.setChoose()
         },
         setup() {
             this.chosenPictograms = Object.assign({}, this.picUrls)
@@ -161,48 +195,8 @@ export default {
             if (unChosen in this.chosenPictograms) {
                 delete this.chosenPictograms[unChosen]
             }
-        }
-    },
-    computed: {
-        picUrls() {
-            let actual_list = []
-            if ("hazard_pictograms" in this.editedData) {
-                actual_list = toRaw(this.editedData["hazard_pictograms"])
-            } else if ("hazard_pictograms" in this.initialData) {
-                actual_list = toRaw(this.initialData["hazard_pictograms"])
-            } else {
-                return {}
-            }
-            if (actual_list === null) {
-                actual_list = []
-            }
-            let result = {}
-            for (let hazard of actual_list) {
-                result[hazard] = this.picturesUrls[hazard]
-            }
-            return result
-        },
-        descriptionOfHighlighted() {
-            if (this.highlighted === "") {
-                return "Double-click on pictogram to choose it"
-            } else {
-                let withSpaces = this.highlighted.replace("_", " ")
-                return withSpaces[0].toUpperCase() + withSpaces.slice(1)
-            }
-        },
-        activateEditors() {
-            return (
-                this.status === this.$options.name.toLowerCase() ||
-                this.status === "create"
-            )
         },
     },
-    created() {
-        if (this.status === "create") {
-            this.unChosenPictograms = Object.assign({}, this.picturesUrls)
-            this.chosenPictograms = {}
-        }
-    }
 }
 </script>
 

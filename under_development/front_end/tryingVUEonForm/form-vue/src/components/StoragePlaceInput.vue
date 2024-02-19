@@ -1,6 +1,6 @@
 <template>
     <button
-        class="dark_button"
+        class="dark-button"
         v-on:click.prevent="toggleEditor"
     >{{ editorIsOn ? "Hide editor" : "Show editor" }}</button>
     <div class="tree" v-show="editorIsOn">
@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import {Tree} from "@/components/trees_editor05";
+import {Tree} from "@/components/trees_editor05.js";
 
 export default {
     name: "StoragePlaceInput",
@@ -55,65 +55,4 @@ export default {
 </script>
 
 <style>
-.tree {
-    background: snow;
-    min-height: 100px;
-    min-width: 95%;
-    margin: 10px;
-    resize: horizontal;
-    overflow: auto;
-    float: left;
-}
-
-.tree_container {
-    position: relative;
-}
-
-.background {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-}
-
-.foreground {
-    position: relative;
-    height: 100%;
-    width: 100%;
-}
-
-.foreground > ul {
-    padding-bottom: 40px;
-}
-
-li.open {
-    list-style-image: url(../assets/door-open.svg);
-}
-
-li.closed {
-    list-style-image: url(../assets/door-closed.svg);
-}
-
-li.chemical {
-    list-style-image: none;
-    list-style-type: disc;
-}
-
-div.figure {
-    margin-top: 50px;
-    margin-left: 40px;
-    height: 50px;
-    width: 50px;
-    background: bisque;
-    position: relative;
-}
-
-.highlighted {
-    background: red;
-}
-
-ul {
-    user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
 </style>

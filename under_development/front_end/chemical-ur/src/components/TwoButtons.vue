@@ -1,30 +1,23 @@
 <template>
     <div v-if="showButtons">
         <button
-            v-on:click="$emit('completeEditing')"
             v-if="statusIsParentName"
-        >Complete editing</button>
+            v-on:click="$emit('completeEditing')"
+        >Complete editing
+        </button>
         <button
             v-on:click="discardChangesClicked"
-        >Discard changes</button>
+        >Discard changes
+        </button>
     </div>
 </template>
 
 <script>
 export default {
     name: "TwoButtons",
-    props: ["parentName"],
     inject: ["status"],
+    props: ["parentName"],
     emits: ["completeEditing", "discardChanges", "clearEditor"],
-    methods: {
-        discardChangesClicked() {
-            if (this.statusIsParentName) {
-                this.$emit('discardChanges')
-            } else if (this.status === "create") {
-                this.$emit('clearEditor')
-            }
-        }
-    },
     computed: {
         statusIsParentName() {
             return this.status === this.parentName.toLowerCase()
@@ -34,11 +27,19 @@ export default {
                 this.statusIsParentName ||
                 this.status === "create"
             )
-        }
-    }
+        },
+    },
+    methods: {
+        discardChangesClicked() {
+            if (this.statusIsParentName) {
+                this.$emit('discardChanges')
+            } else if (this.status === "create") {
+                this.$emit('clearEditor')
+            }
+        },
+    },
 }
 </script>
 
-<style scoped>
-
+<style>
 </style>

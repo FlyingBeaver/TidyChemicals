@@ -32,16 +32,6 @@
 export default {
     name: "UsersDates",
     inject: ["URLsSettings", "initialData",],
-    methods: {
-        formatDate(date) {
-            let day = String(date.getDate())
-            let dayString = (day.length === 1 ? "0" : "") + day + "."
-            let month = String(date.getMonth() + 1)
-            let monthString = (month.length === 1 ? "0" : "") + month + "."
-            let year = String(date.getFullYear())
-            return dayString + monthString + year
-        }
-    },
     computed: {
         dateCreated() {
             if ("creation_date" in this.initialData) {
@@ -74,8 +64,18 @@ export default {
             } else {
                 return ""
             }
-        }
-    }
+        },
+    },
+    methods: {
+        formatDate(date) {
+            let day = String(date.getDate())
+            let dayString = (day.length === 1 ? "0" : "") + day + "."
+            let month = String(date.getMonth() + 1)
+            let monthString = (month.length === 1 ? "0" : "") + month + "."
+            let year = String(date.getFullYear())
+            return dayString + monthString + year
+        },
+    },
 }
 </script>
 

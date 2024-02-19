@@ -1,0 +1,43 @@
+.user-input-container {
+    display: grid;
+    grid-template-columns: 40% 20% 40%;
+    grid-template-rows: auto;
+    margin-top: 5px;
+}
+
+%abstract-user {
+    color: CornflowerBlue;
+    padding-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.users-to-select {
+    border: solid CornflowerBlue 3px;
+    grid-column: span 3;
+    .one-user, .cross {
+        @extend %abstract-user;
+        &.highlighted-username {
+            background-color: CornflowerBlue;
+            color: Azure;
+        }
+        &:hover {
+            background-color: white;
+            cursor: pointer;
+        }
+    }
+}
+
+.selected-users {
+    @extend .users-to-select;
+    border-top: 0;
+    border-bottom: 0;
+    .nobody {
+        @extend %abstract-user;
+    }
+}
+
+.small-grid {
+    display: grid;
+    grid-template-columns: 1fr 20px;
+}

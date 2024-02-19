@@ -14,43 +14,60 @@
                class="water-number-container"
             >
                 <span>Water number:</span>
-                <input type="text"
-                       v-model="waterNumber"
-                       v-on:input="hideWarnings"
+                <input
+                    v-on:input="hideWarnings"
+                    v-model="waterNumber"
+                    type="text"
                 />
             </p>
-            <p v-if="waterNumberType === 'fractional'"
-               class="water-number-container"
+            <p
+                v-if="waterNumberType === 'fractional'"
+                class="water-number-container"
             >
                 <span>Numerator:</span>
-                <input type="text"
-                       v-model="numerator"
-                       v-on:input="hideWarnings"
+                <input
+                    v-model="numerator"
+                    v-on:input="hideWarnings"
+                    type="text"
                 />
                 <span>Denominator:</span>
-                <input type="text"
-                       v-model="denominator"
-                       v-on:input="hideWarnings"
+                <input
+                    v-model="denominator"
+                    v-on:input="hideWarnings"
+                    type="text"
                 />
             </p>
-            <p class="warning" v-show="leadingZeroWarning">
+            <p
+                v-show="leadingZeroWarning"
+                class="warning"
+            >
                 This number can't start with zero
             </p>
-            <p class="warning" v-show="oddCharsWarning">
+            <p
+                v-show="oddCharsWarning"
+                class="warning"
+            >
                 Only digits are allowed
             </p>
-            <p class="warning" v-show="emptyFieldWarning">
-                {{ waterNumberType === "whole" ? "Water number field " : "" }}
-                {{ waterNumberType === "fractional" ? "Both numerator and denominator fields " : "" }}
+            <p
+                v-show="emptyFieldWarning"
+                class="warning"
+            >
+                {{ waterNumberType === "whole"
+                       ? "Water number field "
+                       : "" }}
+                {{ waterNumberType === "fractional"
+                       ? "Both numerator and denominator fields "
+                       : "" }}
                 must be filled
             </p>
         </div>
         <two-buttons
-            class="bottom"
-            v-bind:parent-name="$options.name"
             v-on:complete-editing="localCompleteEditing"
             v-on:discard-changes="discardChanges"
             v-on:clear-editor="clearEditor"
+            v-bind:parent-name="$options.name"
+            class="bottom"
         ></two-buttons>
     </div>
     <div>
@@ -58,10 +75,12 @@
 </template>
 
 <script>
-import {difference} from "./constants.js"
+import {difference} from "../utils/constants.js"
 import TwoButtons from "./TwoButtons.vue"
+
 export default {
     name: "WaterNumber",
+    components: {TwoButtons},
     inject: [
         "sectionChosen",
         "completeEditing",
@@ -70,7 +89,6 @@ export default {
         "initialData",
         "editedData",
     ],
-    components: {TwoButtons},
     data() {
         return {
             waterNumberType: "dry",
@@ -81,6 +99,37 @@ export default {
             oddCharsWarning: false,
             leadingZeroWarning: false,
             emptyFieldWarning: false,
+        }
+    },
+    watch: {
+        waterNumber(newValue, oldValue) {
+            this.commonWatcher(newValue, oldValue, "waterNumber")
+        },
+        numerator(newValue, oldValue) {
+            this.commonWatcher(newValue, oldValue, "numerator")
+        },
+        denominator(newValue, oldValue) {
+            this.commonWatcher(newValue, oldValue, "denominator")
+        },
+    },
+    mounted() {
+        let structureAq = null
+        if ("structure_aq" in this.editedData) {
+            structureAq = this.editedData.structure_aq
+        } else if ("structure_aq" in this.initialData) {
+            structureAq = this.initialData.structure_aq
+        }
+        if (structureAq === null) {
+            this.waterNumberType = "dry"
+        } else if (Number.isInteger(Number(structureAq))) {
+            this.waterNumberType = "whole"
+            this.waterNumber = String(structureAq)
+        } else if (Array.isArray(structureAq) && structureAq.length === 2) {
+            this.waterNumberType = "fractional"
+            this.numerator = String(structureAq[0])
+            this.denominator = String(structureAq[1])
+        } else {
+            throw Error("Wrong structure_aq format!")
         }
     },
     methods: {
@@ -154,37 +203,6 @@ export default {
             this.denominator = ""
         },
     },
-    watch: {
-        waterNumber(newValue, oldValue) {
-            this.commonWatcher(newValue, oldValue, "waterNumber")
-        },
-        numerator(newValue, oldValue) {
-            this.commonWatcher(newValue, oldValue, "numerator")
-        },
-        denominator(newValue, oldValue) {
-            this.commonWatcher(newValue, oldValue, "denominator")
-        },
-    },
-    mounted() {
-        let structureAq = null
-        if ("structure_aq" in this.editedData) {
-            structureAq = this.editedData.structure_aq
-        } else if ("structure_aq" in this.initialData) {
-            structureAq = this.initialData.structure_aq
-        }
-        if (structureAq === null) {
-            this.waterNumberType = "dry"
-        } else if (Number.isInteger(Number(structureAq))) {
-            this.waterNumberType = "whole"
-            this.waterNumber = String(structureAq)
-        } else if (Array.isArray(structureAq) && structureAq.length === 2) {
-            this.waterNumberType = "fractional"
-            this.numerator = String(structureAq[0])
-            this.denominator = String(structureAq[1])
-        } else {
-            throw Error("Wrong structure_aq format!")
-        }
-    }
 }
 </script>
 

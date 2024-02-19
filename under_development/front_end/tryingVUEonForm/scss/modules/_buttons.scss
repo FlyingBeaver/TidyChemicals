@@ -1,0 +1,69 @@
+%abstract-button {
+    box-sizing: border-box;
+    font-size: 18px;
+    width: 285px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover, &:active {
+        cursor: pointer;
+    }
+    &:disabled:hover, &:disabled:active {
+        cursor: inherit;
+    }
+}
+
+.dark-button {
+    @extend %abstract-button;
+    color: Azure;
+    background-color: CornflowerBlue;
+    border: solid CornflowerBlue 3px;
+
+    &:hover {
+        color: white;
+        border: solid RoyalBlue 3px;
+        background-color: RoyalBlue;
+    }
+    &:active {
+        color: white;
+        border: solid MidnightBlue 3px;
+        background-color: MidnightBlue;
+    }
+    &:disabled, &:disabled:hover, &:disabled:active {
+        opacity: 65%;
+        background-color: CornflowerBlue;
+        border: solid CornflowerBlue 3px;
+    }
+}
+
+.search-button {
+    @extend %abstract-button;
+    color: white;
+    font-weight: 700;
+    background-color: DodgerBlue;
+    border: solid DodgerBlue 3px;
+    &:hover {
+        border: solid blue 3px;
+        background-color: blue;
+    }
+    &:active {
+        border: solid Crimson 3px;
+        background-color: Crimson;
+    }
+}
+
+.exit-from-deletion {
+    @extend %abstract-button;
+    color: white;
+    border: solid Crimson 3px;
+    background-color: Crimson;
+    &:hover {
+        border: solid DarkRed 3px;
+        background-color: DarkRed;
+    }
+    &:active {
+        border: solid rgb(77, 0, 0) 3px;
+        background-color: rgb(77, 0, 0);
+    }
+}

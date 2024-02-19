@@ -1,7 +1,7 @@
 <template>
     <input
         type="text"
-        class="simple_text_value"
+        class="simple-text-input"
         v-bind:name="inputName"
         v-bind:disabled="disabled"
         v-model="inputValue"

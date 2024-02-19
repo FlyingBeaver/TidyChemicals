@@ -6,7 +6,8 @@ var Chemical, FrameMaker, ListPoint, Receiver, Storage,
 
 export var Tree = (function() {
   class Tree {
-    constructor(tree_container, input_name, root, path_to_node, children_storages_url) {
+    constructor({tree_container, input_name, root, path_to_node, children_storages_url, mode}) {
+      this.set_mode = this.set_mode.bind(this);
       this.unhighlight_storage = this.unhighlight_storage.bind(this);
       this.update_field = this.update_field.bind(this);
       this.tree_container_mouse = this.tree_container_mouse.bind(this);
@@ -39,8 +40,8 @@ export var Tree = (function() {
           }
         }
       });
-      //there are default (storage_edit) mode, search_form and chemical_edit
-      this.mode = "chemical_edit";
+      this.mode = mode;
+      this.set_mode();
       Tree.children_storages_url = children_storages_url;
       this.highlighted_nodes_ids = [];
       this.tree_container = tree_container;
@@ -58,23 +59,51 @@ export var Tree = (function() {
       this.root_object.span.addEventListener("click", this.process_click);
       this.tree_container.addEventListener("unhighlight-storage", this.unhighlight_storage);
       Tree.instances.push(this);
-      this.frame_maker = new FrameMaker(this);
-      if (this.mode !== "chemical_edit") {
-        this.tree_container.addEventListener("mousedown", this.tree_container_mouse);
-        this.tree_container.addEventListener("mouseup", this.tree_container_mouse);
-        this.tree_container.addEventListener("mousemove", this.tree_container_mouse);
+      if (this.frame_selection) {
+        this.frame_maker = new FrameMaker(this);
       }
+      this.tree_container.addEventListener("mousedown", this.tree_container_mouse);
+      this.tree_container.addEventListener("mouseup", this.tree_container_mouse);
+      this.tree_container.addEventListener("mousemove", this.tree_container_mouse);
       this.there_was_mousedown = false;
-      if (path_to_node !== void 0) {
+      if (path_to_node) {
         Storage.open_with_path(path_to_node);
       }
     }
 
+    set_mode() {
+      if (this.mode === "storage_editing") {
+        this.frame_selection = true;
+        this.multiple_selection = true;
+        this.terminal_selection = true;
+        this.non_terminal_selection = true;
+        this.chemical_selection = true;
+        return this.tree_editing = true;
+      } else if (this.mode === "search_form") {
+        this.frame_selection = true;
+        this.multiple_selection = true;
+        this.terminal_selection = true;
+        this.non_termical_selection = true;
+        this.chemical_selection = false;
+        return this.tree_editing = false;
+      } else if (this.mode === "chemical_editing") {
+        this.frame_selection = false;
+        this.multiple_selection = false;
+        this.terminal_selection = true;
+        this.non_terminal_selection = false;
+        this.chemical_selection = false;
+        return this.tree_editing = false;
+      } else {
+        throw Error("Wrong mode value");
+      }
+    }
+
     unhighlight_storage() {
-      var copy_of_highlighted, processed_id;
+      var copy_of_highlighted, j, len, processed_id;
       copy_of_highlighted = [];
       Object.assign(copy_of_highlighted, this.highlighted_nodes_ids);
-      for (processed_id in copy_of_highlighted) {
+      for (j = 0, len = copy_of_highlighted.length; j < len; j++) {
+        processed_id = copy_of_highlighted[j];
         this.unhighlight(processed_id);
       }
       return this.update_field();
@@ -83,7 +112,7 @@ export var Tree = (function() {
     update_field() {
       var full_path_ids, full_path_names, highlighted_node, highlighted_nodes_json, json_for_input, object_for_input;
       highlighted_nodes_json = JSON.stringify(this.highlighted_nodes_ids);
-      if (this.mode === "chemical_edit") {
+      if (this.mode === "chemical_editing") {
         if (highlighted_nodes_json === "[]") {
           highlighted_node = null;
         } else {
@@ -125,6 +154,25 @@ export var Tree = (function() {
 
     highlight(node_id) {
       var node;
+      node = Chemical.chemicals_and_storages[node_id];
+      if (node === null || node === void 0) {
+        return;
+      }
+      if (!this.terminal_selection) {
+        if (node instanceof Storage && node.is_terminal) {
+          return;
+        }
+      }
+      if (!this.non_terminal_storage) {
+        if (node instanceof Storage && !node.is_terminal) {
+          return;
+        }
+      }
+      if (!this.chemical_selection) {
+        if (!(node instanceof Storage)) {
+          return;
+        }
+      }
       if (this.highlighted_nodes_ids.indexOf(node_id) === -1) {
         this.highlighted_nodes_ids.push(node_id);
         this.update_field();
@@ -166,7 +214,7 @@ export var Tree = (function() {
           return this.highlighted_no_key(event);
         }
       } else {
-        if (this.mode === "chemical_edit") {
+        if (this.multiple_selection) {
           node_id = event.target.dataset.storage_node_id;
           node_object = Chemical.chemicals_and_storages[node_id];
           if (node_object instanceof Storage && node_object.is_terminal === true) {
@@ -374,8 +422,10 @@ Storage = class Storage extends Chemical {
         this.open();
       }
     }
-    this.tree.frame_maker.destructor();
-    return this.tree.frame_maker = new FrameMaker(this.tree);
+    if (this.tree.frame_selection) {
+      this.tree.frame_maker.destructor();
+      return this.tree.frame_maker = new FrameMaker(this.tree);
+    }
   }
 
   close() {

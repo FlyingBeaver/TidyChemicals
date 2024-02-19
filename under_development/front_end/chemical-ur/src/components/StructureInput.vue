@@ -1,20 +1,23 @@
 <template>
     <iframe
+        v-on:load="$emit('ketcherLoaded')"
+        v-bind:src="URLsSettings.ketcherIframeURL"
         id="ifKetcher"
         ref="ifKetcher"
         name="ifKetcher"
-        v-bind:src="URLsSettings.ketcherIframeURL"
         width="650"
         height="400"
-        v-on:load="$emit('ketcherLoaded')"
     >
     </iframe>
 </template>
 
 <script>
-import {emptyMol} from "./constants.js"
+import {emptyMol} from "../utils/constants.js"
+
 export default {
     name: "StructureInput",
+    inject: ["URLsSettings"],
+    props: ["inputName", "disabled"],
     emits: ["ketcherLoaded"],
     data() {
         return {
@@ -27,7 +30,6 @@ export default {
             let messageStr = JSON.stringify(message)
             let ifKetcherWindow = window.frames.ifKetcher
             ifKetcherWindow.postMessage(messageStr, "*")
-            console.log("sending message...")
         },
         getMolecule() {
             let ifKetcherWindow = window.frames.ifKetcher
@@ -37,8 +39,6 @@ export default {
             this.setMolecule(emptyMol)
         },
     },
-    props: ["inputName", "disabled"],
-    inject: ["URLsSettings"],
 }
 </script>
 

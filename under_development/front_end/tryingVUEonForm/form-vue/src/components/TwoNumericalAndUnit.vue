@@ -1,10 +1,10 @@
 <template>
-    <div class="container">
+    <div class="three-columns-container">
         <input
             type="text"
             v-bind:name="inputName + '_left'"
             v-bind:disabled="disabled"
-            class="simple_text_value"
+            class="narrow-text-input"
             v-on:input="inputValidationLeft"
             v-model="inputValueLeft"
         >
@@ -12,7 +12,7 @@
             type="text"
             v-bind:name="inputName + '_right'"
             v-bind:disabled="disabled"
-            class="simple_text_value"
+            class="narrow-text-input"
             v-on:input="inputValidationRight"
             v-model="inputValueRight"
         >
@@ -29,14 +29,14 @@
             <option value="ml">ml</option>
         </select>
         <div
-            class="warning"
+            class="warning-width-3"
             v-show="warningWrongSymbol"
         >
-            You  are trying to enter a symbol that is not allowed
+            You  are trying to enter a character that is not allowed
             in numerical field
         </div>
         <div
-            class="warning"
+            class="warning-width-3"
             v-show="warningOddDelimiter"
         >
             You  are trying to enter second decimal separator
@@ -111,34 +111,5 @@ export default {
 }
 </script>
 
-<style scoped>
-div.container {
-    display: grid;
-    grid-template-columns: 31% 31% 31%;
-    column-gap: 3.5%;
-}
-div.warning {
-    grid-column: span 3;
-}
-input.simple_text_value {
-    grid-column: span 1;
-    width: auto;
-}
-select.narrow-select {
-    font-size: 18px;
-    color: cornflowerblue;
-    background-color: azure;
-    border: solid cornflowerblue 3px;
-    border-radius: 0;
-    width: auto;
-    height: 45px;
-    padding-left: 8px;
-    appearance: none;
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    background-image: url("../assets/Triangle_in_square.svg");
-    background-position: right;
-    background-repeat: no-repeat;
-    background-size: 45px;
-}
+<style>
 </style>

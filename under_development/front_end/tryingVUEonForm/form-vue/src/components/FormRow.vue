@@ -8,8 +8,10 @@
         v-bind:class="{ fired: firedId === rowId }"
     >
         <div class="column" v-if="!rowId.includes('_plus_')">
-            <select v-bind:name="rowId + '_term'"
-                required 
+            <select
+                required
+                class="wide-select"
+                v-bind:name="rowId + '_term'"
                 v-model="termValue" 
                 v-on:change="whenTermChanged"
                 v-bind:disabled="deletionModeOn"
@@ -32,10 +34,11 @@
         </div>
         <div class="operator_box column" v-if="!rowId.includes('_plus_')">
             <div v-if="operatorOptions === ''" class="inactive-field">Operator</div>
-            <select 
+            <select
+                required
+                class="wide-select"
                 v-else
                 v-bind:name="rowId + '_operator'"
-                required 
                 v-model="operatorValue"
                 v-bind:disabled="deletionModeOn"
                 >
@@ -120,10 +123,11 @@
                 v-bind:input-name="rowId + '_value'">
             </structure-input>
         </div>
-        <div class="operator_between_box" v-if="rowId.includes('_plus_')">
-            <select 
+        <div class="operator-between" v-if="rowId.includes('_plus_')">
+            <select
+                required
+                class="wide-select"
                 v-bind:name="rowId"
-                required=""
                 v-bind:disabled="deletionModeOn"
             >
                 <option value="" selected="">AND / NOT / AND NOT</option>
@@ -245,12 +249,4 @@ export default {
 </script>
 
 <style>
-    div.column.ketcher-container {
-        grid-column-start: 2;
-        grid-column-end: 4;
-    }
-
-    textarea.cliparea {
-        display: none;
-    }
 </style>

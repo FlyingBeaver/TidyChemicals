@@ -15,7 +15,7 @@
                 <button class="input-button" data-character="em_dash"
                         v-on:click.prevent="enterSymbol">—</button>
                 <button class="input-button" v-on:click.prevent="toggleGreek">ΑΩ</button>
-                <div
+                <span
                     class="greek-palette"
                     v-show="!greekAlphabetHidden"
                     v-on:click.prevent="enterSymbol"
@@ -68,7 +68,7 @@
                     <button class="input-button" data-character="psi">ψ</button>
                     <button class="input-button" data-character="capital_omega">Ω</button>
                     <button class="input-button" data-character="omega">ω</button>
-                </div>
+                </span>
             </span>
         </div>
         <div
@@ -208,50 +208,4 @@ export default {
 
 <style>
     @import "quill.snow.css";
-    #standalone-container {
-        margin: auto;
-        max-width: 720px;
-    }
-    #editor-container {
-        height: 45px;
-        border: solid cornflowerblue;
-    }
-
-    #toolbar-container {
-        margin: -25px 0 0 0;
-    }
-
-    div.ql-toolbar.ql-snow {
-        padding: 0;
-    }
-
-    div.ql-editor.ql-blank {
-        overflow-y: hidden;
-    }
-
-    .greek-palette {
-        bottom:25px;
-        right: 0;
-        border: 1px grey solid;
-        background: white;
-        position: absolute;
-        width: 432px;
-        height: 81px;
-        display: grid;
-        grid-template: repeat(3, 1fr) / repeat(16, 1fr);
-    }
-
-    div.greek-palette button.input-button {
-        width: 27px;
-        height: 27px;
-    }
-
-    span.ql-formats {
-        position: relative;
-    }
-
-    div.disabled {
-        opacity: 50%;
-        background-color: azure;
-    }
 </style>
