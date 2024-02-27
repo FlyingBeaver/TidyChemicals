@@ -38,6 +38,18 @@
             You  are trying to commit empty field. Some value
             needed for commit.
         </div>
+        <div
+            v-show="warningInvalidValue"
+            class="warning"
+        >
+            Invalid value
+        </div>
+        <div
+            v-show="warningEmptyUnit"
+            class="warning"
+        >
+            Unit must be filled
+        </div>
     </div>
 </template>
 
@@ -52,25 +64,51 @@ export default {
         return {
             numericSymbols: new Set("0123456789.,"),
             inputValue: String(this.number),
-            oldInputValue: "",
+            oldInputValue: String(this.number),
             unitValue: this.unit,
             warningWrongSymbol: false,
             warningOddDelimiter: false,
             warningEmptyField: false,
+            warningInvalidValue: false,
+            warningEmptyUnit: false,
+        }
+    },
+    watch: {
+        unitValue() {
+            this.warningEmptyUnit = false
         }
     },
     methods: {
         localCompleteEditing() {
-            if (this.inputValue !== "") {
+            if (this.validationBeforeCommit()) {
                 let result = {number: this.inputValue, unit: this.unitValue}
                 this.completeEditing("quantity", result)
-            } else {
+            }
+        },
+        validationBeforeCommit() {
+            if (this.inputValue === "") {
                 this.warningEmptyField = true
             }
+            if (
+                isNaN(Number(this.inputValue)) ||
+                Number(this.inputValue) <= 0
+            ) {
+                this.warningInvalidValue = true
+            }
+            if (this.unitValue === "") {
+                this.warningEmptyUnit = true
+            }
+            return !(
+                this.warningEmptyField ||
+                this.warningInvalidValue ||
+                this.warningEmptyUnit
+            )
         },
         inputValidation() {
             this.warningEmptyField = false
             this.warningOddDelimiter = false
+            this.warningInvalidValue = false
+            this.warningEmptyUnit = false
             let valueSet = new Set(this.inputValue)
             if (difference(valueSet, this.numericSymbols).size > 0) {
                 this.inputValue = this.oldInputValue
@@ -79,7 +117,7 @@ export default {
                 this.warningWrongSymbol = false
             }
             this.singleDelimiterCheck(valueSet)
-            if (!this.warningWrongSymbol && !this.warningOddDelimiter) {
+            if (!(this.warningWrongSymbol || this.warningOddDelimiter)) {
                 this.oldInputValue = this.inputValue
             }
         },

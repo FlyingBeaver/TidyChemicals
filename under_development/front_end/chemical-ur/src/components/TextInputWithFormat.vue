@@ -99,16 +99,18 @@
             v-show="!warningHidden"
             class="warning"
         >
-            You are trying to enter a character that is not allowed
-            in this field. Only digits, latin and greek letters
-            with no diacritics, space, full stop (period), comma, (),
-            [], {}, +, -, /, :, ;, ±, — and ′ are allowed.
+            {{ invalidCharacterMessage }}
         </div>
     </div>
 </template>
 
 <script>
-import {characters, characters_in_string, difference} from "../utils/constants.js";
+import {
+    characters,
+    characters_in_string,
+    invalidCharMessage,
+    difference
+} from "../utils/constants.js"
 import Quill from "quill"
 
 export default {
@@ -131,6 +133,18 @@ export default {
             qlEditor: null,
             contentInputContent: "",
             formattingInputContent: "",
+        }
+    },
+    computed: {
+        invalidCharacterMessage() {
+            if (this.charRestriction) {
+                return invalidCharMessage
+            }
+            if (!this.allowLineBreak) {
+                return "Line break is not allowed here"
+            } else {
+                return ""
+            }
         }
     },
     mounted() {

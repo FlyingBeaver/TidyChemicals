@@ -50,7 +50,7 @@
             >Delete a synonym
             </button>
         </p>
-        <p v-if="activateEditors && (mode === 'updateInProcess' || mode === 'create')">
+        <p v-if="showTextEditor">
             <text-input-with-format
                 ref="TextInputWithFormat"
                 v-on:editing-complete="editingCompleteListener"
@@ -128,6 +128,13 @@ export default {
         globalCopyOfSynonyms() {
             return this.parentData(["synonyms"], [])
         },
+        showTextEditor() {
+            return this.activateEditors &&
+            (
+                this.mode === 'updateInProcess' ||
+                this.mode === 'create'
+            )
+        },
     },
     methods: {
         discardChanges() {
@@ -135,7 +142,11 @@ export default {
             this.startEditing()
         },
         clearEditor() {
-            this.clearEditorCommon("TextInputWithFormat")
+            if (this.showTextEditor) {
+                this.clearEditorCommon(
+                    "TextInputWithFormat"
+                )
+            }
             this.localCopyOfSynonyms = []
             this.mode = "show"
         },

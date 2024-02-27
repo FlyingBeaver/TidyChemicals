@@ -1,7 +1,7 @@
 <template>
     <input
         v-model="inputValue"
-        v-on:blur="inputValidationOnBlur"
+        v-on:blur="actionOnBlur"
         v-on:focus="hideInvalidCasWarning"
         v-on:input="inputValidationOnInput"
         type="text"
@@ -49,11 +49,12 @@ export default {
     name: "CasInput",
     inject: ["completeEditing"],
     props: ["cas"],
+    emits: ["discardChanges"],
     data() {
         return {
             expectedSymbols: new Set("0123456789-"),
             digits: new Set("0123456789"),
-            oldInputValue: "",
+            oldInputValue: this.cas,
             inputValue: this.cas,
             warningInvalidCas: false,
             warningTooLongValue: false,
@@ -130,6 +131,21 @@ export default {
             //4. Not more than 10 digits
             this.tooManyDigits()
             this.oldInputValue = this.inputValue
+        },
+        actionOnBlur(event) {
+            let relTarget = event.relatedTarget
+            if (relTarget) {
+                if (relTarget.textContent.trim() === "Discard changes") {
+                    this.$emit("discardChanges")
+                } else if (relTarget.textContent.trim() === "Complete editing") {
+                    this.inputValidationOnBlur()
+                    if (!this.warningInvalidCas) {
+                        this.localCompleteEditing()
+                    }
+                }
+            } else {
+                this.inputValidationOnBlur()
+            }
         },
         inputValidationOnBlur() {
             //5. CAS RN validation rule

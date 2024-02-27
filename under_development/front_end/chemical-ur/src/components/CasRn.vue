@@ -12,9 +12,10 @@
             v-else
             ref="casInput"
             v-bind:cas="casRn"
+            v-on:discard-changes="discardChanges"
         ></cas-input>
         <two-buttons
-            v-on:complete-editing="localCompleteEditing"
+            v-on:complete-editing="completeEditing"
             v-on:discard-changes="discardChanges"
             v-on:clear-editor="clearEditor"
             v-bind:parent-name="$options.name"
@@ -51,7 +52,6 @@ export default {
     ],
     inject: [
         "sectionChosen",
-        "completeEditing",
         "setChoose",
         "status",
         "initialData",
@@ -59,8 +59,16 @@ export default {
     ],
     computed: {
         casRn() {
-            return this.parentData(["cas"], "")
+            return String(this.parentData(["cas"], ""))
         },
+    },
+    methods: {
+        completeEditing() {
+            this.$refs.casInput.inputValidationOnBlur()
+            if (!this.$refs.casInput.warningInvalidCas) {
+                this.localCompleteEditing()
+            }
+        }
     },
 }
 </script>

@@ -86,10 +86,10 @@
             </p>
         </div>
         <div v-else>
-            <p v-for="(value, key) in tagsObject">
+            <p v-for="[key, value] in tagsForViewMode">
                 <a v-bind:href="value">{{ key }}</a>
             </p>
-            <p v-if="Object.keys(tagsObject).length === 0"
+            <p v-if="tagsForViewMode.length === 0"
                class="blank-data"
             >No tags
             </p>
@@ -109,7 +109,6 @@
 <script>
 import {difference, charactersForTags} from "../utils/constants.js"
 import TwoButtons from "./TwoButtons.vue"
-import {toRaw, computed} from "vue"
 import activateEditors from "../mixins/activateEditors.js"
 import getParentData from "../mixins/getParentData.js"
 
@@ -150,27 +149,32 @@ export default {
             return tagsList
         },
         /**
-         * Generates tags object for 'view' and 'change' mode
-         * Syntax of tags object is {tag_name: tag_url}
+         * Generates tags array for 'view' and 'change' mode
+         * Syntax of tags array is [[tag_name, tag_url], ...]
          */
-        tagsObject() {
-            let result = {}
+        tagsForViewMode() {
+            let result = []
+            let link
             for (let tag of this.tags) {
                 if (tag === "Favorites") {
-                    result[tag] = this.URLsSettings.favoritesURL
+                    link = this.URLsSettings.favoritesURL
+                    result.push([tag, link])
                 } else if (tag.startsWith("#")) {
-                    result[tag] = (
+                    link = (
                         this.URLsSettings.hashtagsURL + tag.slice(1) + "/"
                     )
+                    result.push([tag, link])
                 } else if (tag.startsWith("&")) {
-                    result[tag] = (
+                    link = (
                         this.URLsSettings.ampersandtagsURL +
                         tag.slice(1) + "/"
                     )
+                    result.push([tag, link])
                 } else {
                     throw Error("Unknown format of the tag")
                 }
             }
+            result.sort(this.compareFunction)
             return result
         },
         hints() {
@@ -250,9 +254,28 @@ export default {
                 this.inputValue = oldValue
                 this.specialCharNotInStartWarning = true
             }
+        },
+    },
+    async created() {
+        if (this.status === "create") {
+            let tagsResponse = await fetch(this.URLsSettings.tagsURL)
+            this.availableTags = await tagsResponse.json()
         }
     },
     methods: {
+        compareFunction(a, b) {
+            if (a[0] === "Favorites") {
+                return -1
+            } else if (b[0] === "Favorites") {
+                return 1
+            } else if (a[0] < b[0]) {
+                return -1
+            } else if (a[0] > b[0]) {
+                return 1
+            } else {
+                return 0
+            }
+        },
         discardChanges() {
             if ("tags" in this.editedData) {
                 delete this.editedData["tags"]
@@ -273,6 +296,7 @@ export default {
         },
         fillTagsList() {
             this.editableTagsList = this.tags
+            this.sortEditableTagsList()
         },
         deleteTag(event) {
             let index = Number(event.target.parentNode.dataset.key)
@@ -303,10 +327,24 @@ export default {
                 this.leadingCharCheck() &&
                 this.tagIsNewCheck()) {
                 this.editableTagsList.push(this.inputValue)
+                this.sortEditableTagsList()
                 this.inputValue = ""
             } else if (Number.isInteger(this.highlightedTagIndex)) {
-                this.editableTagsList.push(this.hints[this.highlightedTagIndex])
+                this.editableTagsList.push(
+                    this.hints[this.highlightedTagIndex]
+                )
+                this.sortEditableTagsList()
                 this.chosenHints.push(this.hints[this.highlightedTagIndex])
+            }
+        },
+        sortEditableTagsList() {
+            this.editableTagsList.sort()
+            let favIndex = this.editableTagsList.indexOf("Favorites")
+            if (favIndex !== -1 && this.editableTagsList.length > 1) {
+                this.editableTagsList.splice(favIndex, 1)
+                this.editableTagsList.splice(
+                    0, 0, "Favorites"
+                )
             }
         },
         leadingCharCheck() {
@@ -339,6 +377,7 @@ export default {
         chooseHintTag(event) {
             let tag = event.target.textContent
             this.editableTagsList.push(tag)
+            this.sortEditableTagsList()
             this.chosenHints.push(tag)
         },
         inputFocus() {
@@ -351,6 +390,7 @@ export default {
             let favouritesIndex = this.editableTagsList.indexOf("Favorites")
             if (favouritesIndex === -1) {
                 this.editableTagsList.push("Favorites")
+                this.sortEditableTagsList()
             } else {
                 this.editableTagsList.splice(favouritesIndex, 1)
             }

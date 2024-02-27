@@ -26,7 +26,7 @@
                     class="fraction"
                 >
                     <span>{{numerator}}</span>
-                    <div class="fraction-line"></div>
+                    <span class="fraction-line"></span>
                     <span>{{denominator}}</span>
                 </span>
                 <span class="h2o">
@@ -68,11 +68,17 @@ import {emptyMol} from "../utils/constants.js"
 import activateEditors from "../mixins/activateEditors.js"
 import discardChanges from "../mixins/discardChanges.js"
 import clearEditor from "../mixins/clearEditor.js"
+import getParentData from "../mixins/getParentData.js";
 
 export default {
     name: "StructureEditor",
     components: {StructureInput, TwoButtons},
-    mixins: [activateEditors, discardChanges, clearEditor],
+    mixins: [
+        activateEditors,
+        discardChanges,
+        clearEditor,
+        getParentData
+    ],
     inject: [
         "sectionChosen",
         "completeEditing",
@@ -96,17 +102,15 @@ export default {
         showWaterNumber() {
             return (
                 this.waterNumberType !== 'dry' &&
-                Number(this.waterNumber) !== 0 &&
+                Number(this.structureAq) !== 0 &&
                 Boolean(this.structurePic)
             )
         },
         structureName() {
-            let delta
-            if ('name_data' in this.editedData) {
-                delta = this.editedData.name_data.delta
-            } else if ('name_data' in this.initialData) {
-                delta = this.initialData.name_data.delta
-            } else {
+            let delta = this.parentData(
+                ["name_data", "delta"], ""
+            )
+            if (delta === "") {
                 return ""
             }
             if (delta.ops && delta.ops[0] && delta.ops[0].insert) {
@@ -131,23 +135,14 @@ export default {
             }
         },
         structureAq() {
-            if ("structure_aq" in this.editedData) {
-                return  this.editedData.structure_aq
-            } else if ("structure_aq" in this.initialData) {
-                return this.initialData.structure_aq
-            } else {
-                // only null!
-                return null
-            }
+            return this.parentData(
+                ["structure_aq"], null
+            )
         },
         structureMol() {
-            if ("structure_mol" in this.editedData) {
-                return this.editedData.structure_mol
-            } else if ("structure_mol" in this.initialData) {
-                return this.initialData.structure_mol
-            } else {
-                return emptyMol
-            }
+            return this.parentData(
+                ["structure_mol"], emptyMol
+            )
         },
         waterNumberType() {
             if (this.structureAq === null) {
@@ -238,10 +233,11 @@ span.fraction {
     padding-right: 5px;
 }
 
-div.fraction-line {
+span.fraction-line {
     border: solid black 1px;
     width: 100%;
     height: 0;
+    display: inline-block;
 }
 span.dot {
     padding-right: 5px;
