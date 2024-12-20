@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import {toRaw} from "vue";
 import {Tree} from "./trees_editor05.js"
 import TwoButtons from "./TwoButtons.vue"
 import activateEditors from "../mixins/activateEditors.js"
@@ -59,7 +60,7 @@ export default {
     ],
     data() {
         return {
-            editorIsOn: false,
+            knownTreeFragment: null,
             tree: null,
             selectedStorages: "",
         }
@@ -80,9 +81,10 @@ export default {
         discardChanges() {
             this.discardChangesCommon("location")
             this.discardChangesCommon("storageId")
+            this.tree = null
+            Tree.instances = []
         },
         unhighlightStorage () {
-            console.log("unhighlight storage")
             let event = new Event("unhighlight-storage")
             this.$refs.tree_container.dispatchEvent(event)
         },
@@ -91,9 +93,13 @@ export default {
             let treeOutputObj = JSON.parse(treeOutputContent)
             let fullPathNames = treeOutputObj.full_path_names
             let fullPath = fullPathNames.join("/")
-            let fullPathIds = treeOutputObj.full_path_ids
+            let [newStorageId] = (treeOutputObj.full_path_ids).slice(-1)
             this.completeEditing("location", fullPath)
-            this.updateStorageId(fullPathIds.slice(-1))
+            this.updateStorageId(newStorageId)
+            this.knownTreeFragment = this.tree
+                .recalculate_known_fragment(newStorageId)
+            this.tree = null
+            Tree.instances = []
         },
         async showEditor() {
             if (this.status !== "create") {
@@ -108,11 +114,15 @@ export default {
             }
             let pathChildren
             if (this.status !== "create") {
-                let response2 = await fetch(
-                    this.URLsSettings.pathToChemicalURL +
-                    String(this.initialData.id)
-                )
-                pathChildren = await response2.json()
+                if (this.knownTreeFragment === null) {
+                    let response2 = await fetch(
+                        this.URLsSettings.pathToChemicalURL +
+                        String(this.initialData.id)
+                    )
+                    pathChildren = await response2.json()
+                } else {
+                    pathChildren = toRaw(this.knownTreeFragment)
+                }
             } else {
                 pathChildren = null
             }

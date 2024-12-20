@@ -21,7 +21,7 @@
                     <td>Available:</td>
                 </tr>
                 <tr>
-                    <td>
+                    <td v-on:click="unhighlight">
                         <img
                             v-for="(value, key) in chosenPictograms"
                             v-bind:key="key"
@@ -33,7 +33,7 @@
                             width="100"
                             height="100">
                     </td>
-                    <td>
+                    <td  v-on:click="unhighlight">
                         <img
                             v-for="(value, key) in unChosenPictograms"
                             v-bind:key="key"
@@ -164,6 +164,7 @@ export default {
         discardChanges() {
             this.discardChangesCommon("hazard_pictograms")
             this.setup()
+            this.highlighted = ""
         },
         setup() {
             this.chosenPictograms = Object.assign({}, this.picUrls)
@@ -194,6 +195,11 @@ export default {
             this.unChosenPictograms[unChosen] = this.picturesUrls[unChosen]
             if (unChosen in this.chosenPictograms) {
                 delete this.chosenPictograms[unChosen]
+            }
+        },
+        unhighlight(event) {
+            if (event.target.tagName === "TD") {
+                this.highlighted = ""
             }
         },
     },

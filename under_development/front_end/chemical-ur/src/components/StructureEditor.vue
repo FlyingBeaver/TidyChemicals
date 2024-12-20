@@ -37,8 +37,18 @@
         <div v-if="activateEditors">
             <structure-input
                 ref="structureInput"
-                v-on:ketcher-loaded="ketcherLoadListener">
+                v-on:ketcher-loaded="ketcherLoadListener"
+                v-on:mouseenter="hideWarning"
+            >
             </structure-input>
+            <p
+                v-show="molBlockEmptyWarning"
+                class="warning"
+            >
+                Empty structure is not compatible with water numbers,
+                other than "dry substance". Please, enter some structure
+                or set water number equal to "dry substance"
+            </p>
             <two-buttons
                 v-on:complete-editing="localCompleteEditing"
                 v-on:discard-changes="discardChanges"
@@ -56,6 +66,7 @@
         <button
             v-if="status === 'choose'"
             v-on:click="sectionChosen('waternumber')"
+            v-bind:disabled="structureMol === emptyMol"
         >Edit water number
         </button>
     </div>
@@ -88,14 +99,16 @@ export default {
         "initialData",
         "editedData",
     ],
+    emits: ["structure-empty", "structure-not-empty"],
     data() {
         return {
             waterNumber: "",
             numerator: "",
             denominator: "",
             imageEdited: false,
-            svgCode: "",
-            listenToKetcherLoad: false
+            emptyMol: emptyMol,
+            listenToKetcherLoad: false,
+            molBlockEmptyWarning: false,
         }
     },
     computed: {
@@ -194,14 +207,49 @@ export default {
                 event.data.indexOf("molBlock") !== -1
             ) {
                 let molObject = JSON.parse(event.data)
-                //let newImageLink = result.link_to_file
-                // теперь он должен отправить на сервер mol и получить имя новой картинки
-                // м изменить старое имя картинки на новое имя картинки
-                this.completeEditing("structure_mol", molObject.molBlock)
-                this.completeEditing(
-                    "structure_pic",
-                    molObject.pictureName
-                )
+                // let newImageLink = result.link_to_file
+                // теперь он должен отправить на сервер mol
+                // и получить имя новой картинки и изменить
+                // старое имя картинки на новое имя картинки
+                let molBlock = molObject.molBlock
+                // Проверка не пустой ли molBlock
+                // Если molBlock пустой:
+                // 1. Эмитируется событие
+                // 2. App.vue ловит событие
+                // 3. App.vue смотрит состояние WaterNumber
+                // 4. Если WaterNumber не dry, в StructureEditor
+                // вызывается метод, который устанавливает переменную
+                // которая зажигает предупреждение
+                // Если molBlock не пустой:
+                let molBlockIsEmpty = this.checkIfMolBlockEmpty(molBlock)
+                // this.molBlockEmptyWarning =
+                if (molBlockIsEmpty) {
+                    this.$emit("structure-empty")
+                } else {
+                    this.$emit("structure-not-empty")
+                    this.completeEditing("structure_mol", molBlock)
+                    this.completeEditing(
+                        "structure_pic",
+                        molObject.pictureName
+                    )
+                }
+            }
+        },
+        checkIfMolBlockEmpty(molBlock) {
+            let listOfLines = molBlock.split("\n")
+            let fourthLine = listOfLines[3].trim()
+            let firstWord = fourthLine.split(" ")[0]
+            let noOfAtoms = Number(firstWord)
+            return (isNaN(noOfAtoms) || noOfAtoms === 0)
+        },
+        hideWarning() {
+            if (this.molBlockEmptyWarning) {
+                this.molBlockEmptyWarning = false
+            }
+        },
+        showWarning() {
+            if (!this.molBlockEmptyWarning) {
+                this.molBlockEmptyWarning = true
             }
         },
     },

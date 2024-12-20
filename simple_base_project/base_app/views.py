@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.views.defaults import page_not_found
+from django.views.decorators.cache import cache_page
 from base_app.models import Chemical, StoragePlace, DatabaseException
 from base_app.search import find_superstructures
 from base_app.rendering_paginator import (RenderingPaginator,
@@ -164,3 +165,22 @@ def new_search(request):
                     for child in children:
                         response_dict[child.id] = [child.name, child.terminal]
                     return JsonResponse(response_dict)
+
+
+@cache_page
+def chemical_image_view(request, file_name):
+    # also there must be check if filename has valid format,
+    # but it will be implemented later
+    name_from_cache = cache.get(file_name, "no name in cache")
+
+    if name == "no name in cache":
+        return page_not_found(request)
+
+    svg_code = cache.set("svg-for" + file_name, "no code in cache")
+    if svg_code == "no code in cache":
+        return page_not_found(request)
+
+    svg_bytes = svg_code.encode()
+    response = HttpResponse(svg_bytes, content_type="image/svg+xml")
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
+    return response

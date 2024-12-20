@@ -22,6 +22,7 @@ export var Tree = (function() {
       this.highlight_domain = this.highlight_domain.bind(this);
       this.unhighlighted_ctrl = this.unhighlighted_ctrl.bind(this);
       this.unhighlighted_no_key = this.unhighlighted_no_key.bind(this);
+      this.recalculate_known_fragment = this.recalculate_known_fragment.bind(this);
       if (Tree.instances.length >= 2) {
         throw Error("can't create more than 2 tree instances");
       } else if (Tree.instances.length === 1) {
@@ -214,7 +215,7 @@ export var Tree = (function() {
           return this.highlighted_no_key(event);
         }
       } else {
-        if (this.multiple_selection) {
+        if (!this.multiple_selection) {
           node_id = event.target.dataset.storage_node_id;
           node_object = Chemical.chemicals_and_storages[node_id];
           if (node_object instanceof Storage && node_object.is_terminal === true) {
@@ -334,6 +335,29 @@ export var Tree = (function() {
       return this.highlight_only_this(event.target.dataset.storage_node_id);
     }
 
+    recalculate_known_fragment(storage_id) {
+      var child_id, child_instance, children, children_list, full_path, storage_inst, storage_no;
+      full_path = Storage.make_full_path(storage_id)[0];
+      children = {};
+      for (storage_no in full_path) {
+        storage_inst = Chemical.chemicals_and_storages[storage_no];
+        children_list = [];
+        for (child_id in storage_inst.children) {
+          child_instance = Chemical.chemicals_and_storages[child_id];
+          children_list.push({
+            id: child_id,
+            name: child_instance.name,
+            type: child_instance.type_index()
+          });
+        }
+        children[storage_no] = children_list;
+      }
+      return {
+        "children": children,
+        "full_path": full_path
+      };
+    }
+
   };
 
   Tree.instances = [];
@@ -347,6 +371,7 @@ export var Tree = (function() {
 Chemical = (function() {
   class Chemical {
     constructor(name, id, parent, tree) {
+      this.type_index = this.type_index.bind(this);
       this.name = name;
       this.id = id;
       this.parent = parent;
@@ -354,6 +379,20 @@ Chemical = (function() {
       this.li = null;
       this.span = null;
       Chemical.chemicals_and_storages[id] = this;
+    }
+
+    type_index() {
+      if (this instanceof Storage) {
+        if (this.is_terminal) {
+          return 1;
+        } else {
+          return 0;
+        }
+      } else if (this instanceof Chemical) {
+        return 2;
+      } else {
+        throw new Error("Wrong instance type");
+      }
     }
 
   };

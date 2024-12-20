@@ -1,13 +1,15 @@
 import json
 from pprint import pprint
 from datetime import datetime, date, time
+from uuid import uuid4
+
 from flask import Flask, request, url_for, render_template, redirect
 from flask_cors import CORS, cross_origin
-from instead_of_db import storages, users_dict, recent
-from mol import mol
 from rdkit.Chem.rdmolfiles import MolFromMolBlock
 from rdkit.Chem.Draw import MolToFile
-from uuid import uuid4
+
+from mol import mol
+from instead_of_db import storages, users_dict, recent
 from storages_dict import children_of, path_children
 
 
@@ -37,7 +39,7 @@ def make_dict(structure_pic):
                       "delta": delta},
         "structure_pic": structure_pic,
         "structure_mol": mol,
-        "structure_aq": 0,
+        "structure_aq": None,
         "location": "root/Лаборатория 1/Холодильник/Нижняя полка",
         "quantity": {"number": 50, "unit": "g"},
         "hazard_pictograms": ["flammable", "corrosive", "environmental_hazard"],
@@ -163,7 +165,6 @@ def show_request():
 @app.route("/users/", methods=("POST", "GET"))
 def users():
     return {"users": users_dict, "recent": recent}
-    # Будет возвращать словарь формата {id_юзера: имя_юзера}
 
 
 @app.route("/chemical/", methods=("POST", "GET"))
@@ -180,6 +181,7 @@ def chemical_data():
 @app.route("/units/", methods=["GET"])
 def units():
     return ["l", "ml", "g", "kg", "mg"]
+# Is it really needed?
 
 
 @app.route("/tags/", methods=("POST", "GET"))
@@ -209,7 +211,9 @@ def children(id):
 
 @app.route("/path_to_chemical/<id>", methods=("POST", "GET"))
 def path_to_chemical(id):
-    return path_children(int(id))
+    data = path_children(int(id))
+    pprint(data)
+    return data
 
 
 if __name__ == '__main__':

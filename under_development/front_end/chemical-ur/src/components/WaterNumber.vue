@@ -106,10 +106,12 @@
 <script>
 import {difference} from "../utils/constants.js"
 import TwoButtons from "./TwoButtons.vue"
+import getParentData from "../mixins/getParentData.js"
 
 export default {
     name: "WaterNumber",
     components: {TwoButtons},
+    mixins: [getParentData],
     inject: [
         "sectionChosen",
         "completeEditing",
@@ -118,6 +120,7 @@ export default {
         "initialData",
         "editedData",
     ],
+    emits: ["water-number-update"],
     data() {
         return {
             waterNumberType: "dry",
@@ -134,7 +137,14 @@ export default {
             denominatorIsOneWarning: false,
             cancellableFractionWarning: false,
             wholeNumberWarning: false,
+            structureIsEmptyWarning: false,
             greatestCommonDivisor: 1,
+        }
+    },
+    watch: {
+        waterNumberType() {
+            this.hideWarnings()
+            this.$emit("water-number-update")
         }
     },
     mounted() {
@@ -163,6 +173,7 @@ export default {
     methods: {
         validateWaterNumber() {
             this.hideWarnings()
+            this.structureIsEmptyWarning = this.structureEmptyCheck()
             this.oddCharsWarning = !this.containsOnlyDigits(this.waterNumber)
             this.leadingZeroWarning = this.waterNumber[0] === "0"
             if (this.oddCharsWarning || this.leadingZeroWarning) {
@@ -173,6 +184,7 @@ export default {
         },
         validateNumerator() {
             this.hideWarnings()
+            this.structureIsEmptyWarning = this.structureEmptyCheck()
             this.oddCharsWarning = !this.containsOnlyDigits(this.numerator)
             this.leadingZeroWarning = this.numerator[0] === "0"
             if (this.oddCharsWarning || this.leadingZeroWarning) {
@@ -184,6 +196,7 @@ export default {
         },
         validateDenominator() {
             this.hideWarnings()
+            this.structureIsEmptyWarning = this.structureEmptyCheck()
             this.oddCharsWarning = !this.containsOnlyDigits(this.denominator)
             this.leadingZeroWarning = this.denominator[0] === "0"
             if (this.oddCharsWarning || this.leadingZeroWarning) {
@@ -295,6 +308,11 @@ export default {
             this.waterNumber = ""
             this.numerator = ""
             this.denominator = ""
+        },
+        structureEmptyCheck() {
+            return Boolean(
+                this.parentData(["structure_mol"], false)
+            )
         },
     },
 }

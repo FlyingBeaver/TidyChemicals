@@ -11,6 +11,7 @@ urlpatterns = [
     path('new_search/', login_required(base_app.views.new_search)),
     path('chemical/<int:chemical_id>/', login_required(base_app.views.chemical_view)),
     path('', profiles.views.HomePage),
+    path('chemicals-images/<str:filename>/', base_app.views.chemical_image_view),
     path('registration/', profiles.views.RegistrationPage.as_view()),
     path('login/', profiles.views.LoginPage.as_view()),
     path('logout/', profiles.views.logout_invisible),

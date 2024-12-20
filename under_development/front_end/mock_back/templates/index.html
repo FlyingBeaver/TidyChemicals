@@ -31,7 +31,8 @@
             }
 
             const handleMessage = async function(event) {
-                if (typeof event.data === 'string' && event.data.indexOf("action") !== -1) {
+                if (typeof event.data === 'string' && 
+                    event.data.indexOf("action") !== -1) {
                     let messageStr = event.data
                     let message = JSON.parse(messageStr)
                     let ketcher = window.ketcher
@@ -44,7 +45,10 @@
                         let response
                         if (message.pictureNeeded) {
                             let pictureName = await getPictureName(molBlock)
-                            response = {"molBlock": molBlock, "pictureName": pictureName}
+                            response = {
+                                "molBlock": molBlock,
+                                "pictureName": pictureName
+                            }
                         } else {
                             response = {"molBlock": molBlock}
                         }

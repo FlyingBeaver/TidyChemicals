@@ -21,6 +21,7 @@ Created on 29.07.2021
 
 from collections import OrderedDict
 from re import fullmatch, search, findall, ASCII
+from decimal import Decimal
 
 from rdkit.Chem import MolFromSmiles
 from rdkit.Chem import MolToSmiles
@@ -132,6 +133,7 @@ class LazyMol(object):
         if self._calc_mwmf:
             self.molecular_formula = CalcMolFormula(structure)
             self.molar_weight = MolWt(structure)
+            # self.molar_weight = Decimal(str(MolWt(structure)))
         
     def process_block(self, structure: str, form: str):
         if form.lower() in ('mol', 'pdb'):

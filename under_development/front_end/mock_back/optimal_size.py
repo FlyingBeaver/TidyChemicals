@@ -1,4 +1,4 @@
-import math
+from math import sqrt
 from rdkit.Chem import AllChem
 from rdkit.Chem.Draw import MolToFile
 
@@ -19,7 +19,7 @@ def get_optimal_size(mol):
         end_index = bond.GetEndAtomIdx()
         begin_atom_pos = conformer.GetAtomPosition(begin_index)
         end_atom_pos = conformer.GetAtomPosition(end_index)
-        bond_length = math.sqrt(
+        bond_length = sqrt(
             (begin_atom_pos.x - end_atom_pos.x) ** 2 + 
             (begin_atom_pos.y - end_atom_pos.y) ** 2
         )

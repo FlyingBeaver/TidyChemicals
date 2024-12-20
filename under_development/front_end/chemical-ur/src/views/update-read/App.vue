@@ -1,8 +1,23 @@
 <template>
+    <div class="popup-background"
+         v-if="popupShown"
+    ></div>
+    <div class="popup"
+         v-if="popupShown"
+    ></div>
     <div class="grid-container">
         <name-editor></name-editor>
-        <structure-editor></structure-editor>
-        <water-number v-if="status === 'waternumber'"></water-number>
+        <structure-editor
+            v-on:structure-empty="structureDataUpdate($event)"
+            v-on:structure-not-empty="structureDataUpdate($event)"
+        >
+        </structure-editor>
+        <water-number
+            v-if="status === 'waternumber'"
+            ref="waterNumber"
+            v-on:water-number-update="structureDataUpdate($event)"
+        >
+        </water-number>
         <quantity-editor></quantity-editor>
         <location-editor></location-editor>
         <hazard-pictograms></hazard-pictograms>
@@ -103,7 +118,7 @@ export default {
             initialData: {},
             editedData: {},
             getContentFromServer: true,
-            availableTags: {}
+            popupShown: false
         }
     },
     computed: {
@@ -203,12 +218,42 @@ export default {
         // so setting it with completeEditing() is impossible
         updateStorageId(value) {
             this.editedData.storageId = value
+        },
+        structureDataUpdate(event) {
+            console.log(event)
+            let eventType = event.type
+            console.log(eventType)
+            //if (eventType === "") {}
         }
     },
 }
 </script>
 
 <style>
+
+.popup {
+    position: fixed;
+    z-index: 10;
+    margin: 10% 10% 10% 10%;
+    height: 60%;
+    width: 80%;
+    background-color: white;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+}
+
+.popup-background {
+    margin-top: -130px;
+    width: 100%;
+    height: 150%;
+    background-color: gray;
+    opacity: 50%;
+    position: fixed;
+    z-index: 9;
+    padding-top: 100px;
+}
+
 div.grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;

@@ -4,6 +4,9 @@
         v-on:blur="actionOnBlur"
         v-on:focus="hideInvalidCasWarning"
         v-on:input="inputValidationOnInput"
+        v-on:cut="inputValidationOnInput"
+        v-on:copy="inputValidationOnInput"
+        v-on:paste="inputValidationOnInput"
         type="text"
         class="simple_text_value"
     >
@@ -42,6 +45,13 @@
         You  are trying to enter two hyphens together, but hyphens must
         separate groups of digits
     </div>
+    <div
+        v-show="warningStartsWithZero"
+        class="warning"
+    >
+        You  are trying to enter value that starts with zero, but CAS RN
+        can't start with zero
+    </div>
 </template>
 
 <script>
@@ -61,20 +71,21 @@ export default {
             warningWrongSymbol: false,
             warningThreeHyphens: false,
             warningHyphensTogether: false,
+            warningStartsWithZero: false,
         }
     },
     methods: {
         clear() {
             this.inputValue = ""
+            this.warningInvalidCas = false
+            this.warningTooLongValue = false
+            this.warningWrongSymbol = false
+            this.warningThreeHyphens = false
+            this.warningHyphensTogether = false
+            this.warningStartsWithZero = false
         },
         localCompleteEditing() {
-            let casValue
-            if (this.inputValue === "") {
-                casValue = null
-            } else {
-                casValue = this.inputValue
-            }
-            this.completeEditing("cas", casValue)
+            this.completeEditing("cas", this.inputValue)
         },
         charCheck() {
             let ok = true
@@ -121,6 +132,14 @@ export default {
                 this.warningTooLongValue = false
             }
         },
+        cantStartWithZeroCheck() {
+            if (this.inputValue[0] === "0") {
+                this.warningStartsWithZero = true
+                this.inputValue = this.oldInputValue
+            } else {
+                this.warningStartsWithZero = false
+            }
+        },
         inputValidationOnInput() {
             //1. Only digits and hyphens
             this.charCheck()
@@ -130,20 +149,17 @@ export default {
             this.hyphensTogetherCheck()
             //4. Not more than 10 digits
             this.tooManyDigits()
+            //5. Can't start with zero
+            this.cantStartWithZeroCheck()
             this.oldInputValue = this.inputValue
         },
         actionOnBlur(event) {
             let relTarget = event.relatedTarget
-            if (relTarget) {
-                if (relTarget.textContent.trim() === "Discard changes") {
-                    this.$emit("discardChanges")
-                } else if (relTarget.textContent.trim() === "Complete editing") {
-                    this.inputValidationOnBlur()
-                    if (!this.warningInvalidCas) {
-                        this.localCompleteEditing()
-                    }
-                }
-            } else {
+            if (!(relTarget &&
+                  (relTarget.textContent.trim() === "Discard changes" ||
+                   relTarget.textContent.trim() === "Complete editing")
+                  )
+            ) {
                 this.inputValidationOnBlur()
             }
         },

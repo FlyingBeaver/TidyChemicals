@@ -32,8 +32,12 @@ export default {
             ifKetcherWindow.postMessage(messageStr, "*")
         },
         getMolecule() {
+            //listener is acceptMessage() from StructureEditor.vue
             let ifKetcherWindow = window.frames.ifKetcher
-            ifKetcherWindow.postMessage('{"action": "getMolecule", "pictureNeeded": true}', "*")
+            ifKetcherWindow.postMessage(
+                '{"action": "getMolecule", "pictureNeeded": true}',
+                "*"
+            )
         },
         clear() {
             this.setMolecule(emptyMol)

@@ -3,6 +3,9 @@
         <input
             v-model="inputValue"
             v-on:input="inputValidation"
+            v-on:cut="inputValidation"
+            v-on:copy="inputValidation"
+            v-on:paste="inputValidation"
             type="text"
             name="numerical_input"
             class="simple_text_value"

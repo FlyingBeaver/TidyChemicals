@@ -2,6 +2,7 @@ from os.path import isfile
 from os import listdir, remove
 from time import time
 from rdkit.Chem.inchi import InchiToInchiKey
+from rdkit.Chem.Draw import _moltoSVG
 from django.core.cache import cache
 from django.core.paginator import Paginator, Page
 from uuid import uuid4
@@ -20,8 +21,16 @@ def create_svg(lazy_mol, chemical, size=300):
     inchi = chemical.structure["inchi"]
     inchiKey = InchiToInchiKey(inchi)
     file_name = inchiKey + "-" + str(size) + ".svg"
+    # в будущем вместо inchiKey использовать хэш от molblock
+    # и размер картинки
     full_path = PICS_DIRECTORY_PATH + file_name
     files_dict = cache.get("files_dict", "expired")
+
+    # Если files_dict нет в кэше, то отрендерить структуру в файл
+    # (если её там нет) и сохранить в кэше словарь
+    # {имя_файла: время_истечения_срока_хранения}
+    # на срок хранения.
+    # Все прочие файлы из папки удалить.
     if files_dict == "expired":
         if isfile(full_path):
             files_list = listdir(PICS_DIRECTORY_PATH)
@@ -42,6 +51,13 @@ def create_svg(lazy_mol, chemical, size=300):
                   SVG_EXP_TIME_IN_HOURS * 3600)
 
     else:
+        # Случай, если files_dict есть в кэше.
+        # Если имени файла нет в files_dict, он рендерится.
+        # В files_dict вносится пара имя_файла --
+        # время_истечения_срока_хранения.
+        # В files_dict ищутся записи, у которых истёк срок
+        # хранения. Записи удаляются из словаря. Соответствующие
+        # файлы удаляются из папки.
         current_time = int(time())
         if file_name not in files_dict:
             lazy_mol.save_to_picture(filename=full_path,
@@ -57,6 +73,21 @@ def create_svg(lazy_mol, chemical, size=300):
             del files_dict[key]
         cache.set("files_dict", files_dict, SVG_EXP_TIME_IN_HOURS * 3600)
     return file_name
+
+
+def create_svg_alt(lazy_mol, chemical, size=300):
+    if lazy_mol is None:
+        lazy_mol = LazyMol(chemical.mol_block, "mol")
+    file_name = str(size) + "-" + str(hash(chemical.mol_block)) + ".svg"
+    name_from_cache = cache.get(file_name, "no name in cache")
+    
+    if name_from_cache == "no name in cache":
+        svg_code = _moltoSVG(lazy_mol._rdmol)
+        cache.set("svg-for" + file_name,
+                  svg_code,
+                  SVG_EXP_TIME_IN_HOURS * 3600)
+        cache.set(file_name, 0, SVG_EXP_TIME_IN_HOURS * 3600)
+
 
 
 def create_and_move_file(lazy_mol, filenames):
@@ -78,6 +109,7 @@ class RenderingPaginator(Paginator):
             rendering_page = RenderingPage([], number, self, [])
             return rendering_page
 
+        # если original_page наполнен словарями
         if type(original_page[0]) == dict:
             for item in original_page:
                 chemical = item["chemical"]
@@ -91,6 +123,7 @@ class RenderingPaginator(Paginator):
                                            filenames)
             return rendering_page
 
+        # иначе он наполнен именованными кортежами
         elif NOTATION_FOR_RENDERING == "mol":
             for item in original_page:
                 mol_block = item.mol_block
