@@ -25,6 +25,10 @@ FIELD_VALUES_TYPES = {'name': str,
                       'who_updated': 'Profile'}
 
 
+class UninitializedStorageError(BaseException):
+    pass
+
+
 def join_set(set_: set):
     return "'" + "', '".join(list(set_)) + "'"
 
@@ -60,6 +64,11 @@ def summary_dict_validation(summary):
                 raise TypeError(f"Some values in 'summary' dict have "
                                 f"wrong types: key is {key}, type "
                                 f"is {summary[key].__class__}")
+    if "storage_place" in summary:
+        if not summary["storage_place"].initialized:
+            raise UninitializedStorageError("Trying to place "
+                "chemical in an uninitialized storage: " +
+                str(summary["storage_place"]))
 
 
 def if_lacks_add_items(summary):
@@ -125,3 +134,22 @@ def check_and_correct(summary):
 def are_there_required_keys(summary):
     if not REQUIRED_KEYS <= set(summary):
         raise ValueError("Not all required keys are in summary")
+
+
+def check_type(argument=None, type=None, argunemt_name=None):
+    if (argument and type and argunemt_name) is None:
+        raise ValueError("'check_type' function must be "
+                         "called with all 3 arguments")
+    if isinstance(type, str):
+        class_name = argument.__class__.__name__
+        if class_name == type:
+            # all is ok
+            return None
+        else:
+            raise TypeError(f"'{argunemt_name}' must be an "
+                f"instance of {type}, but it is {class_name}")
+    elif not isinstance(argument, type):
+        raise TypeError(f"'{argunemt_name}' must be an "
+                f"instance of {type.__name__}, but it is "
+                f"{argument.__class__.__name__}"
+            )

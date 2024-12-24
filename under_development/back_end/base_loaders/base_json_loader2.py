@@ -82,592 +82,592 @@ def create_elements():
     new_element_ = Element.objects.create(z=1,
                                          name="Hydrogen",
                                          symbol="H",
-                                         atomic_weight=D(1.008))
+                                         atomic_weight=D("1.008"))
     new_element_.save()
     new_element_ = Element.objects.create(z=2,
                                           name="Helium",
                                           symbol="He",
-                                          atomic_weight=D(4.003))
+                                          atomic_weight=D("4.003"))
     new_element_.save()
     new_element_ = Element.objects.create(z=3,
                                           name="Lithium",
                                           symbol="Li",
-                                          atomic_weight=D(6.941))
+                                          atomic_weight=D("6.941"))
     new_element_.save()
     new_element_ = Element.objects.create(z=4,
                                           name="Beryllium",
                                           symbol="Be",
-                                          atomic_weight=D(9.012))
+                                          atomic_weight=D("9.012"))
     new_element_.save()
     new_element_ = Element.objects.create(z=5,
                                           name="Boron",
                                           symbol="B",
-                                          atomic_weight=D(10.812))
+                                          atomic_weight=D("10.812"))
     new_element_.save()
     new_element_ = Element.objects.create(z=6,
                                           name="Carbon",
                                           symbol="C",
-                                          atomic_weight=D(12.011))
+                                          atomic_weight=D("12.011"))
     new_element_.save()
     new_element_ = Element.objects.create(z=7,
                                           name="Nitrogen",
                                           symbol="N",
-                                          atomic_weight=D(14.007))
+                                          atomic_weight=D("14.007"))
     new_element_.save()
     new_element_ = Element.objects.create(z=8,
                                           name="Oxygen",
                                           symbol="O",
-                                          atomic_weight=D(15.999))
+                                          atomic_weight=D("15.999"))
     new_element_.save()
     new_element_ = Element.objects.create(z=9,
                                           name="Fluorine",
                                           symbol="F",
-                                          atomic_weight=D(18.998))
+                                          atomic_weight=D("18.998"))
     new_element_.save()
     new_element_ = Element.objects.create(z=10,
                                           name="Neon",
                                           symbol="Ne",
-                                          atomic_weight=D(20.18))
+                                          atomic_weight=D("20.18"))
     new_element_.save()
     new_element_ = Element.objects.create(z=11,
                                           name="Sodium",
                                           symbol="Na",
-                                          atomic_weight=D(22.99))
+                                          atomic_weight=D("22.99"))
     new_element_.save()
     new_element_ = Element.objects.create(z=12,
                                           name="Magnesium",
                                           symbol="Mg",
-                                          atomic_weight=D(24.305))
+                                          atomic_weight=D("24.305"))
     new_element_.save()
     new_element_ = Element.objects.create(z=13,
                                           name="Aluminium",
                                           symbol="Al",
-                                          atomic_weight=D(26.982))
+                                          atomic_weight=D("26.982"))
     new_element_.save()
     new_element_ = Element.objects.create(z=14,
                                           name="Silicon",
                                           symbol="Si",
-                                          atomic_weight=D(28.086))
+                                          atomic_weight=D("28.086"))
     new_element_.save()
     new_element_ = Element.objects.create(z=15,
                                           name="Phosphorus",
                                           symbol="P",
-                                          atomic_weight=D(30.974))
+                                          atomic_weight=D("30.974"))
     new_element_.save()
     new_element_ = Element.objects.create(z=16,
                                           name="Sulfur",
                                           symbol="S",
-                                          atomic_weight=D(32.067))
+                                          atomic_weight=D("32.067"))
     new_element_.save()
     new_element_ = Element.objects.create(z=17,
                                           name="Chlorine",
                                           symbol="Cl",
-                                          atomic_weight=D(35.453))
+                                          atomic_weight=D("35.453"))
     new_element_.save()
     new_element_ = Element.objects.create(z=18,
                                           name="Argon",
                                           symbol="Ar",
-                                          atomic_weight=D(39.948))
+                                          atomic_weight=D("39.948"))
     new_element_.save()
     new_element_ = Element.objects.create(z=19,
                                           name="Potassium",
                                           symbol="K",
-                                          atomic_weight=D(39.098))
+                                          atomic_weight=D("39.098"))
     new_element_.save()
     new_element_ = Element.objects.create(z=20,
                                           name="Calcium",
                                           symbol="Ca",
-                                          atomic_weight=D(40.078))
+                                          atomic_weight=D("40.078"))
     new_element_.save()
     new_element_ = Element.objects.create(z=21,
                                           name="Scandium",
                                           symbol="Sc",
-                                          atomic_weight=D(44.956))
+                                          atomic_weight=D("44.956"))
     new_element_.save()
     new_element_ = Element.objects.create(z=22,
                                           name="Titanium",
                                           symbol="Ti",
-                                          atomic_weight=D(47.867))
+                                          atomic_weight=D("47.867"))
     new_element_.save()
     new_element_ = Element.objects.create(z=23,
                                           name="Vanadium",
                                           symbol="V",
-                                          atomic_weight=D(50.942))
+                                          atomic_weight=D("50.942"))
     new_element_.save()
     new_element_ = Element.objects.create(z=24,
                                           name="Chromium",
                                           symbol="Cr",
-                                          atomic_weight=D(51.996))
+                                          atomic_weight=D("51.996"))
     new_element_.save()
     new_element_ = Element.objects.create(z=25,
                                           name="Manganese",
                                           symbol="Mn",
-                                          atomic_weight=D(54.938))
+                                          atomic_weight=D("54.938"))
     new_element_.save()
     new_element_ = Element.objects.create(z=26,
                                           name="Iron",
                                           symbol="Fe",
-                                          atomic_weight=D(55.845))
+                                          atomic_weight=D("55.845"))
     new_element_.save()
     new_element_ = Element.objects.create(z=27,
                                           name="Cobalt",
                                           symbol="Co",
-                                          atomic_weight=D(58.933))
+                                          atomic_weight=D("58.933"))
     new_element_.save()
     new_element_ = Element.objects.create(z=28,
                                           name="Nickel",
                                           symbol="Ni",
-                                          atomic_weight=D(58.693))
+                                          atomic_weight=D("58.693"))
     new_element_.save()
     new_element_ = Element.objects.create(z=29,
                                           name="Copper",
                                           symbol="Cu",
-                                          atomic_weight=D(63.546))
+                                          atomic_weight=D("63.546"))
     new_element_.save()
     new_element_ = Element.objects.create(z=30,
                                           name="Zinc",
                                           symbol="Zn",
-                                          atomic_weight=D(65.39))
+                                          atomic_weight=D("65.39"))
     new_element_.save()
     new_element_ = Element.objects.create(z=31,
                                           name="Gallium",
                                           symbol="Ga",
-                                          atomic_weight=D(69.723))
+                                          atomic_weight=D("69.723"))
     new_element_.save()
     new_element_ = Element.objects.create(z=32,
                                           name="Germanium",
                                           symbol="Ge",
-                                          atomic_weight=D(72.61))
+                                          atomic_weight=D("72.61"))
     new_element_.save()
     new_element_ = Element.objects.create(z=33,
                                           name="Arsenic",
                                           symbol="As",
-                                          atomic_weight=D(74.922))
+                                          atomic_weight=D("74.922"))
     new_element_.save()
     new_element_ = Element.objects.create(z=34,
                                           name="Selenium",
                                           symbol="Se",
-                                          atomic_weight=D(78.96))
+                                          atomic_weight=D("78.96"))
     new_element_.save()
     new_element_ = Element.objects.create(z=35,
                                           name="Bromine",
                                           symbol="Br",
-                                          atomic_weight=D(79.904))
+                                          atomic_weight=D("79.904"))
     new_element_.save()
     new_element_ = Element.objects.create(z=36,
                                           name="Krypton",
                                           symbol="Kr",
-                                          atomic_weight=D(83.8))
+                                          atomic_weight=D("83.8"))
     new_element_.save()
     new_element_ = Element.objects.create(z=37,
                                           name="Rubidium",
                                           symbol="Rb",
-                                          atomic_weight=D(85.468))
+                                          atomic_weight=D("85.468"))
     new_element_.save()
     new_element_ = Element.objects.create(z=38,
                                           name="Strontium",
                                           symbol="Sr",
-                                          atomic_weight=D(87.62))
+                                          atomic_weight=D("87.62"))
     new_element_.save()
     new_element_ = Element.objects.create(z=39,
                                           name="Yttrium",
                                           symbol="Y",
-                                          atomic_weight=D(88.906))
+                                          atomic_weight=D("88.906"))
     new_element_.save()
     new_element_ = Element.objects.create(z=40,
                                           name="Zirconium",
                                           symbol="Zr",
-                                          atomic_weight=D(91.224))
+                                          atomic_weight=D("91.224"))
     new_element_.save()
     new_element_ = Element.objects.create(z=41,
                                           name="Niobium",
                                           symbol="Nb",
-                                          atomic_weight=D(92.906))
+                                          atomic_weight=D("92.906"))
     new_element_.save()
     new_element_ = Element.objects.create(z=42,
                                           name="Molybdenum",
                                           symbol="Mo",
-                                          atomic_weight=D(95.94))
+                                          atomic_weight=D("95.94"))
     new_element_.save()
     new_element_ = Element.objects.create(z=43,
                                           name="Technetium",
                                           symbol="Tc",
-                                          atomic_weight=D(98))
+                                          atomic_weight=D("98"))
     new_element_.save()
     new_element_ = Element.objects.create(z=44,
                                           name="Ruthenium",
                                           symbol="Ru",
-                                          atomic_weight=D(101.07))
+                                          atomic_weight=D("101.07"))
     new_element_.save()
     new_element_ = Element.objects.create(z=45,
                                           name="Rhodium",
                                           symbol="Rh",
-                                          atomic_weight=D(102.906))
+                                          atomic_weight=D("102.906"))
     new_element_.save()
     new_element_ = Element.objects.create(z=46,
                                           name="Palladium",
                                           symbol="Pd",
-                                          atomic_weight=D(106.42))
+                                          atomic_weight=D("106.42"))
     new_element_.save()
     new_element_ = Element.objects.create(z=47,
                                           name="Silver",
                                           symbol="Ag",
-                                          atomic_weight=D(107.868))
+                                          atomic_weight=D("107.868"))
     new_element_.save()
     new_element_ = Element.objects.create(z=48,
                                           name="Cadmium",
                                           symbol="Cd",
-                                          atomic_weight=D(112.412))
+                                          atomic_weight=D("112.412"))
     new_element_.save()
     new_element_ = Element.objects.create(z=49,
                                           name="Indium",
                                           symbol="In",
-                                          atomic_weight=D(114.818))
+                                          atomic_weight=D("114.818"))
     new_element_.save()
     new_element_ = Element.objects.create(z=50,
                                           name="Tin",
                                           symbol="Sn",
-                                          atomic_weight=D(118.711))
+                                          atomic_weight=D("118.711"))
     new_element_.save()
     new_element_ = Element.objects.create(z=51,
                                           name="Antimony",
                                           symbol="Sb",
-                                          atomic_weight=D(121.76))
+                                          atomic_weight=D("121.76"))
     new_element_.save()
     new_element_ = Element.objects.create(z=52,
                                           name="Tellurium",
                                           symbol="Te",
-                                          atomic_weight=D(127.6))
+                                          atomic_weight=D("127.6"))
     new_element_.save()
     new_element_ = Element.objects.create(z=53,
                                           name="Iodine",
                                           symbol="I",
-                                          atomic_weight=D(126.904))
+                                          atomic_weight=D("126.904"))
     new_element_.save()
     new_element_ = Element.objects.create(z=54,
                                           name="Xenon",
                                           symbol="Xe",
-                                          atomic_weight=D(131.29))
+                                          atomic_weight=D("131.29"))
     new_element_.save()
     new_element_ = Element.objects.create(z=55,
                                           name="Caesium",
                                           symbol="Cs",
-                                          atomic_weight=D(132.905))
+                                          atomic_weight=D("132.905"))
     new_element_.save()
     new_element_ = Element.objects.create(z=56,
                                           name="Barium",
                                           symbol="Ba",
-                                          atomic_weight=D(137.328))
+                                          atomic_weight=D("137.328"))
     new_element_.save()
     new_element_ = Element.objects.create(z=57,
                                           name="Lanthanum",
                                           symbol="La",
-                                          atomic_weight=D(138.906))
+                                          atomic_weight=D("138.906"))
     new_element_.save()
     new_element_ = Element.objects.create(z=58,
                                           name="Cerium",
                                           symbol="Ce",
-                                          atomic_weight=D(140.116))
+                                          atomic_weight=D("140.116"))
     new_element_.save()
     new_element_ = Element.objects.create(z=59,
                                           name="Praseodymium",
                                           symbol="Pr",
-                                          atomic_weight=D(140.908))
+                                          atomic_weight=D("140.908"))
     new_element_.save()
     new_element_ = Element.objects.create(z=60,
                                           name="Neodymium",
                                           symbol="Nd",
-                                          atomic_weight=D(144.24))
+                                          atomic_weight=D("144.24"))
     new_element_.save()
     new_element_ = Element.objects.create(z=61,
                                           name="Promethium",
                                           symbol="Pm",
-                                          atomic_weight=D(145))
+                                          atomic_weight=D("145"))
     new_element_.save()
     new_element_ = Element.objects.create(z=62,
                                           name="Samarium",
                                           symbol="Sm",
-                                          atomic_weight=D(150.36))
+                                          atomic_weight=D("150.36"))
     new_element_.save()
     new_element_ = Element.objects.create(z=63,
                                           name="Europium",
                                           symbol="Eu",
-                                          atomic_weight=D(151.964))
+                                          atomic_weight=D("151.964"))
     new_element_.save()
     new_element_ = Element.objects.create(z=64,
                                           name="Gadolinium",
                                           symbol="Gd",
-                                          atomic_weight=D(157.25))
+                                          atomic_weight=D("157.25"))
     new_element_.save()
     new_element_ = Element.objects.create(z=65,
                                           name="Terbium",
                                           symbol="Tb",
-                                          atomic_weight=D(158.925))
+                                          atomic_weight=D("158.925"))
     new_element_.save()
     new_element_ = Element.objects.create(z=66,
                                           name="Dysprosium",
                                           symbol="Dy",
-                                          atomic_weight=D(162.5))
+                                          atomic_weight=D("162.5"))
     new_element_.save()
     new_element_ = Element.objects.create(z=67,
                                           name="Holmium",
                                           symbol="Ho",
-                                          atomic_weight=D(164.93))
+                                          atomic_weight=D("164.93"))
     new_element_.save()
     new_element_ = Element.objects.create(z=68,
                                           name="Erbium",
                                           symbol="Er",
-                                          atomic_weight=D(167.26))
+                                          atomic_weight=D("167.26"))
     new_element_.save()
     new_element_ = Element.objects.create(z=69,
                                           name="Thulium",
                                           symbol="Tm",
-                                          atomic_weight=D(168.934))
+                                          atomic_weight=D("168.934"))
     new_element_.save()
     new_element_ = Element.objects.create(z=70,
                                           name="Ytterbium",
                                           symbol="Yb",
-                                          atomic_weight=D(173.04))
+                                          atomic_weight=D("173.04"))
     new_element_.save()
     new_element_ = Element.objects.create(z=71,
                                           name="Lutetium",
                                           symbol="Lu",
-                                          atomic_weight=D(174.967))
+                                          atomic_weight=D("174.967"))
     new_element_.save()
     new_element_ = Element.objects.create(z=72,
                                           name="Hafnium",
                                           symbol="Hf",
-                                          atomic_weight=D(178.49))
+                                          atomic_weight=D("178.49"))
     new_element_.save()
     new_element_ = Element.objects.create(z=73,
                                           name="Tantalum",
                                           symbol="Ta",
-                                          atomic_weight=D(180.948))
+                                          atomic_weight=D("180.948"))
     new_element_.save()
     new_element_ = Element.objects.create(z=74,
                                           name="Tungsten",
                                           symbol="W",
-                                          atomic_weight=D(183.84))
+                                          atomic_weight=D("183.84"))
     new_element_.save()
     new_element_ = Element.objects.create(z=75,
                                           name="Rhenium",
                                           symbol="Re",
-                                          atomic_weight=D(186.207))
+                                          atomic_weight=D("186.207"))
     new_element_.save()
     new_element_ = Element.objects.create(z=76,
                                           name="Osmium",
                                           symbol="Os",
-                                          atomic_weight=D(190.23))
+                                          atomic_weight=D("190.23"))
     new_element_.save()
     new_element_ = Element.objects.create(z=77,
                                           name="Iridium",
                                           symbol="Ir",
-                                          atomic_weight=D(192.217))
+                                          atomic_weight=D("192.217"))
     new_element_.save()
     new_element_ = Element.objects.create(z=78,
                                           name="Platinum",
                                           symbol="Pt",
-                                          atomic_weight=D(195.078))
+                                          atomic_weight=D("195.078"))
     new_element_.save()
     new_element_ = Element.objects.create(z=79,
                                           name="Gold",
                                           symbol="Au",
-                                          atomic_weight=D(196.967))
+                                          atomic_weight=D("196.967"))
     new_element_.save()
     new_element_ = Element.objects.create(z=80,
                                           name="Mercury",
                                           symbol="Hg",
-                                          atomic_weight=D(200.59))
+                                          atomic_weight=D("200.59"))
     new_element_.save()
     new_element_ = Element.objects.create(z=81,
                                           name="Thallium",
                                           symbol="Tl",
-                                          atomic_weight=D(204.383))
+                                          atomic_weight=D("204.383"))
     new_element_.save()
     new_element_ = Element.objects.create(z=82,
                                           name="Lead",
                                           symbol="Pb",
-                                          atomic_weight=D(207.2))
+                                          atomic_weight=D("207.2"))
     new_element_.save()
     new_element_ = Element.objects.create(z=83,
                                           name="Bismuth",
                                           symbol="Bi",
-                                          atomic_weight=D(208.98))
+                                          atomic_weight=D("208.98"))
     new_element_.save()
     new_element_ = Element.objects.create(z=84,
                                           name="Polonium",
                                           symbol="Po",
-                                          atomic_weight=D(209))
+                                          atomic_weight=D("209"))
     new_element_.save()
     new_element_ = Element.objects.create(z=85,
                                           name="Astatine",
                                           symbol="At",
-                                          atomic_weight=D(210))
+                                          atomic_weight=D("210"))
     new_element_.save()
     new_element_ = Element.objects.create(z=86,
                                           name="Radon",
                                           symbol="Rn",
-                                          atomic_weight=D(222))
+                                          atomic_weight=D("222"))
     new_element_.save()
     new_element_ = Element.objects.create(z=87,
                                           name="Francium",
                                           symbol="Fr",
-                                          atomic_weight=D(223))
+                                          atomic_weight=D("223"))
     new_element_.save()
     new_element_ = Element.objects.create(z=88,
                                           name="Radium",
                                           symbol="Ra",
-                                          atomic_weight=D(226))
+                                          atomic_weight=D("226"))
     new_element_.save()
     new_element_ = Element.objects.create(z=89,
                                           name="Actinium",
                                           symbol="Ac",
-                                          atomic_weight=D(227))
+                                          atomic_weight=D("227"))
     new_element_.save()
     new_element_ = Element.objects.create(z=90,
                                           name="Thorium",
                                           symbol="Th",
-                                          atomic_weight=D(232.038))
+                                          atomic_weight=D("232.038"))
     new_element_.save()
     new_element_ = Element.objects.create(z=91,
                                           name="Protactinium",
                                           symbol="Pa",
-                                          atomic_weight=D(231.036))
+                                          atomic_weight=D("231.036"))
     new_element_.save()
     new_element_ = Element.objects.create(z=92,
                                           name="Uranium",
                                           symbol="U",
-                                          atomic_weight=D(238.029))
+                                          atomic_weight=D("238.029"))
     new_element_.save()
     new_element_ = Element.objects.create(z=93,
                                           name="Neptunium",
                                           symbol="Np",
-                                          atomic_weight=D(237))
+                                          atomic_weight=D("237"))
     new_element_.save()
     new_element_ = Element.objects.create(z=94,
                                           name="Plutonium",
                                           symbol="Pu",
-                                          atomic_weight=D(244))
+                                          atomic_weight=D("244"))
     new_element_.save()
     new_element_ = Element.objects.create(z=95,
                                           name="Americium",
                                           symbol="Am",
-                                          atomic_weight=D(243))
+                                          atomic_weight=D("243"))
     new_element_.save()
     new_element_ = Element.objects.create(z=96,
                                           name="Curium",
                                           symbol="Cm",
-                                          atomic_weight=D(247))
+                                          atomic_weight=D("247"))
     new_element_.save()
     new_element_ = Element.objects.create(z=97,
                                           name="Berkelium",
                                           symbol="Bk",
-                                          atomic_weight=D(247))
+                                          atomic_weight=D("247"))
     new_element_.save()
     new_element_ = Element.objects.create(z=98,
                                           name="Californium",
                                           symbol="Cf",
-                                          atomic_weight=D(251))
+                                          atomic_weight=D("251"))
     new_element_.save()
     new_element_ = Element.objects.create(z=99,
                                           name="Einsteinium",
                                           symbol="Es",
-                                          atomic_weight=D(252))
+                                          atomic_weight=D("252"))
     new_element_.save()
     new_element_ = Element.objects.create(z=100,
                                           name="Fermium",
                                           symbol="Fm",
-                                          atomic_weight=D(257))
+                                          atomic_weight=D("257"))
     new_element_.save()
     new_element_ = Element.objects.create(z=101,
                                           name="Mendelevium",
                                           symbol="Md",
-                                          atomic_weight=D(258))
+                                          atomic_weight=D("258"))
     new_element_.save()
     new_element_ = Element.objects.create(z=102,
                                           name="Nobelium",
                                           symbol="No",
-                                          atomic_weight=D(259))
+                                          atomic_weight=D("259"))
     new_element_.save()
     new_element_ = Element.objects.create(z=103,
                                           name="Lawrencium",
                                           symbol="Lr",
-                                          atomic_weight=D(262))
+                                          atomic_weight=D("262"))
     new_element_.save()
     new_element_ = Element.objects.create(z=104,
                                           name="Rutherfordium",
                                           symbol="Rf",
-                                          atomic_weight=D(267))
+                                          atomic_weight=D("267"))
     new_element_.save()
     new_element_ = Element.objects.create(z=105,
                                           name="Dubnium",
                                           symbol="Db",
-                                          atomic_weight=D(268))
+                                          atomic_weight=D("268"))
     new_element_.save()
     new_element_ = Element.objects.create(z=106,
                                           name="Seaborgium",
                                           symbol="Sg",
-                                          atomic_weight=D(269))
+                                          atomic_weight=D("269"))
     new_element_.save()
     new_element_ = Element.objects.create(z=107,
                                           name="Bohrium",
                                           symbol="Bh",
-                                          atomic_weight=D(270))
+                                          atomic_weight=D("270"))
     new_element_.save()
     new_element_ = Element.objects.create(z=108,
                                           name="Hassium",
                                           symbol="Hs",
-                                          atomic_weight=D(269))
+                                          atomic_weight=D("269"))
     new_element_.save()
     new_element_ = Element.objects.create(z=109,
                                           name="Meitnerium",
                                           symbol="Mt",
-                                          atomic_weight=D(278))
+                                          atomic_weight=D("278"))
     new_element_.save()
     new_element_ = Element.objects.create(z=110,
                                           name="Darmstadtium",
                                           symbol="Ds",
-                                          atomic_weight=D(281))
+                                          atomic_weight=D("281"))
     new_element_.save()
     new_element_ = Element.objects.create(z=111,
                                           name="Roentgenium",
                                           symbol="Rg",
-                                          atomic_weight=D(281))
+                                          atomic_weight=D("281"))
     new_element_.save()
     new_element_ = Element.objects.create(z=112,
                                           name="Copernicium",
                                           symbol="Cn",
-                                          atomic_weight=D(285))
+                                          atomic_weight=D("285"))
     new_element_.save()
     new_element_ = Element.objects.create(z=113,
                                           name="Nihonium",
                                           symbol="Nh",
-                                          atomic_weight=D(284))
+                                          atomic_weight=D("284"))
     new_element_.save()
     new_element_ = Element.objects.create(z=114,
                                           name="Flerovium",
                                           symbol="Fl",
-                                          atomic_weight=D(289))
+                                          atomic_weight=D("289"))
     new_element_.save()
     new_element_ = Element.objects.create(z=115,
                                           name="Moscovium",
                                           symbol="Mc",
-                                          atomic_weight=D(288))
+                                          atomic_weight=D("288"))
     new_element_.save()
     new_element_ = Element.objects.create(z=116,
                                           name="Livermorium",
                                           symbol="Lv",
-                                          atomic_weight=D(293))
+                                          atomic_weight=D("293"))
     new_element_.save()
     new_element_ = Element.objects.create(z=117,
                                           name="Tennessine",
                                           symbol="Ts",
-                                          atomic_weight=D(292))
+                                          atomic_weight=D("292"))
     new_element_.save()
     new_element_ = Element.objects.create(z=118,
                                           name="Oganesson",
                                           symbol="Og",
-                                          atomic_weight=D(294))
+                                          atomic_weight=D("294"))
     new_element_.save()
 
 
@@ -675,77 +675,77 @@ def load_units():
     kilogram = QuantityUnit.objects.create(name="kilogram",
                                            unit_symbol="kg",
                                            measure_type="mass",
-                                           relation_to_basic=D(1))
+                                           relation_to_basic=D("1"))
     kilogram.save()
     gram = QuantityUnit.objects.create(name="gram",
                                        unit_symbol="g",
                                        measure_type="mass",
-                                       relation_to_basic=D(0.001))
+                                       relation_to_basic=D("0.001"))
     gram.save()
     milligram = QuantityUnit.objects.create(name="milligram",
                                             unit_symbol="mg",
                                             measure_type="mass",
-                                            relation_to_basic=D(0.000001))
+                                            relation_to_basic=D("0.000001"))
     milligram.save()
     liter = QuantityUnit.objects.create(name="liter",
                                         unit_symbol="l",
                                         measure_type="volume",
-                                        relation_to_basic=D(1))
+                                        relation_to_basic=D("1"))
     liter.save()
     milliliter = QuantityUnit.objects.create(name="milliliter",
                                              unit_symbol="ml",
                                              measure_type="volume",
-                                             relation_to_basic=D(0.001))
+                                             relation_to_basic=D("0.001"))
     milliliter.save()
     kilogram = QuantityUnit.objects.create(name="kilogram",
                                            unit_symbol="kg",
                                            measure_type="mass",
-                                           relation_to_basic=D(1))
+                                           relation_to_basic=D("1"))
     kilogram.save()
     gram = QuantityUnit.objects.create(name="gram",
                                        unit_symbol="g",
                                        measure_type="mass",
-                                       relation_to_basic=D(0.001))
+                                       relation_to_basic=D("0.001"))
     gram.save()
     milligram = QuantityUnit.objects.create(name="milligram",
                                             unit_symbol="mg",
                                             measure_type="mass",
-                                            relation_to_basic=D(0.000001))
+                                            relation_to_basic=D("0.000001"))
     milligram.save()
     liter = QuantityUnit.objects.create(name="liter",
                                         unit_symbol="l",
                                         measure_type="volume",
-                                        relation_to_basic=D(1))
+                                        relation_to_basic=D("1"))
     liter.save()
     milliliter = QuantityUnit.objects.create(name="milliliter",
                                              unit_symbol="ml",
                                              measure_type="volume",
-                                             relation_to_basic=D(0.001))
+                                             relation_to_basic=D("0.001"))
     milliliter.save()
     kilogram = QuantityUnit.objects.create(name="kilogram",
                                            unit_symbol="kg",
                                            measure_type="mass",
-                                           relation_to_basic=D(1))
+                                           relation_to_basic=D("1"))
     kilogram.save()
     gram = QuantityUnit.objects.create(name="gram",
                                        unit_symbol="g",
                                        measure_type="mass",
-                                       relation_to_basic=D(0.001))
+                                       relation_to_basic=D("0.001"))
     gram.save()
     milligram = QuantityUnit.objects.create(name="milligram",
                                             unit_symbol="mg",
                                             measure_type="mass",
-                                            relation_to_basic=D(0.000001))
+                                            relation_to_basic=D("0.000001"))
     milligram.save()
     liter = QuantityUnit.objects.create(name="liter",
                                         unit_symbol="l",
                                         measure_type="volume",
-                                        relation_to_basic=D(1))
+                                        relation_to_basic=D("1"))
     liter.save()
     milliliter = QuantityUnit.objects.create(name="milliliter",
                                              unit_symbol="ml",
                                              measure_type="volume",
-                                             relation_to_basic=D(0.001))
+                                             relation_to_basic=D("0.001"))
     milliliter.save()
 
 
