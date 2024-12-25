@@ -2,7 +2,8 @@ from base_app.mol_classes import LazyMol
 import re
 
 
-REQUIRED_KEYS = {'name', 
+REQUIRED_KEYS = {'name',
+                 'name_data',
                  'storage_place', 
                  'quantity', 
                  'quantity_unit', 

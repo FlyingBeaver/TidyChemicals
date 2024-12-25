@@ -749,6 +749,11 @@ def load_units():
     milliliter.save()
 
 
+def make_name_data_dict(name):
+    return {"html": f"<p>{name}</p>",
+            "delta": {"ops":[{"insert":f"{name}\n"}]}},
+
+
 def load_base():
     profiles = dict()
     storage_places = dict()
@@ -772,5 +777,6 @@ def load_base():
         record["storage_place"] = storage_places[record["storage_place"]]
         record["quantity_unit"] = units[record["quantity_unit"]]
         record["who_created"] = profiles[record["who_created"]]
+        record["name_data"] = make_name_data_dict(record["name"])
         new_chemical = Chemical.create(record, elements_dict)
         new_chemical.save()
