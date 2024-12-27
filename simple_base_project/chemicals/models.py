@@ -281,7 +281,7 @@ class Chemical(models.Model):
             chemical=self
         )
         for rel in relations_ring:
-            rel.path.decrement()
+            rel.ring.decrement()
         super().delete(*args, **kwargs)
         if old_storage is not None:
             self.process_old_storage(old_storage)
