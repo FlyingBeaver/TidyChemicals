@@ -29,7 +29,7 @@ class DatabaseException(BaseException):
 class Chemical(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
-    name_data = models.JSONField(null=True)
+    name_data = models.JSONField()
     structure = models.JSONField(null=True)
     # Пока что у структуры будет 2 поля внутри structure:
     # обязательное inchi и необязательное aq
@@ -156,7 +156,7 @@ class Chemical(models.Model):
             self.process_old_storage(old_storage)
 
     def process_old_storage(self, old_storage):
-        chemicals_in_old_storage = self.objects.filter(
+        chemicals_in_old_storage = self.__class__.objects.filter(
             storage_place=old_storage
         )
         if (len(chemicals_in_old_storage) == 0 and
@@ -300,7 +300,7 @@ class Chemical(models.Model):
             raise DatabaseException("Standard of barcode proposed "
                 "for chemical initialization doesn't match with "
                 "standard set for chemicals")
-        self.barcode = barcode.id
+        self.barcode = barcode.number
         barcode.delete()
         if storage is not None and self.storage_place is not None:
             warn("Attempt to set storage place during "
@@ -705,11 +705,11 @@ class StoragePlace(models.Model):
                 "but storage that contains chemicals can't be "
                 "parent storage for other storages."
             )
-        if not parent.initialized:
-            raise DatabaseException("Storage that was proposed "
-                "as a new parent is not initialized, "
-                "so it can't contain anything until "
-                "initialization")
+        # if not parent.initialized:
+        #     raise DatabaseException("Storage that was proposed "
+        #         "as a new parent is not initialized, "
+        #         "so it can't contain anything until "
+        #         "initialization")
 
     def __str__(self):
         return self.path_str
@@ -731,7 +731,7 @@ class StoragePlace(models.Model):
         if barcode.standard != BARCODE_STANDARDS["storages"]:
             raise DatabaseException("Attempt to assign to the "
                 "storage bacode of wrong format")
-        self.barcode = barcode.id
+        self.barcode = barcode.number
         barcode.delete()
         self.save()
 

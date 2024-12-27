@@ -117,13 +117,12 @@ class LazyMol(object):
         self._rdmol = structure
         if self._calc_mwmf:
             self.molecular_formula = CalcMolFormula(structure)
-            self.molar_weight = MolWt(structure)
-            # self.molar_weight = Decimal(str(MolWt(structure)))
+            self.molar_weight = Decimal(str(MolWt(structure)))
         
     def process_block(self, structure: str, form: str):
         if form.lower() in ('mol', 'pdb'):
             self.make_rdmol(structure, form.lower() + "_block")
-        elif form.lower in ('mol_block', 'pdb_block'):
+        elif form.lower() in ('mol_block', 'pdb_block'):
             self.make_rdmol(structure, form.lower())
         elif form.lower() in ('smiles', 'inchi'):
             self.make_rdmol(structure, form.lower())

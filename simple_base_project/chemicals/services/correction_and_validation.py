@@ -10,7 +10,7 @@ REQUIRED_KEYS = {'name',
                  'who_created'}
 
 FIELD_VALUES_TYPES = {'name': str,
-                      'name_format': str, 
+                      'name_data': dict, 
                       'structure': dict, 
                       'mol_block': str, 
                       'molecular_formula': str, 
@@ -137,8 +137,8 @@ def are_there_required_keys(summary):
         raise ValueError("Not all required keys are in summary")
 
 
-def check_type(argument=None, type=None, argunemt_name=None):
-    if (argument and type and argunemt_name) is None:
+def check_type(argument=None, type=None, argument_name=None):
+    if (argument and type and argument_name) is None:
         raise ValueError("'check_type' function must be "
                          "called with all 3 arguments")
     if isinstance(type, str):
@@ -147,10 +147,10 @@ def check_type(argument=None, type=None, argunemt_name=None):
             # all is ok
             return None
         else:
-            raise TypeError(f"'{argunemt_name}' must be an "
+            raise TypeError(f"'{argument_name}' must be an "
                 f"instance of {type}, but it is {class_name}")
     elif not isinstance(argument, type):
-        raise TypeError(f"'{argunemt_name}' must be an "
+        raise TypeError(f"'{argument_name}' must be an "
                 f"instance of {type.__name__}, but it is "
                 f"{argument.__class__.__name__}"
             )
