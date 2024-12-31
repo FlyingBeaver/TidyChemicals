@@ -13,7 +13,8 @@ from simple_base_project.settings import NOTATION_FOR_RENDERING
 from chemicals.services.mol_classes import LazyMol
 
 
-PICS_DIRECTORY_PATH = "./chemicals/static/chemicals/structures/"
+# PICS_DIRECTORY_PATH = "./chemicals/static/chemicals/structures/"
+PICS_DIRECTORY_PATH = 'chemicals-images/'
 SVG_EXP_TIME_IN_HOURS = 24
 
 
@@ -84,12 +85,11 @@ def create_svg_alt(lazy_mol, chemical, size=300):
     name_from_cache = cache.get(file_name, "no name in cache")
     
     if name_from_cache == "no name in cache":
-        svg_code = _moltoSVG(lazy_mol._rdmol)
-        cache.set("svg-for" + file_name,
+        svg_code = _moltoSVG(lazy_mol._rdmol, (size, size), [], "", True)
+        cache.set(file_name,
                   svg_code,
                   SVG_EXP_TIME_IN_HOURS * 3600)
-        cache.set(file_name, 0, SVG_EXP_TIME_IN_HOURS * 3600)
-
+    return file_name
 
 
 def create_and_move_file(lazy_mol, filenames):
@@ -118,7 +118,7 @@ class RenderingPaginator(Paginator):
                 new_object_list.append(chemical)
                 lazy_mol = item["lazymol"]
                 # create_and_move_file(lazy_mol, filenames)
-                filenames.append(create_svg(lazy_mol, chemical))
+                filenames.append(create_svg_alt(lazy_mol, chemical))
             rendering_page = RenderingPage(new_object_list,
                                            number,
                                            self,
@@ -131,7 +131,7 @@ class RenderingPaginator(Paginator):
                 mol_block = item.mol_block
                 lazy_mol = LazyMol(mol_block, "mol")
                 # create_and_move_file(lazy_mol, filenames)
-                filenames.append(create_svg(lazy_mol, item))
+                filenames.append(create_svg_alt(lazy_mol, item))
             rendering_page = RenderingPage(original_page.object_list,
                                            number,
                                            self,
@@ -143,7 +143,7 @@ class RenderingPaginator(Paginator):
                 inchi = item.structure["inchi"]
                 lazy_mol = LazyMol(inchi, "inchi")
                 # create_and_move_file(lazy_mol, filenames)
-                filenames.append(create_svg(lazy_mol, item))
+                filenames.append(create_svg_alt(lazy_mol, item))
             rendering_page = RenderingPage(original_page.object_list,
                                            number,
                                            self,

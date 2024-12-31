@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'api',
+    'rest_framework',
     'profiles.apps.ProfilesConfig',
     'chemicals.apps.ChemicalsConfig',
     'django.contrib.admin',
@@ -146,3 +148,9 @@ CACHES = {
 }
 
 # APPEND_SLASH = False
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

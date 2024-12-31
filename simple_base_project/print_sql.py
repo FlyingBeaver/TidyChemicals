@@ -1,5 +1,5 @@
 from sql_formatter.core import format_sql
-from prettytable import PrettyTable
+#from prettytable import PrettyTable
 
 
 def print_sql(queryset):

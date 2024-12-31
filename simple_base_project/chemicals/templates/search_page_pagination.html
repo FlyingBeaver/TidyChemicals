@@ -113,7 +113,7 @@ Search results
 <div class="hidden" id="popup-background"></div>
 
 <div class="hidden" id="popup">
-	<img class="cross" src="/static/base_app/x-lg.svg" width="100%" height="100%">
+	<img class="cross" src="/static/chemicals/x-lg.svg" width="100%" height="100%">
 	<img class="structure" height="100%">
 </div>
 
@@ -121,14 +121,14 @@ Search results
 {% for file_name, chemical in page_obj|filename_item %}
 <span class="inner-grid">
 	<div class="image">
-		<img src="/static/base_app/structures/{{ file_name }}" width=100%>
+		<img src="/chemicals-images/{{ file_name }}" width=100%>
 		{% if 'aq' in chemical.structure %}
 		<span class="aq"><b>·</b>{{chemical.structure.aq}} H<sub>2</sub>O</span>
 		{% endif %}
 	</div>
 	<span class="border"></span>
 	<div>
-		<a class="substance-title" href="/chemical/{{ chemical.id }}/">{{ chemical.name }}</a>
+		<a class="substance-title" href="/chemical/{{ chemical.id }}">{{ chemical.name }}</a>
 		<p>{{ chemical.synonyms }}</p>
 		<p class="substance-quantity">{{ chemical.quantity|custom_floatformat }} {{ chemical.quantity_unit }}</p>
 	</div>

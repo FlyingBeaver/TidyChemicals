@@ -6,6 +6,7 @@ __pycache__/
 profiles/migrations/
 base_app/migrations/
 chemicals/migrations/
+api/migrations/
 *.svg
 *.pyc
 !__init__.py
@@ -13,3 +14,4 @@ base_app/__pycache__/
 simple_base_project/__pycache__/
 profiles/__pycache__/
 chemicals/__pycache__/
+api/__pycache__/

@@ -2,6 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+def default_preferences():
+    return {
+        "recent_users": [],
+        "search_fields": []
+    }
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User,
                                 on_delete=models.CASCADE,
@@ -11,7 +18,7 @@ class Profile(models.Model):
     middle_names = models.CharField(max_length=256, null=True)
     phone_numbers = models.CharField(max_length=256, null=True)
     room = models.CharField(max_length=256, null=True)
-    search_preferences = models.JSONField(null=True)
+    search_preferences = models.JSONField(default=default_preferences)
     n_of_unread_messages = models.IntegerField(default=0)
     initialized = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)

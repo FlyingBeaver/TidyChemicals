@@ -27,7 +27,7 @@ Chemical view
 	</div>
 	<div>
 		<p class="label">Structure:</p>
-		<p class="value"><img src="/static/base_app/structures/{{ picture_file }}"></p>
+		<p class="value"><img src="/chemicals-images/{{ picture_file }}"></p>
 	</div>
 	<div>
 		<p class="label">Location:</p>
@@ -42,8 +42,8 @@ Chemical view
 	<div>
 		<p class="label">Hazard pictograms:</p>
 		<p class="value">
-			{% for hazard_url in data.hazards %}
-			<img src="{{ hazard_url }}">
+			{% for hazard_url in hazards %}
+			<img src="{{ hazard_url }}" width="100" height="100">
 			{% endfor %}
 		</p>
 	</div>

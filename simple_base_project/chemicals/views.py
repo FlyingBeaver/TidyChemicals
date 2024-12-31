@@ -8,12 +8,11 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.views.defaults import page_not_found
-from django.views.decorators.cache import cache_page
 
 from chemicals.models import Chemical, StoragePlace, DatabaseException
 from chemicals.services.search import find_superstructures
 from chemicals.services.rendering_paginator import (RenderingPaginator,
-                                                    create_svg,
+                                                    create_svg_alt,
                                                     PICS_DIRECTORY_PATH)
 
 
@@ -63,7 +62,8 @@ def search_view(request):
             page_number = int(request.POST["page_no"])
             if post_dict != "expired":
                 mol_block = post_dict["mol"]
-                return process_mol_block(mol_block, request, page_number=page_number)
+                return process_mol_block(mol_block, request,
+                                         page_number=page_number)
             else:
                 return render(request,
                               "search_results_deleted.html")
@@ -111,14 +111,14 @@ def tree_api(request):
 def chemical_view(request, chemical_id):
     try:
         chemical = Chemical.objects.get(id=chemical_id)
-        if chemical.hazard_pictograms is None:
+        if not chemical.hazard_pictograms:
             hazard_list = []
         else:
             hazard_list = chemical.hazard_pictograms.split(", ")
         hazards = []
         for item in hazard_list:
             hazards.append(HAZARD_URLS[item])
-        picture_file = create_svg(None, chemical)
+        picture_file = create_svg_alt(None, chemical, size=600)
         context = {
             "chemical": chemical,
             "picture_file": picture_file,
@@ -168,20 +168,13 @@ def new_search(request):
                     return JsonResponse(response_dict)
 
 
-@cache_page
-def chemical_image_view(request, file_name):
-    # also there must be check if filename has valid format,
-    # but it will be implemented later
-    name_from_cache = cache.get(file_name, "no name in cache")
-
-    if name == "no name in cache":
-        return page_not_found(request)
-
-    svg_code = cache.set("svg-for" + file_name, "no code in cache")
+def chemical_image_view(request, filename):
+    svg_code = cache.get(filename, "no code in cache")
     if svg_code == "no code in cache":
         return page_not_found(request)
 
     svg_bytes = svg_code.encode()
     response = HttpResponse(svg_bytes, content_type="image/svg+xml")
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
+    response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+    cache.delete(filename)
     return response

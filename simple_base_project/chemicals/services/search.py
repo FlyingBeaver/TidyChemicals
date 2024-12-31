@@ -26,19 +26,19 @@ def primary_search(search_order: OrderedDict, q_set=None):
         element_obj = Element.get_by_symbol(elem_sym)
         if not q_set:
             new_q_set = Chemical.objects \
-                .filter(structelementrel__element=element_obj,
-                        structelementrel__index__gte=index)
+                .filter(chemical_element__element=element_obj,
+                        chemical_element__n_of_occurrences__gte=index)
         else:
-            new_q_set = q_set.filter(structelementrel__element=element_obj,
-                                     structelementrel__index__gte=index)
+            new_q_set = q_set.filter(chemical_element__element=element_obj,
+                                     chemical_element__n_of_occurrences__gte=index)
         return primary_search(search_order, new_q_set)
     # elif len(search_order) == 1:
     else:
         elem_sym, index = search_order.popitem(last=False)
         element_obj = Element.get_by_symbol(elem_sym)
         new_q_set = \
-            q_set.filter(structelementrel__element=element_obj,
-                         structelementrel__index__gte=index)
+            q_set.filter(chemical_element__element=element_obj,
+                         chemical_element__n_of_occurrences__gte=index)
         return new_q_set
     #else:
     #    raise SearchException("search_order всё.")
@@ -51,11 +51,11 @@ def secondary_search(path_dict: OrderedDict, primary_results=None):
         objects = primary_results
     else:
         objects = Chemical.objects
-    link_table_name = "structpathrel"
+    link_table_name = "chemical_path"
     fk_name = "path"
-    quantity_name = "n_of_occurences"
+    quantity_name = "n_of_occurrences"
     i = 1
-    for label, n_of_occurences in path_dict.items():
+    for label, n_of_occurrences in path_dict.items():
         relation_name = "pathFR" + str(i)
         condition_q = Q(**{link_table_name + "__" + fk_name: label})
         filtered_relation = FilteredRelation(link_table_name,
@@ -64,7 +64,7 @@ def secondary_search(path_dict: OrderedDict, primary_results=None):
             **{relation_name: filtered_relation}
         ).filter(
             **{(relation_name + "__" +
-                quantity_name + "__gte"): n_of_occurences}
+                quantity_name + "__gte"): n_of_occurrences}
         )
         i += 1
     return objects
@@ -78,11 +78,11 @@ def tertiary_search(ring_dict: OrderedDict, previous_results=None):
         objects = previous_results
     else:
         objects = Chemical.objects
-    link_table_name = "structringrel"
+    link_table_name = "chemical_ring"
     fk_name = "ring"
-    quantity_name = "n_of_occurences"
+    quantity_name = "n_of_occurrences"
     i = 1
-    for label, n_of_occurences in ring_dict.items():
+    for label, n_of_occurrences in ring_dict.items():
         relation_name = "ringFR" + str(i)
         condition_q = Q(**{link_table_name + "__" + fk_name: label})
         filtered_relation = FilteredRelation(link_table_name,
@@ -91,7 +91,7 @@ def tertiary_search(ring_dict: OrderedDict, previous_results=None):
             **{relation_name: filtered_relation}
         ).filter(
             **{(relation_name + "__" +
-                quantity_name + "__gte"): n_of_occurences}
+                quantity_name + "__gte"): n_of_occurrences}
         )
         i += 1
     return objects

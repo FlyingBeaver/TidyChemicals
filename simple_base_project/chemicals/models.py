@@ -74,6 +74,9 @@ class Chemical(models.Model):
                                  null=True)
     date_time_taken = models.DateTimeField(null=True)
 
+    class Meta:
+       ordering = ['id']
+
     @property
     def initialized(self):
         return self.barcode is not None
