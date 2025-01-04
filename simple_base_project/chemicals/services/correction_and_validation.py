@@ -4,13 +4,14 @@ from chemicals.services.mol_classes import LazyMol
 
 REQUIRED_KEYS = {'name',
                  'name_data',
-                 'storage_place', 
                  'quantity', 
                  'quantity_unit', 
                  'who_created'}
 
 FIELD_VALUES_TYPES = {'name': str,
-                      'name_data': dict, 
+                      'name_data': dict,
+                      'comment_data': dict,
+                      'synonym_data': dict,
                       'structure': dict, 
                       'mol_block': str, 
                       'molecular_formula': str, 
@@ -93,7 +94,16 @@ def if_lacks_add_items(summary):
             """Function for reuse the same lazymol obj"""
             nonlocal lazy_mol
             if not lazy_mol:
-                lazy_mol = LazyMol(sum_dic["structure"]["inchi"])
+                if ("structure" in sum_dic and
+                    "inchi" in sum_dic["structure"] and
+                        sum_dic["structure"]["inchi"]):
+                    lazy_mol = LazyMol(
+                        sum_dic["structure"]["inchi"],
+                        form="inchi"
+                    )
+                else:
+                    lazy_mol = LazyMol(sum_dic["mol_block"],
+                                       form="mol_block")
             return lazy_mol
 
         if not summary.get("molar_mass"):
@@ -101,7 +111,7 @@ def if_lacks_add_items(summary):
         if not summary.get("molecular_formula"):
             summary["molecular_formula"] = \
                 make_lazymol(summary).molecular_formula
-        if not summary.get["mol_block"]:
+        if not summary.get("mol_block"):
             summary["mol_block"] = make_lazymol(summary).molblock
     return summary
 
@@ -153,4 +163,28 @@ def check_type(argument=None, type=None, argument_name=None):
         raise TypeError(f"'{argument_name}' must be an "
                 f"instance of {type.__name__}, but it is "
                 f"{argument.__class__.__name__}"
+            )
+
+def none_case_validation(summary, elem_dict, path_dict, ring_dict):
+    if (elem_dict or path_dict or ring_dict) is None and
+            (elem_dict and path_dict and ring_dict) is not None:
+        raise ValueError(
+            "Some of values of elem_dict, path_dict, ring_dict "
+            "are None, some aren't. Acceptable cases are when "
+            "none of these arguments is None, or when all are "
+            "None"
+        )
+    if (elem_dict or path_dict or ring_dict) is None:
+        if "mol_block" in summary and summary["mol_block"] is not None:
+            raise ValueError(
+                "'mol_block' in summary is filled, but elem_dict, "
+                "path_dict and ring_dict are None"
+            )
+        if ("structure" in summary and
+            bool(summary["structure"]) and
+            "inchi" in summary["structure"] and
+                bool(summary["structure"]["inchi"])):
+            raise ValueError(
+                "summary['structure']['inchi'] is filled, but "
+                "elem_dict, path_dict and ring_dict are None"
             )

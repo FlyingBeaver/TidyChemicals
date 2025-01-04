@@ -1,11 +1,11 @@
 from os import path, listdir
 
 
-EXTENSIONS = {"vue", "css", "scss", "sass"}
+EXTENSIONS = {"vue", "css", "scss", "sass", "py"}
 
 
 def main():
-    dir_path = input("Enter folder path:\n").strip()
+    dir_path = input("Enter folder path:\n").strip().strip('"')
     string_to_find = input("Enter string to find:\n").strip()
     paths = paths_to_files(dir_path)
     files_where_found = dict()

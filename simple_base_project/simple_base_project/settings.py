@@ -137,9 +137,6 @@ LOGIN_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# From which linear notation render pictures: "mol", "inchi"
-
-NOTATION_FOR_RENDERING = "inchi"
 
 CACHES = {
     "default": {

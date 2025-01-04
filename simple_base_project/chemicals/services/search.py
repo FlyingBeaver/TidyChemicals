@@ -1,5 +1,4 @@
-from collections import OrderedDict, namedtuple
-import uuid
+from collections import OrderedDict
 import datetime
 
 from django.db.models import FilteredRelation, Q
@@ -11,7 +10,6 @@ from chemicals.models import (
     StoragePlace, Path, Ring
 )
 from chemicals.services.mol_classes import LazyMol, MyMolError
-from simple_base_project.settings import NOTATION_FOR_RENDERING
 
 
 class SearchException(BaseException):
@@ -32,7 +30,6 @@ def primary_search(search_order: OrderedDict, q_set=None):
             new_q_set = q_set.filter(chemical_element__element=element_obj,
                                      chemical_element__n_of_occurrences__gte=index)
         return primary_search(search_order, new_q_set)
-    # elif len(search_order) == 1:
     else:
         elem_sym, index = search_order.popitem(last=False)
         element_obj = Element.get_by_symbol(elem_sym)
@@ -40,8 +37,6 @@ def primary_search(search_order: OrderedDict, q_set=None):
             q_set.filter(chemical_element__element=element_obj,
                          chemical_element__n_of_occurrences__gte=index)
         return new_q_set
-    #else:
-    #    raise SearchException("search_order всё.")
 
 
 def secondary_search(path_dict: OrderedDict, primary_results=None):
@@ -129,62 +124,17 @@ def find_superstructures(mol_block):
     cleaned_results = []
     n = 0
     for item in raw_results3:
-        if NOTATION_FOR_RENDERING == "inchi":
-            inchi = item.structure['inchi']
-            try:
-                potential_superstructure = LazyMol(inchi, "inchi", False)
-            except MyMolError:
-                with open("errors_log.txt", "at", encoding="utf-8") as log:
-                    date_time_string = datetime.datetime.now().strftime("%c")
-                    log.write(f"\n{date_time_string}: MyMolError at object "
-                              f"with id={item.id}, name='{item.name}'\n")
-                continue
-        elif NOTATION_FOR_RENDERING == "mol":
-            mol_block = item.mol_block
-            try:
-                potential_superstructure = LazyMol(mol_block, "mol_block", False)
-            except MyMolError:
-                with open("errors_log.txt", "at", encoding="utf-8") as log:
-                    date_time_string = datetime.datetime.now().strftime("%c")
-                    log.write(f"\n{date_time_string}: MyMolError at object "
-                              f"with id={item.id}, name='{item.name}'\n")
-                continue
-        if potential_superstructure % substructure:
-            match = {"chemical": item, "lazymol": potential_superstructure}
-            cleaned_results.append(match)
-        n += 1
-        if not n % 100:
-            print("checked:", n)
-
-    return cleaned_results
-
-
-def find_superstructures2(mol_block):
-    raw_results = Chemical.objects.all()[6350:6400]
-    cleaned_results = []
-    n = 0
-
-    for i in raw_results:
-        inchi = i.structure['inchi']
+        mol_block = item.mol_block
         try:
-            potential_superstructure = LazyMol(inchi, "inchi", False)
+            potential_superstructure = LazyMol(mol_block, "mol_block", False)
         except MyMolError:
             with open("errors_log.txt", "at", encoding="utf-8") as log:
                 date_time_string = datetime.datetime.now().strftime("%c")
                 log.write(f"\n{date_time_string}: MyMolError at object "
-                          f"with id={i.id}, name='{i.name}'\n")
-        if True:
-            if NOTATION_FOR_RENDERING == "inchi":
-                structure_container = potential_superstructure
-            elif NOTATION_FOR_RENDERING == "mol":
-                structure_container = i.mol_block
-            else:
-                raise SearchException(f"Unknown NOTATION_FOR_RENDERING: "
-                                      f"{NOTATION_FOR_RENDERING}")
-            match = {"id": i.id, "name": i.name,
-                     "storage_place": i.storage_place.path_str, 
-                     "structure_container": structure_container}
-
+                          f"with id={item.id}, name='{item.name}'\n")
+            continue
+        if potential_superstructure % substructure:
+            match = {"chemical": item, "lazymol": potential_superstructure}
             cleaned_results.append(match)
         n += 1
         if not n % 100:

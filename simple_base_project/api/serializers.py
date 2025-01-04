@@ -1,9 +1,12 @@
+from decimal import Decimal
+from pprint import pprint
 from rest_framework.serializers import (ModelSerializer,
                                         ListSerializer)
 from django.contrib.auth.models import User
 from chemicals.models import Chemical
 from chemicals.services.rendering_paginator import create_svg_alt
 from profiles.models import Hashtag, Ampersandtag
+from api.services.make_summaries import make_summary
 
 
 class UsersListSerializer(ListSerializer):
@@ -50,7 +53,10 @@ class ChemicalsSerializer(ModelSerializer):
         ).only("name")
         ampersandtags_list = list(map(lambda x: x.name, ampersandtags))
         storage_path = instance.storage_place.path_str
-        structure_picture = create_svg_alt(None, instance)
+
+        structure_picture = None
+        if instance.mol_block not in (None, ""):
+            structure_picture = create_svg_alt(None, instance)
 
         who_created = None
         if instance.who_created is not None:
@@ -74,3 +80,21 @@ class ChemicalsSerializer(ModelSerializer):
              "structure_picture": structure_picture}
         )
         return ret
+
+    def create(self, validated_data):
+        (generated_fields,
+         elem_dict,
+         path_dict,
+         ring_dict) = make_summary(
+            validated_data.get("mol_block", None),
+            validated_data.get("structure", None),
+            self.context["request"].user.profile,
+            "create"
+        )
+        validated_data.update(generated_fields)
+        return Chemical.create(validated_data,
+                               elem_dict,
+                               path_dict,
+                               ring_dict)
+
+    #def update(self, instance, validated_data):

@@ -1,6 +1,7 @@
 import copy
 from datetime import datetime
 from warnings import warn
+from pprint import pprint
 from collections import OrderedDict, namedtuple
 
 from django.db import models
@@ -12,7 +13,8 @@ from chemicals.services.correction_and_validation import (
     summary_dict_validation,
     check_and_correct,
     are_there_required_keys,
-    check_type
+    check_type,
+    none_case_validation
 )
 
 
@@ -92,8 +94,8 @@ class Chemical(models.Model):
         new_chemical = cls(**summary)
         new_chemical.save()
 
-        storage_place = summary["storage_place"]
-        if not storage_place.contains_chemicals:
+        storage_place = summary.get("storage_place")
+        if storage_place and not storage_place.contains_chemicals:
             if storage_place.has_children:
                 raise DatabaseException("Attempt to place a "
                     "chemical in a storage that contains other "
@@ -131,10 +133,14 @@ class Chemical(models.Model):
         return new_chemical
 
     def update(self, summary: dict,
-               elem_dict: (dict, OrderedDict),
-               path_dict: (dict, OrderedDict),
-               ring_dict: (dict, OrderedDict)):
+               elem_dict: (dict, OrderedDict, None.__class__),
+               path_dict: (dict, OrderedDict, None.__class__),
+               ring_dict: (dict, OrderedDict, None.__class__)):
         summary_dict_validation(summary)
+        none_case_validation(summary,
+                             elem_dict,
+                             path_dict,
+                             ring_dict)
         self.update_related_elem(elem_dict)
         self.update_related_path(path_dict)
         self.update_related_ring(ring_dict)
@@ -150,6 +156,8 @@ class Chemical(models.Model):
             if not storage_place.contains_chemicals:
                 storage_place.contains_chemicals = True
             old_storage = self.storage_place
+        
+        self.when_updated = datetime.now().date()
 
         for key, value in summary.items():
             setattr(self, key, value)
@@ -168,6 +176,8 @@ class Chemical(models.Model):
             old_storage.save()
 
     def update_related_elem(self, elem_dict):
+        if elem_dict is None:
+            return None
         relations = Chemical_Element.objects.filter(chemical=self)
         new_elem_dict = copy.copy(elem_dict)
         AboutElement = namedtuple("AboutElement", 
@@ -219,6 +229,8 @@ class Chemical(models.Model):
             element.increment_n_of_chemicals()
 
     def update_related_path(self, path_dict):
+        if path_dict is None:
+            return None
         old_relations = Chemical_Path.objects.filter(chemical=self)
         old_relations_dict = {rel.path.label:rel
                               for rel in old_relations}
@@ -243,6 +255,8 @@ class Chemical(models.Model):
                                           new_path_labels[label])
 
     def update_related_ring(self, ring_dict):
+        if ring_dict is None:
+            return None
         old_relations = Chemical_Ring.objects.filter(chemical=self)
         old_relations_dict = {rel.ring.label:rel
                               for rel in old_relations}
