@@ -9,8 +9,9 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, HttpResponseNotAllowed
 from django.views.defaults import page_not_found
 
-from chemicals.models import Chemical, StoragePlace, DatabaseException
+from chemicals.models import Chemical, StoragePlace
 from chemicals.services.search import find_superstructures
+from chemicals.services.exceptions import DatabaseException
 from chemicals.services.rendering_paginator import (RenderingPaginator,
                                                     create_svg_alt,
                                                     PICS_DIRECTORY_PATH)

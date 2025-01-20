@@ -1,6 +1,4 @@
-import json
-import random
-from pprint import pprint
+from random import choice, randint
 from collections import namedtuple
 from pathlib import Path
 from decimal import Decimal as D
@@ -27,7 +25,6 @@ from simple_base_project.services.elements_units import (
 )
 
 
-
 SUBSTANCES_PATH = Path(__file__).resolve().parent / "substances"
 
 AMPERSANDTAGS_USERS = {
@@ -48,13 +45,46 @@ HAZARD_TYPES = ['compressed_gas',
                 'toxic']
 
 
+class InfiniteLoop(BaseException):
+    pass
+
+
 def make_name_data_dict(name):
     return {"html": f"<p>{name}</p>",
             "delta": {"ops":[{"insert":f"{name}\n"}]}}
 
 
-class TestSetup(TestCase):
+def dict_to_namedtuple(dictionary):
+    NamedTuple = namedtuple("NamedTuple", dictionary.keys())
+    return NamedTuple(**dictionary)
+
+
+def rchoice(seq):
+    if seq.__class__.__name__ == "QuerySet":
+        length = seq.count()
+        return seq[randint(0, length - 1)]
+    elif seq.__class__.__name__ == "filter":
+        return choice(list(seq))
+    else:
+        return choice(seq)
+
+
+def rchoice_exclude(seq, exclude):
+    if seq.__class__.__name__ == "filter":
+        seq = list(seq)
+    result = rchoice(seq)
+    i = 0
+    while result == exclude:
+        result = rchoice(seq)
+        i += 1
+        if i > 200:
+            raise InfiniteLoop()
+    return result
+
+
+class BasicApiTest(TestCase):
     def setUp(self):
+        self.client = Client()
         create_units()
         self.extract_units()
         create_elements()
@@ -83,9 +113,9 @@ class TestSetup(TestCase):
 
         self.cabinet = StoragePlace.create("Cabinet", self.lab2)
         self.fridge = StoragePlace.create("Fridge", self.lab2)
+        self.safe = StoragePlace.create("Safe", self.lab1)
 
     def create_users(self):
-        client = Client()
         UserData = namedtuple("UserData",
                               ["username",
                                "password",
@@ -93,18 +123,18 @@ class TestSetup(TestCase):
                                defaults=(None,))
         self.darth_vader_data = UserData(username="DarthVader",
                                          password='doEiusmod1')
-        response1 = client.post(
+        response1 = self.client.post(
             '/registration/',
             {'username': self.darth_vader_data.username,
              'password1': self.darth_vader_data.password,
              'password2': self.darth_vader_data.password}
         )
-        response2 = client.get(reverse(logout_invisible))
+        response2 = self.client.get(reverse(logout_invisible))
 
         self.billie_eilish_data = UserData(username='BillieEilish',
                                            password='temporIncididunt2',
                                            created_ampersandtag="lorem")
-        response3 = client.post(
+        response3 = self.client.post(
             '/registration/',
             {'username': self.billie_eilish_data.username,
              'password1': self.billie_eilish_data.password,
@@ -114,7 +144,7 @@ class TestSetup(TestCase):
         self.larysa_hrybalova_data = UserData(username="LarysaHrybalova",
                                               password='utLaboreEt3',
                                               created_ampersandtag="ipsum")
-        response4 = client.post(
+        response4 = self.client.post(
             '/registration/',
             {'username': self.larysa_hrybalova_data.username,
              'password1': self.larysa_hrybalova_data.password,
@@ -131,7 +161,7 @@ class TestSetup(TestCase):
                         storage: StoragePlace,
                         creator: Profile,
                         hazards: list,
-                        aq=None):
+                        water_number=None):
         name = file.replace(".mol", "")
         summary = dict()
         with open(SUBSTANCES_PATH / file, "rt", encoding="utf-8") as f:
@@ -141,23 +171,21 @@ class TestSetup(TestCase):
         if hazards is not None:
             summary.update({"hazard_pictograms": ", ".join(hazards)})
         mol = LazyMol(mol_block, form="mol_block")
-        inchi = mol.inchi
         elem_dict = mol.elements_dict()
         path_dict = mol.path_dict()
         ring_dict = mol.ring_dict()
-        if aq is None:
-            structure = {"inchi": inchi}
-        else:
-            structure = {"inchi": inchi, "aq": aq}
-        summary = {
-            "mol_block": mol_block,
-            "quantity": quantity,
-            "quantity_unit": unit,
-            "who_created": creator,
-            "name": name,
-            "name_data": make_name_data_dict(name),
-            "structure": structure
-        }
+        if water_number is not None:
+            summary["water_number"] = water_number
+        summary.update(
+            {
+                "mol_block": mol_block,
+                "quantity": quantity,
+                "quantity_unit": unit,
+                "who_created": creator,
+                "name": name,
+                "name_data": make_name_data_dict(name),
+            }
+        )
         return Chemical.create(summary, elem_dict, path_dict, ring_dict)
 
         
@@ -305,3 +333,10 @@ class TestSetup(TestCase):
             Ampersandtag.bind(chemical,
                               self.ampersandtag2.tag,
                               self.ampersandtag2.creator)
+
+    def billie_eilish_logs_in(self):
+        response = self.client.post(
+            '/login/',
+            {"username": self.billie_eilish_data.username,
+             "password": self.billie_eilish_data.password}
+        )

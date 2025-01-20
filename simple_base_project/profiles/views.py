@@ -46,11 +46,8 @@ class LoginPage(Mixin, View):
                                 password=form.cleaned_data['password'])
             if user is not None:
                 login(request, user)
-                print(user)
-                print("user is not none")
                 return redirect('/search')
             else:
-                print('user is none')
                 return self.try_again(request)
         else:
             return self.try_again(request)

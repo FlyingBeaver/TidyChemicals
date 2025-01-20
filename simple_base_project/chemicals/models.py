@@ -16,6 +16,7 @@ from chemicals.services.correction_and_validation import (
     check_type,
     none_case_validation
 )
+from chemicals.services.exceptions import DatabaseException
 
 
 BARCODE_STANDARDS = {
@@ -24,17 +25,15 @@ BARCODE_STANDARDS = {
 }
 
 
-class DatabaseException(BaseException):
-    pass
+def default_water_number():
+    return 0
 
 
 class Chemical(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
     name_data = models.JSONField()
-    structure = models.JSONField(null=True)
-    # Пока что у структуры будет 2 поля внутри structure:
-    # обязательное inchi и необязательное aq
+    water_number = models.JSONField(default=default_water_number)
     mol_block = models.TextField(null=True)
     molecular_formula = models.CharField(max_length=128, null=True)
     molar_mass = models.DecimalField(max_digits=16,
@@ -95,12 +94,13 @@ class Chemical(models.Model):
         new_chemical.save()
 
         storage_place = summary.get("storage_place")
-        if storage_place and not storage_place.contains_chemicals:
-            if storage_place.has_children:
+        if storage_place:
+            if not storage_place.initialized:
                 raise DatabaseException("Attempt to place a "
-                    "chemical in a storage that contains other "
-                    "storages")
-            else:
+                    "chemical in uninitialized storage. Uninitialized "
+                    "storages are supposed to contain other "
+                    "storages, not chemicals")
+            elif not storage_place.has_children:
                 storage_place.contains_chemicals = True
                 storage_place.save()
 
@@ -148,13 +148,15 @@ class Chemical(models.Model):
         old_storage = None
         if "storage_place" in summary:
             storage_place = summary["storage_place"]
-            if storage_place.has_children:
+            if not storage_place.initialized:
                 raise DatabaseException(
-                    "Storage that contains other storages "
-                    "can't contain chemicals"
+                    "Attempt to put chemical in uninitialized "
+                    "storage. Uninitialized storages can't "
+                    "contain chemicals, only other storages."
                 )
-            if not storage_place.contains_chemicals:
+            elif not storage_place.contains_chemicals:
                 storage_place.contains_chemicals = True
+                storage_place.save()
             old_storage = self.storage_place
         
         self.when_updated = datetime.now().date()
@@ -176,7 +178,10 @@ class Chemical(models.Model):
             old_storage.save()
 
     def update_related_elem(self, elem_dict):
-        if elem_dict is None:
+        if elem_dict == dict():
+            return None
+        elif elem_dict is None:
+            self.destroy_related_elem()
             return None
         relations = Chemical_Element.objects.filter(chemical=self)
         new_elem_dict = copy.copy(elem_dict)
@@ -229,7 +234,10 @@ class Chemical(models.Model):
             element.increment_n_of_chemicals()
 
     def update_related_path(self, path_dict):
-        if path_dict is None:
+        if path_dict == dict():
+            return None
+        elif path_dict is None:
+            self.destroy_related_path()
             return None
         old_relations = Chemical_Path.objects.filter(chemical=self)
         old_relations_dict = {rel.path.label:rel
@@ -250,12 +258,22 @@ class Chemical(models.Model):
                 rel.save()
 
         for label in new_path_labels:
-            rel = Chemical_Element.create(label,
-                                          self,
-                                          new_path_labels[label])
+            try:
+                path_instance = Path.get_by_label(label)
+            except ValueError:
+                path_instance = Path.create(label)
+            rel = Chemical_Path.create(path_instance,
+                                       self,
+                                       path_dict[label])
+            # rel = Chemical_Element.create(label,
+            #                               self,
+            #                               new_path_labels[label])
 
     def update_related_ring(self, ring_dict):
-        if ring_dict is None:
+        if ring_dict == dict():
+            return None
+        elif ring_dict is None:
+            self.destroy_related_ring()
             return None
         old_relations = Chemical_Ring.objects.filter(chemical=self)
         old_relations_dict = {rel.ring.label:rel
@@ -281,6 +299,21 @@ class Chemical(models.Model):
             rel = Chemical_Ring.create(label,
                                        self,
                                        new_ring_labels[label])
+    
+    def destroy_related_elem(self):
+        relations = Chemical_Element.objects.filter(chemical=self)
+        for rel in relations:
+            rel.delete()
+
+    def destroy_related_path(self):
+        relations = Chemical_Path.objects.filter(chemical=self)
+        for rel in relations:
+            rel.delete()
+
+    def destroy_related_ring(self):
+        relations = Chemical_Ring.objects.filter(chemical=self)
+        for rel in relations:
+            rel.delete()
 
     def delete(self, *args, **kwargs):
         old_storage = self.storage_place
@@ -436,7 +469,7 @@ class Path(models.Model):
             path = cls.objects.get(label=label)
         except ObjectDoesNotExist:
             raise ValueError("Method get_by_label() of Path: "
-                             "path with symbol '{label}' does "
+                             f"path with symbol '{label}' does "
                              "not exist")
         return path
 
@@ -447,13 +480,15 @@ class Path(models.Model):
     def decrement(self):
         if self.n_of_chemicals == 1:
             self.delete()
-        else:
+        elif self.n_of_chemicals > 1:
             self.n_of_chemicals -= 1
             self.save()
+        else:
+            raise DatabaseException("n_of_chemicals <= 0")
     
     @classmethod
     def create(cls, label: str):
-        instance = cls(label=label, n_of_chemicals=0)
+        instance = cls(label=label, n_of_chemicals=1)
         instance.save()
         return instance
 
@@ -566,6 +601,11 @@ class Chemical_Path(models.Model):
                            n_of_occurrences=n_of_occurrences)
             relation.save()
             return relation
+    
+    def delete(self):
+        self.path.decrement()
+        super().delete()
+
 
 class Chemical_Ring(models.Model):
     ring = models.ForeignKey(Ring,
@@ -593,6 +633,10 @@ class Chemical_Ring(models.Model):
                            n_of_occurrences=n_of_occurrences)
             relation.save()
             return relation
+
+    def delete(self):
+        self.ring.decrement()
+        super().delete()
 
 
 class Chemical_Element(models.Model):
@@ -622,6 +666,10 @@ class Chemical_Element(models.Model):
                        n_of_occurrences=n_of_occurrences)
         relation.save()
         return relation
+
+    def delete(self):
+        self.element.decrement_n_of_chemicals()
+        super().delete()
 
 
 class StoragePlace(models.Model):
@@ -669,6 +717,13 @@ class StoragePlace(models.Model):
         parent_path = parent.path_str
         self_path = parent_path + '/' + name
         parent_no = parent.id
+        if not parent.is_this_child_name_available(name):
+            raise DatabaseException("Attempt to create in "
+                "the storage second child storage with the "
+                "same name. Storage names inside of a parent "
+                "storage must be unique. Try to choose another "
+                "name."
+            )
         new_storage = cls(name=name,
                           parent=parent_no,
                           level=level,
@@ -687,7 +742,7 @@ class StoragePlace(models.Model):
             if len(children) > 0:
                 raise DatabaseException("Attempt to delete a "
                     "storage that contains other storages")
-        self.delete()
+        super().delete()
 
     def move(self, new_parent):
         self.__class__.check_parent(new_parent)
@@ -708,25 +763,42 @@ class StoragePlace(models.Model):
         new_path = new_parent.path_str + "/" + self.name
         self.level = new_level
         self.path_str = new_path
-        self.parent = new_parent
+        self.parent = new_parent.id
         self.save()
     
+    def rename(self, new_name: str):
+        if self.level == 0:
+            self.name = new_name
+            self.save()
+            return None
+        parent = self.__class__.objects.get(id=self.parent)
+        if parent.is_this_child_name_available(new_name):
+            self.name = new_name
+            self.save()
+        else:
+            raise DatabaseException("Attempt to move the storage "
+                "to another parent storage, but new parent "
+                "storage already has a child storage with the "
+                "same name. Storage names inside of a parent "
+                "storage must be unique. Try to rename the "
+                "storage first."
+            )
+    
+    def is_this_child_name_available(self, name: str):
+        queryset = self.__class__.objects.filter(parent=self.id,
+                                                 name=name)
+        return queryset.count() == 0
+
     @classmethod
     def check_parent(cls, parent):
         check_type(argument=parent,
                    type=cls,
                    argument_name="parent")
-        if parent.contains_chemicals:
+        if parent.initialized:
             raise DatabaseException(
-                "Parent storage marked as containing chemicals, "
-                "but storage that contains chemicals can't be "
-                "parent storage for other storages."
+                "Parent storage marked as initialized, so it "
+                "has to contain chemicals."
             )
-        # if not parent.initialized:
-        #     raise DatabaseException("Storage that was proposed "
-        #         "as a new parent is not initialized, "
-        #         "so it can't contain anything until "
-        #         "initialization")
 
     def __str__(self):
         return self.path_str

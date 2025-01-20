@@ -1,5 +1,6 @@
 from decimal import Decimal 
 from chemicals.services.mol_classes import LazyMol
+from chemicals.services.exceptions import DatabaseException
 
 
 REQUIRED_KEYS = {'name',
@@ -12,10 +13,10 @@ FIELD_VALUES_TYPES = {'name': str,
                       'name_data': dict,
                       'comment_data': dict,
                       'synonym_data': dict,
-                      'structure': dict, 
-                      'mol_block': str, 
-                      'molecular_formula': str, 
-                      'molar_mass': Decimal, 
+                      'water_number': (list, int),
+                      'mol_block': (str, None.__class__),
+                      'molecular_formula': str,
+                      'molar_mass': Decimal,
                       'synonym': str, 
                       'comment': str, 
                       'cas': int, 
@@ -46,7 +47,7 @@ def summary_dict_validation(summary):
     If summary is invalid, exception raised
     Method doesn't return anything
     """
-    auto_gen_keys = {"id", "when_created", "who_updated"}
+    auto_gen_keys = {"id", "when_created"}
     if auto_gen_keys & set(summary):
         raise ValueError(f"summary dict can't contain '"
                          f"{join_set(auto_gen_keys & set(summary))} "
@@ -68,42 +69,23 @@ def summary_dict_validation(summary):
                                 f"is {summary[key].__class__}")
     if "storage_place" in summary:
         if not summary["storage_place"].initialized:
-            raise UninitializedStorageError("Trying to place "
+            raise DatabaseException("Trying to place "
                 "chemical in an uninitialized storage: " +
                 str(summary["storage_place"]))
 
 
 def if_lacks_add_items(summary):
-    """If 'summary' dict does contains 'structure' but
-    'molar_mass', 'molecular_formula' and 'mol_block'
-    for some reason doesn't, this method will add
-    them to 'summary'. Otherwise 'summary' won't be
-    changed.
-    Returns 'summary'
-    """
-    # TODO Выглядит ужасно. Неплохо было бы переписать
-    lacking_keys = filter(lambda x: not summary.get(x), 
-                          ["molar_mass", 
-                           "molecular_formula", 
-                           "mol_block"])
-    lacking_keys_list = list(lacking_keys)
-    if lacking_keys_list:
+    if ("mol_block" in summary and
+        (not "molecular_formula" in summary or
+         not "molar_mass" in summary)):
         lazy_mol = None
 
         def make_lazymol(sum_dic):
             """Function for reuse the same lazymol obj"""
             nonlocal lazy_mol
             if not lazy_mol:
-                if ("structure" in sum_dic and
-                    "inchi" in sum_dic["structure"] and
-                        sum_dic["structure"]["inchi"]):
-                    lazy_mol = LazyMol(
-                        sum_dic["structure"]["inchi"],
-                        form="inchi"
-                    )
-                else:
-                    lazy_mol = LazyMol(sum_dic["mol_block"],
-                                       form="mol_block")
+                lazy_mol = LazyMol(sum_dic["mol_block"],
+                                   form="mol_block")
             return lazy_mol
 
         if not summary.get("molar_mass"):
@@ -111,34 +93,28 @@ def if_lacks_add_items(summary):
         if not summary.get("molecular_formula"):
             summary["molecular_formula"] = \
                 make_lazymol(summary).molecular_formula
-        if not summary.get("mol_block"):
-            summary["mol_block"] = make_lazymol(summary).molblock
     return summary
 
 
 def check_and_correct(summary):
     """
     Method checks: 
-        if there are mol_block, molecular_formula 
-           or molar_mass with no structure
+        if there are molecular_formula 
+           or molar_mass with no mol_block
     If there are: 
         exception 
     but if vice versa,
         method 'if_lacks_add_items' 
         adds lacking fields to summary dict
     """
-    if summary.get('structure'):
-        if not summary['structure'].get('inchi'):
-            raise ValueError("fiels 'structure' in 'summary' dict' "
-                             "doesn't contain inchi")
-        summary = if_lacks_add_items(summary)
-    else:
-        if any(map(lambda x: summary.get(x), 
-                   ["molar_mass", "molecular_formula", "mol_block"])):
-            raise ValueError("Summary can't contain 'molecular_formula', "
-                             "'mol_block' or 'molar_mass' if it doesn't "
-                             "contain 'structure', as it's a sign of "
+    if not summary.get("mol_block"):
+        if "molar_mass" in summary or "molecular_formula" in summary:
+            raise ValueError("Summary can't contain 'molecular_formula' or "
+                             "'molar_mass' if it doesn't "
+                             "contain 'mol_block', as it's a sign of "
                              "incomplete or wrong data")
+    else:
+        if_lacks_add_items(summary)
     return summary
 
 
@@ -166,8 +142,8 @@ def check_type(argument=None, type=None, argument_name=None):
             )
 
 def none_case_validation(summary, elem_dict, path_dict, ring_dict):
-    if (elem_dict or path_dict or ring_dict) is None and
-            (elem_dict and path_dict and ring_dict) is not None:
+    if ((elem_dict or path_dict or ring_dict) is None and
+            (elem_dict and path_dict and ring_dict) is not None):
         raise ValueError(
             "Some of values of elem_dict, path_dict, ring_dict "
             "are None, some aren't. Acceptable cases are when "
@@ -179,12 +155,4 @@ def none_case_validation(summary, elem_dict, path_dict, ring_dict):
             raise ValueError(
                 "'mol_block' in summary is filled, but elem_dict, "
                 "path_dict and ring_dict are None"
-            )
-        if ("structure" in summary and
-            bool(summary["structure"]) and
-            "inchi" in summary["structure"] and
-                bool(summary["structure"]["inchi"])):
-            raise ValueError(
-                "summary['structure']['inchi'] is filled, but "
-                "elem_dict, path_dict and ring_dict are None"
             )

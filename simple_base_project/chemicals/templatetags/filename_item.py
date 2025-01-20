@@ -31,3 +31,16 @@ def cas_format(number):
     str_cas = str(number)
     dashed_cas = str_cas[: -3] + "-" + str_cas[-3: -1] + "-" + str_cas[-1]
     return dashed_cas
+
+
+@register.filter()
+def ispositive(value):
+    return isinstance(value, int) and value > 0
+
+
+@register.filter()
+def omit_one(value):
+    if value == 1:
+        return ""
+    else:
+        return str(value)

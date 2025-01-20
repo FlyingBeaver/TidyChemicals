@@ -1,0 +1,114 @@
+post_requests:
+  - {water_number: "No", mol_block: "No", status_code: 201}
+  # Chemical without mol_block was created
+  # (water number in such cases is 0, what is default value)
+  - {water_number: "No", mol_block: null, status_code: 201}
+  # Chemical without mol_block was created
+  - {water_number: "No", mol_block: "Valid", status_code: 201}
+  # Chemical with mol_block and water_number == 0 was created
+
+  - {water_number: null, mol_block: "No", status_code: 400}
+  - {water_number: null, mol_block: null, status_code: 400}
+  - {water_number: null, mol_block: "Valid", status_code: 400}
+
+  - {water_number: 0, mol_block: "No", status_code: 201}
+  # Chemical without mol_block was created
+  - {water_number: 0, mol_block: null, status_code: 201}
+  # Chemical without mol_block was created
+  - {water_number: 0, mol_block: "Valid", status_code: 201}
+  # Chemical with mol_block and water_number == 0 was created
+
+  - {water_number: 1, mol_block: "No", status_code: 400}
+  # Attempt to create chemical without mol_block, but with water_number
+  - {water_number: 1, mol_block: null, status_code: 400}
+  # Attempt to create chemical without mol_block, but with water_number
+  - {water_number: 1, mol_block: "Valid", status_code: 201}
+  # Chemical with mol_block and water_number was created
+
+
+# Case 1: initially edited chemical has mol_block == None and 
+# water_number == 0
+put_requests_case_1:
+  - {water_number: "No", mol_block: "No", status_code: 200}
+  # Chamical was changed, but mol_block and water number weren't impacted
+  - {water_number: "No", mol_block: null, status_code: 200}
+  # Chamical was changed, but mol_block and water number weren't impacted
+  - {water_number: "No", mol_block: "Valid", status_code: 200}
+  # Chemical was changed, now it has valid mol_block
+
+  - {water_number: null, mol_block: "No", status_code: 400}
+  - {water_number: null, mol_block: null, status_code: 400}
+  - {water_number: null, mol_block: "Valid", status_code: 400}
+
+  - {water_number: 0, mol_block: "No", status_code: 200}
+    # Chamical was changed, but mol_block and water number weren't impacted
+  - {water_number: 0, mol_block: null, status_code: 200}
+    # Chamical was changed, but mol_block and water number weren't impacted
+  - {water_number: 0, mol_block: "Valid", status_code: 200}
+    # Chemical was changed, now it has valid mol_block
+
+  - {water_number: 1, mol_block: "No", status_code: 400}
+    # Attempt to set for chemical non-zero water number with mol_block == None
+  - {water_number: 1, mol_block: null, status_code: 400}
+    # Attempt to set for chemical non-zero water number with mol_block == None
+  - {water_number: 1, mol_block: "Valid", status_code: 200}
+    # Chemical was changed, now it has valid mol_block with 
+    # non-zero water_number
+
+
+# Case 2: initially edited chemical has valid mol_block and 
+# water_number == 0
+put_requests_case_2:
+  - {water_number: "No", mol_block: "No", status_code: 200}
+  # Chamical was changed, but mol_block and water number weren't impacted
+  - {water_number: "No", mol_block: null, status_code: 200}
+  # Chemical was chenged. Now mol_block is None.
+  - {water_number: "No", mol_block: "Valid", status_code: 200}
+  # Chemical was chenged. Its mol_block is has a new value.
+
+  - {water_number: null, mol_block: "No", status_code: 400}
+  - {water_number: null, mol_block: null, status_code: 400}
+  - {water_number: null, mol_block: "Valid", status_code: 400}
+
+  - {water_number: 0, mol_block: "No", status_code: 200}
+  # Chamical was changed, but mol_block and water number weren't impacted
+  - {water_number: 0, mol_block: null, status_code: 200}
+  # Chemical was changed. Now mol_block is None.
+  - {water_number: 0, mol_block: "Valid", status_code: 200}
+  # Chemical was changed. Its mol_block is has a new value.
+
+  - {water_number: 1, mol_block: "No", status_code: 200}
+  # Chemical was changed. Now water_number is 1
+  - {water_number: 1, mol_block: null, status_code: 400}
+  # Attempt to set for chemical non-zero water number with mol_block == None
+  - {water_number: 1, mol_block: "Valid", status_code: 200}
+  # Chemical was changed. mol_block and water_numbes have new values.
+
+
+# Case 3: initially edited chemical has valid mol_block and 
+# water_number == 2
+put_requests_case_3:
+  - {water_number: "No", mol_block: "No", status_code: 200}
+  # Chamical was changed, but mol_block and water number weren't impacted
+  - {water_number: "No", mol_block: null, status_code: 400}
+  # Attempt to set for chemical non-zero water number with mol_block == None
+  - {water_number: "No", mol_block: "Valid", status_code: 200}
+  # Chemical was changed. mol_block now has a new value.
+
+  - {water_number: null, mol_block: "No", status_code: 400}
+  - {water_number: null, mol_block: null, status_code: 400}
+  - {water_number: null, mol_block: "Valid", status_code: 400}
+
+  - {water_number: 0, mol_block: "No", status_code: 200}
+  # Chemical was changed. Now water_number == 0.
+  - {water_number: 0, mol_block: null, status_code: 200}
+  # Chemical was changed. Now water_number == 0 and mol_block is None
+  - {water_number: 0, mol_block: "Valid", status_code: 200}
+  # Chemical was changed. Now water_number == 0 and mol_block has a new value
+
+  - {water_number: 1, mol_block: "No", status_code: 200}
+  # Chemical was changed. Now water_number == 1.
+  - {water_number: 1, mol_block: null, status_code: 400}
+  # Attempt to set for chemical non-zero water number with mol_block == None
+  - {water_number: 1, mol_block: "Valid", status_code: 200}
+  # Chemical was changed. Now water_number == 1 and mol_block has a new value

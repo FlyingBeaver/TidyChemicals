@@ -1,7 +1,7 @@
 from os import path, listdir
 
 
-EXTENSIONS = {"vue", "css", "scss", "sass", "py"}
+EXTENSIONS = {"vue", "css", "scss", "sass", "py", "html"}
 
 
 def main():

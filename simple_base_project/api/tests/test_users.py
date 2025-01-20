@@ -1,42 +1,11 @@
-import json
-import random
-from collections import namedtuple
-from pathlib import Path
-from decimal import Decimal as D
-from django.test import TestCase, Client
-from django.urls import reverse
-from profiles.views import logout_invisible
-from chemicals.models import (
-    Chemical,
-    StoragePlace,
-    QuantityUnit,
-    Element,
-    BARCODE_STANDARDS
-)
-from chemicals.services.mol_classes import LazyMol
-from profiles.models import (
-    Profile,
-    Hashtag,
-    Ampersandtag,
-    FreeBarcode
-)
-from api.tests.setup import TestSetup
+from api.tests.setup import BasicApiTest, dict_to_namedtuple
+from profiles.models import Profile
 
 
-def dict_to_namedtuple(dictionary):
-    NamedTuple = namedtuple("NamedTuple", dictionary.keys())
-    return NamedTuple(**dictionary)
-
-
-class ClassName(TestSetup):
-    def test_users_api(self):
-        client = Client()
-        response1 = client.post(
-            '/login/',
-            {"username": self.billie_eilish_data.username,
-             "password": self.billie_eilish_data.password}
-        )
-        users_response = client.get("/api/v1/users")
+class UsersApiTest(BasicApiTest):
+    def test_users_read(self):
+        self.billie_eilish_logs_in()
+        users_response = self.client.get("/api/v1/users")
         self.assertEqual(users_response.status_code, 200)
         response_data = list(users_response.data)
         self.assertTrue(response_data)
@@ -72,7 +41,6 @@ class ClassName(TestSetup):
             recent_reference
         )
 
-    def test_users_api2(self):
-        client = Client()
-        users_response = client.get("/api/v1/users")
+    def test_users_read_unauthorized(self):
+        users_response = self.client.get("/api/v1/users")
         self.assertEqual(users_response.status_code, 403)
